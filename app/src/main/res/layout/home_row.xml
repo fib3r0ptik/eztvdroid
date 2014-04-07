@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:id="@+id/row_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".12"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical" >
+
+            <CheckBox
+                android:id="@+id/home_chk_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".88"
+            android:orientation="vertical" >
+
+            <TextView
+                android:text="30 Rock S02E03 HDTV x286 MVGroup"
+                android:ellipsize="end"
+			    android:maxLines="1"
+			    android:singleLine="true"
+                android:id="@+id/home_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<LinearLayout
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent"
+			    android:gravity="right"
+			    android:orientation="horizontal" >
+
+	            <TextView
+                    android:ellipsize="start"
+                    android:maxLines="1"
+                    android:singleLine="true"
+	                android:id="@+id/home_ext_info"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_marginRight="5dp"
+	                android:layout_weight=".7"
+	                android:text="396mb 4d 8hrs 3min" />
+
+				<LinearLayout
+				    android:layout_width="0dp"
+				    android:layout_height="match_parent"
+				    android:layout_weight=".3"
+				    android:gravity="right|center_horizontal"
+				    android:orientation="horizontal" >
+
+		            <ImageView
+		                android:visibility="gone"
+		                android:layout_width="wrap_content"
+		                android:id="@+id/imgcheck"
+		                android:layout_height="match_parent"
+		                android:src="@drawable/ic_action_accept" />
+		            <ImageView
+		                android:visibility="gone"
+		                android:layout_width="wrap_content"
+		                android:id="@+id/imgfav"
+		                android:layout_height="match_parent"
+		                android:src="@drawable/ic_action_favorite" />
+		            <ImageView
+		                android:visibility="gone"
+		                android:layout_width="wrap_content"
+		                android:id="@+id/imgshow"
+		                android:layout_height="match_parent"
+		                android:src="@drawable/ic_action_dock" />
+
+				</LinearLayout>
+
+			    
+			</LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</LinearLayout>
