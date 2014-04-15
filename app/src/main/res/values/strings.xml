@@ -7,7 +7,7 @@
         <item name="cat_shows">[\"Shows\"]</item>
         <item name="cat_sources">[\"Load other Sources\",\"EZTVRSS\",\"Yify-720p\",\"Yify-1080p\",\"TPB-HD-TV\",\"TPB-HD-Movies\",\"KAT Movies\",\"KAT-TV\"]</item>
         <item name="cat_downloads">[\"Downloads\"]</item>
-        <item name="cat_search">[\"Search\"]</item>
+        <!--item name="cat_search">[\"Search\"]</item-->
         <item name="cat_app_settings">[\"Application Settings\"]</item>
         <item name="cat_settings">[\"Settings\"]</item>
         <item name="cat_support">[\"Help/Support\"]</item>
@@ -18,7 +18,8 @@
     <string name="drawer_close">Close navigation drawer</string>
 
     <string name="fragment_tag_latest">LATEST_FRAGMENT</string>
-
+    <string name="fragment_tag_search">SEARCH_FRAGMENT</string>
+    <string name="fragment_tag_shows">SHOWS_FRAGMENT</string>
 
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
@@ -45,7 +46,8 @@
 	<string name="loader_working">Working, please wait&#8230;</string>
 	<string name="loader_searching">Searching, please wait&#8230;</string>
 	<string name="loader_title_request_result">Request Result</string>
-	
+    <string name="loader_search_no_result">Your query returned no result.</string>
+
 	<string name="dialog_button_yes">Yes</string>
 	<string name="dialog_button_ok">Okay</string>
 	<string name="dialog_button_close">Close</string>
@@ -137,5 +139,11 @@
     <string name="landing_subscribed">Subscribed Shows</string>
     <string name="landing_latest">Latest Shows</string>
     <string name="landing_airing">Airing</string>
+
+    <string name="dialog_open">Open</string>
+    <string name="dialog_send">Send</string>
+    <string name="dialog_view">View Show Page</string>
+
+    <string name="unknown_handler">Sorry, there are currently no handler for this filetype on this device.</string>
 
 </resources>

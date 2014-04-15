@@ -37,6 +37,7 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.idea
 
 # External tool builders
 # .externalToolBuilders/
@@ -55,3 +56,10 @@ local.properties
 #
 # # TeXlipse plugin
 # .texlipse
+
+.idea/
+gradle/
+*.gradle
+.iml
+
+

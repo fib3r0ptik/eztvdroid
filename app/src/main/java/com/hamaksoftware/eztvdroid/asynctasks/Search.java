@@ -17,16 +17,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
-    private int page;
+public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
     private Context ctx;
     private ShowHandler sh;
+    private String query;
+    private boolean byId;
+
     public IAsyncTaskListener asyncTaskListener;
 
-    public GetLatestShow(Context ctx,int page){
-        this.page = page;
+    public Search(Context ctx, String query, boolean byId){
         sh = new ShowHandler(ctx);
         this.ctx  = ctx;
+        this.query = query;
+        this.byId = byId;
     }
 
     @Override
@@ -37,39 +40,38 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
     @Override
     protected ArrayList<EZTVRow> doInBackground(Void... voids) {
         ArrayList<EZTVRow> items = new ArrayList<EZTVRow>(0);
+        String response = "";
         try{
-            ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(2);
-            param.add(new BasicNameValuePair("page", page+""));
-            param.add(new BasicNameValuePair("method", "getLatest"));
-            String response = Utility.getInstance(ctx).doPostRequest(param);
+            ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(4);
+            if(byId) param.add(new BasicNameValuePair("show_id", query));
+            param.add(new BasicNameValuePair("byid", byId+""));
+            param.add(new BasicNameValuePair("query", query));
+            param.add(new BasicNameValuePair("method", "search"));
+            response = Utility.getInstance(ctx).doPostRequest(param);
+            //Log.i("search",response);
             JSONObject jResponse = new JSONObject(response);
             if(jResponse.getInt("err") == 0){
                 JSONArray latest = jResponse.getJSONArray("data");
                 for(int i = 0; i < latest.length();i++){
                     JSONObject item = latest.getJSONObject(i);
-                    if(!item.getString("show_id").equals("add")){
-                        EZTVRow row = new EZTVRow();
-                        row.title = item.getString("title");
-                        row.filesize = Utility.getFancySize(item.getLong("size"));
-                        row.elapsed = Utility.getElapsed(item.getString("pubdate"));
-                        row.showId = Integer.parseInt(item.getString("show_id"));
+                    EZTVRow row = new EZTVRow();
+                    row.title = item.getString("title");
+                    row.filesize = Utility.getFancySize(item.getLong("size"));
+                    row.elapsed = Utility.getElapsed(item.getString("pubdate"));
+                    row.showId = Integer.parseInt(item.getString("show_id"));
 
-                        JSONArray jLinks = item.getJSONArray("links");
-                        for(int j = 0; j < jLinks.length();j++){
-                            row.links.add(jLinks.getString(j));
-                        }
-
-                        row.isFavorite = isFavorite(row.showId);
-                        items.add(row);
+                    JSONArray jLinks = item.getJSONArray("links");
+                    for(int j = 0; j < jLinks.length();j++){
+                        row.links.add(jLinks.getString(j));
                     }
+                    row.isFavorite = isFavorite(row.showId);
+                    items.add(row);
                 }
-
-                //cloneItems();
             }else{
-                Log.i("err", response);
+                Log.i("err",response);
             }
         }catch (Exception e) {
-            Log.e("err",e.getMessage());
+            Log.i("err", response);
         }
         return items;
     }

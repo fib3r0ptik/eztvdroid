@@ -157,6 +157,8 @@ public class Utility {
 			String line;
 			while ((line = rd.readLine()) != null) sb.append(line);
 
+            System.out.println(sb.toString());
+
 			return sb.toString();
 
 		}catch(UnsupportedEncodingException e){

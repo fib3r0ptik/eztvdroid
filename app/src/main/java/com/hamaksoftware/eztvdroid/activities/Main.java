@@ -12,8 +12,11 @@ import org.json.JSONException;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,16 +25,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.fragments.*;
 import com.hamaksoftware.eztvdroid.utils.*;
 import com.hamaksoftware.eztvdroid.adapters.*;
 
-public class Main extends Activity implements IFragmentListener {
+public class Main extends Activity{
     /* private members */
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
@@ -46,6 +52,7 @@ public class Main extends Activity implements IFragmentListener {
     private HashMap<String, List<String>> listDataChild;
 
     private DrawerChildClickListener drawerChildClickListener;
+    public boolean forceRefresh;
 
     //private Fragment gridFragment;
     
@@ -55,10 +62,10 @@ public class Main extends Activity implements IFragmentListener {
     /* public members */
     
     public int currentPage;
-    public IActivityListener activityListener;
+    //public IActivityListener activityListener;
 
     public int currentFragmentTag;
-    public List<WeakReference<Fragment>> visibleFragments = new ArrayList<WeakReference<Fragment>>(0);
+    //public List<WeakReference<Fragment>> visibleFragments = new ArrayList<WeakReference<Fragment>>(0);
       
     private void prepareListData() {
     	
@@ -107,7 +114,7 @@ public class Main extends Activity implements IFragmentListener {
 
         drawerChildClickListener =  new DrawerChildClickListener();
         
-        //mDrawerList.setOnGroupClickListener(new DrawerGroupItemClickListener());
+        mDrawerList.setOnGroupClickListener(new DrawerGroupItemClickListener());
         mDrawerList.setOnChildClickListener(drawerChildClickListener);
         mDrawerList.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
@@ -143,28 +150,26 @@ public class Main extends Activity implements IFragmentListener {
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
                 R.string.drawer_close  /* "close drawer" description for accessibility */
                 ) {
+
             public void onDrawerClosed(View view) {
-                //check for vsible fragments
-                String visibleTag = null;
-                for(WeakReference<Fragment> ref : visibleFragments) {
-                    Fragment f = ref.get();
-                    if(f != null){
-                        if(f.isVisible()){
-                            visibleTag = f.getTag();
-                            break;
-                        }
-                    }
+                if(currentFragmentTag == R.string.fragment_tag_latest){
+                    Bundle args = new Bundle();
+                    args.putBoolean("force",forceRefresh);
+                    launchFragment(R.string.fragment_tag_latest, args,forceRefresh);
                 }
 
-                if(activityListener != null && !visibleTag.equals(getString(currentFragmentTag))) {
-                    activityListener.onActivityDrawerClosed();
+                if(currentFragmentTag == R.string.fragment_tag_shows){
+                    launchFragment(R.string.fragment_tag_shows, null,false);
                 }
+
             }
 
             public void onDrawerOpened(View drawerView) {
                 getActionBar().setTitle(mDrawerTitle);
                 //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
+
+
         };
         
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -173,40 +178,86 @@ public class Main extends Activity implements IFragmentListener {
             //selectItem(0);
         }
 
-        LatestFragment listFragment = (LatestFragment)fragmentManager.findFragmentByTag("LIST_FRAGMENT");
-        if(listFragment == null){
-            listFragment = new LatestFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, listFragment,getString(R.string.fragment_tag_latest)).commit();
-        }
+        launchFragment(R.string.fragment_tag_latest,null,false);
 
-        activityListener = listFragment;
-        currentFragmentTag = R.string.fragment_tag_latest;
     }
 
 
-    public List<Fragment> getActiveFragments() {
-        ArrayList<Fragment> activeFragments = new ArrayList<Fragment>();
-        for(WeakReference<Fragment> ref : visibleFragments) {
-            Fragment f = ref.get();
-            if(f != null) {
-                if(f.isVisible()) {
-                    activeFragments.add(f);
+    private void launchFragment(int fragmentTag, Bundle params,boolean force){
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        switch(fragmentTag){
+            case R.string.fragment_tag_latest:
+                LatestFragment listFragment = (LatestFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_latest));
+                if(listFragment == null) {
+                    listFragment = new LatestFragment();
+                    listFragment.setArguments(params);
                 }
-            }
+
+
+                transaction.replace(R.id.content_frame, listFragment,getString(R.string.fragment_tag_latest));
+
+                if(force){
+                    listFragment.force = force;
+                    listFragment.onActivityDrawerClosed();
+                }
+
+                break;
+
+            case R.string.fragment_tag_shows:
+                ShowsFragment showFragment = (ShowsFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_shows));
+                if(showFragment == null) {
+                    showFragment = new ShowsFragment();
+                    showFragment.setArguments(params);
+                }
+                transaction.replace(R.id.content_frame, showFragment,getString(R.string.fragment_tag_shows));
+                break;
+            case R.string.fragment_tag_search:
+                SearchFragment searchFragment = (SearchFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_search));
+                if(searchFragment == null) {
+                    searchFragment = new SearchFragment();
+                    searchFragment.setArguments(params);
+                }
+                transaction.replace(R.id.content_frame, searchFragment,getString(R.string.fragment_tag_search));
+                break;
         }
-        return activeFragments;
+
+        transaction.addToBackStack(null);
+        transaction.commit();
+        invalidateOptionsMenu();
+        currentFragmentTag = fragmentTag; //just in case
     }
 
     @Override
-    public void onAttachFragment (Fragment fragment) {
-        visibleFragments.add(new WeakReference<Fragment>(fragment));
-    }
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        switch(currentFragmentTag){
+            case R.string.fragment_tag_search:
+            case R.string.fragment_tag_latest:
+                inflater.inflate(R.menu.menu_latest, menu);
+                final SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        Bundle args = new Bundle();
+                        args.putString("query", s);
+                        args.putBoolean("byId",false);
+                        launchFragment(R.string.fragment_tag_search, args,true);
 
-        //MenuInflater inflater = getMenuInflater();
-        //inflater.inflate(R.menu.main, menu);
+                        searchView.clearFocus();
+                        menu.findItem(R.id.action_search).collapseActionView();
+
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return false;
+                    }
+                });
+
+                break;
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -219,6 +270,12 @@ public class Main extends Activity implements IFragmentListener {
         menu.findItem(R.id.action_server_status_on).setVisible(false);
         menu.findItem(R.id.action_server_status_off).setVisible(true);
 		*/
+
+        menu.findItem(R.id.action_refresh).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
+                currentFragmentTag == R.string.fragment_tag_shows);
+        menu.findItem(R.id.action_search).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
+                currentFragmentTag == R.string.fragment_tag_shows || currentFragmentTag == R.string.fragment_tag_search);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -229,18 +286,38 @@ public class Main extends Activity implements IFragmentListener {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         // Handle action buttons
+
         switch(item.getItemId()) {
-        default:
-            return super.onOptionsItemSelected(item);
+            case R.id.action_refresh:
+                currentPage = 0;
+                if(currentFragmentTag == R.string.fragment_tag_latest || currentFragmentTag == R.string.fragment_tag_search){
+                    Bundle args = new Bundle();
+                    args.putBoolean("force",true);
+                    launchFragment(R.string.fragment_tag_latest,args,true);
+                }
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private class DrawerGroupItemClickListener implements ExpandableListView.OnGroupClickListener {
 		@Override
 		public boolean onGroupClick(ExpandableListView parent, View v,
 				int groupPosition, long id) {
-			//Toast.makeText(getApplicationContext(), listDataHeader.get(groupPosition), Toast.LENGTH_SHORT).show();
+            if(listDrawerAdapter.getChildrenCount(groupPosition) <= 0 ){
+                String category = listDataHeader.get(groupPosition);
+                if(category.equals(getString(R.string.cat_latest))) {
+                    //forceRefresh = true;
+                    currentFragmentTag = R.string.fragment_tag_latest;
+                }
+                if(category.equals(getString(R.string.cat_shows))) {
+                    currentFragmentTag = R.string.fragment_tag_shows;
+                }
+
+                mDrawerLayout.closeDrawer(mDrawerList);
+            }
 
 			return false;
 		}
@@ -250,58 +327,18 @@ public class Main extends Activity implements IFragmentListener {
    	 	Utility.showDialog(Main.this,title, message, btnPosTitle, null, false,null);
     }
 
-	@Override
-	public void onFragmentViewCreated() {
-		activityListener.onFragmentLaunched();
-	}
-    
-	@Override
-	public void onViewClicked(View v) {
-        /*
-		if(v.getId() == R.id.btnSearch){
-			activityListener = null;
-			String tag = v.getTag().toString();
-			String[] tags = tag.split("|");
-
-			ListItemFragment listfrag = (ListItemFragment)getFragmentManager().findFragmentByTag("LIST_FRAGMENT");
-			if(listfrag == null){
-				listfrag = new ListItemFragment();
-			}
-            
-            Bundle args = new Bundle();
-            args.putString("cat", tags[0]);
-            args.putString("query", tags[1]);
-            listfrag.setArguments(args);
-			
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, listfrag,"LIST_FRAGMENT").commit();
-            
-            activityListener = listfrag;
-    		
-		}
-		*/
-
-	}
-	
-	
 	
     /* The click listner for ListView in the navigation drawer */
     private class DrawerChildClickListener implements ExpandableListView.OnChildClickListener {
         @Override
         public boolean onChildClick(ExpandableListView parent, View v,
                 int groupPosition, int childPosition, long id) {
-        	
-            activityListener = null; //reset drawerChildClickListener to avoid "unnecessary" triggering of async on onDrawerClosed
-            
+
         	String cat = listDataHeader.get(groupPosition);
         	String subcat = listDataChild.get(listDataHeader.get(groupPosition)).get(childPosition);
         	
             FragmentManager fragmentManager = getFragmentManager();
             if(cat.equals(getString(R.string.cat_latest)) && currentFragmentTag != R.string.fragment_tag_latest){
-                LatestFragment listFragment = (LatestFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_latest));
-                if(listFragment == null) listFragment = new LatestFragment();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, listFragment,getString(R.string.fragment_tag_latest)).commit();
-                activityListener = listFragment;
                 currentFragmentTag = R.string.fragment_tag_latest;
             }
 
