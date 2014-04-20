@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="eztvpal_prefs">
+    <PreferenceCategory android:title="Remote Torrent Client Settings">
+        <ListPreference
+            android:key="client_type"
+            android:title="Remote Client Type"
+            android:summary="Either Utorrent or Transmission"
+            android:entries="@array/client_type"
+            android:entryValues="@array/client_type"
+            android:dialogTitle="Indicate Type of Remote Client" />
+        <EditTextPreference
+            android:dialogTitle="Friendly Name"
+            android:inputType="text"
+            android:key="client_name"
+            android:summary="Ex: My Desktop, Linux Laptop, etc"
+            android:title="Client Friendly Name" />
+        <EditTextPreference
+            android:dialogTitle="Client I.P or Hostname"
+            android:inputType="text"
+            android:key="client_host"
+            android:summary="Ex: 192.168.1.2 or myPC"
+            android:title="Client IP address or Hostname" />
+        <EditTextPreference
+            android:dialogTitle="Client Port Number"
+            android:inputType="number"
+            android:maxLength="5"
+            android:key="client_port"
+            android:summary="Ex: 8080"
+            android:title="Client Port Number" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="use_auth"
+            android:summary="Check this box if you enabled authentication on Web UI (usually checked by default)"
+            android:title="Enable Authentication" />
+        <EditTextPreference
+            android:dependency="use_auth"
+            android:dialogTitle="Client Username"
+            android:inputType="text"
+            android:key="client_username"
+            android:summary="The username name you have set on the remote client"
+            android:title="Client Username" />
+        <EditTextPreference
+            android:dependency="use_auth"
+            android:dialogTitle="Client Password"
+            android:inputType="text"
+            android:key="client_password"
+            android:summary="The password you have set on the remote client"
+            android:title="Client Password" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Application Settings">
+        <EditTextPreference
+            android:defaultValue="10"
+            android:dialogTitle="Request Timeout"
+            android:inputType="number"
+            android:key="request_timeout"
+            android:summary="A specified amount of time until the request is considered timeout."
+            android:title="Request timeout (in seconds)" />
+        <EditTextPreference
+            android:defaultValue="5"
+            android:dialogTitle="Connection Timeout"
+            android:inputType="number"
+            android:key="connection_timeout"
+            android:summary="A specified amount of time until the connection is considered unreachable."
+            android:title="Connection timeout (in seconds)" />
+        <EditTextPreference
+            android:defaultValue="15"
+            android:dialogTitle="Refresh Interval"
+            android:inputType="number"
+            android:key="refresh_interval_torrent"
+            android:summary="Refresh Interval when viewing current items on the download section."
+            android:title="Refresh Interval (in seconds)" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="use_landing"
+            android:summary="Check this box if you want start the app with the landing page "
+            android:title="Enable Landing Page" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="use_subscription"
+            android:summary="Check this box if you want to use the subscription and push notification enabled. "
+            android:title="Enable Subscription/Push Notification" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:dependency="use_subscription"
+            android:key="auto_send_torrent"
+            android:summary="Auto send to the first torrent client available"
+            android:title="Attempt auto send of torrents" />
+        <ListPreference
+            android:defaultValue="1"
+            android:dependency="auto_send_torrent"
+            android:entries="@array/entries_list_autosend_type"
+            android:entryValues="@array/entries_list_autosend_type_values"
+            android:key="auto_send_quality"
+            android:summary="Choose which type of files to send to your torrent client (default low quality) "
+            android:title="What quality to auto send?" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="About myEZTV App">
+        <Preference
+            android:enabled="false"
+            android:key="info"
+            android:summary=""
+            android:title="Device ID" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

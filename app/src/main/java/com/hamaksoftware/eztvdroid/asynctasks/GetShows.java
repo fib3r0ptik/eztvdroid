@@ -1,16 +1,13 @@
 package com.hamaksoftware.eztvdroid.asynctasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
 import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
 import com.hamaksoftware.eztvdroid.utils.AppPref;
-import com.hamaksoftware.eztvdroid.utils.EZTVScraper;
 import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
@@ -23,6 +20,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
+    public static final String ASYNC_ID = "GETSHOWS";
     private int page;
     private Context ctx;
     private ShowHandler sh;
@@ -41,13 +39,13 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
 
     @Override
     protected void onPreExecute(){
-        asyncTaskListener.onTaskWorking();
+        asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
     protected ArrayList<EZTVShowItem> doInBackground(Void... voids) {
         ArrayList<EZTVShowItem> shows = new ArrayList<EZTVShowItem>(0);
-        asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...");
+        asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...",ASYNC_ID);
         int count = sh.getCount();
         try {
 
@@ -66,7 +64,7 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
                 JSONArray myShows = new JSONArray(response);
                 Log.i("api", "ttl my shows:"+ myShows.length());
 
-                asyncTaskListener.onTaskProgressMax(jShows.length());
+                asyncTaskListener.onTaskProgressMax(jShows.length(),ASYNC_ID);
                 sh.deleteAll();
                 for(int i = 0;  i < jShows.length();i++){
                     EZTVShowItem show = new EZTVShowItem();
@@ -90,7 +88,7 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
 
                     sh.addShow(show);
                     shows.add(show);
-                    asyncTaskListener.onTaskProgressUpdate(ctr);
+                    asyncTaskListener.onTaskProgressUpdate(ctr,ASYNC_ID);
                     ctr++;
                 }
 
@@ -109,6 +107,6 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
 
     @Override
     protected void onPostExecute(ArrayList<EZTVShowItem> data) {
-        asyncTaskListener.onTaskCompleted(data);
+        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 }

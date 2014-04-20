@@ -31,6 +31,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.fragments.*;
@@ -56,7 +57,10 @@ public class Main extends Activity{
 
     //private Fragment gridFragment;
     
-    private AppPref pref;
+    public AppPref pref;
+    public ShowHandler sh;
+    public ProfileHandler ph;
+    public ArrayList<ClientProfile> profiles;
     private FragmentManager fragmentManager;
     
     /* public members */
@@ -99,6 +103,10 @@ public class Main extends Activity{
         setContentView(R.layout.activity_main);
 
         pref = new AppPref(getApplicationContext());
+        ph = new ProfileHandler(getApplicationContext());
+        profiles = ph.getAllProfiles();
+        sh = new ShowHandler(getApplicationContext());
+
         fragmentManager = getFragmentManager();
 
         mTitle = mDrawerTitle = getResources().getString(R.string.app_name);
@@ -124,6 +132,7 @@ public class Main extends Activity{
                 expand.setImageResource(R.drawable.ic_action_expand);
             }
         });
+
         mDrawerList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int i) {
@@ -162,6 +171,10 @@ public class Main extends Activity{
                     launchFragment(R.string.fragment_tag_shows, null,false);
                 }
 
+                if(currentFragmentTag == R.string.fragment_tag_pref){
+                    launchFragment(R.string.fragment_tag_pref,null, false);
+                }
+
             }
 
             public void onDrawerOpened(View drawerView) {
@@ -183,7 +196,7 @@ public class Main extends Activity{
     }
 
 
-    private void launchFragment(int fragmentTag, Bundle params,boolean force){
+    public void launchFragment(int fragmentTag, Bundle params,boolean force){
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         switch(fragmentTag){
             case R.string.fragment_tag_latest:
@@ -216,8 +229,27 @@ public class Main extends Activity{
                 if(searchFragment == null) {
                     searchFragment = new SearchFragment();
                     searchFragment.setArguments(params);
+                }else{
+                    searchFragment.search(params.getString("query"));
                 }
                 transaction.replace(R.id.content_frame, searchFragment,getString(R.string.fragment_tag_search));
+                break;
+            case R.string.fragment_tag_show_detail:
+                ShowDetailsFragment detail = (ShowDetailsFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_show_detail));
+                if(detail == null) {
+                    detail = new ShowDetailsFragment();
+                    detail.setArguments(params);
+                }else{
+                    detail.setShowDetails(params.getInt("show_id"));
+                }
+                transaction.replace(R.id.content_frame, detail,getString(R.string.fragment_tag_show_detail));
+                break;
+            case R.string.fragment_tag_pref:
+                PrefFragment pref = (PrefFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_pref));
+                if(pref == null){
+                    pref = new PrefFragment();
+                }
+                transaction.replace(R.id.content_frame, pref,getString(R.string.fragment_tag_pref));
                 break;
         }
 
@@ -235,7 +267,6 @@ public class Main extends Activity{
             case R.string.fragment_tag_latest:
                 inflater.inflate(R.menu.menu_latest, menu);
                 final SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
-
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
@@ -257,6 +288,9 @@ public class Main extends Activity{
                 });
 
                 break;
+            case R.string.fragment_tag_shows:
+                inflater.inflate(R.menu.menu_latest, menu); //reuse
+                break;
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -269,14 +303,20 @@ public class Main extends Activity{
         final boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
         menu.findItem(R.id.action_server_status_on).setVisible(false);
         menu.findItem(R.id.action_server_status_off).setVisible(true);
-		*/
+        */
+        if(currentFragmentTag == R.string.fragment_tag_latest || currentFragmentTag == R.string.fragment_tag_shows){
+            menu.findItem(R.id.action_refresh).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
+                    currentFragmentTag == R.string.fragment_tag_shows);
+            menu.findItem(R.id.action_search).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
+                    currentFragmentTag == R.string.fragment_tag_shows || currentFragmentTag == R.string.fragment_tag_search);
+        }
 
-        menu.findItem(R.id.action_refresh).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
-                currentFragmentTag == R.string.fragment_tag_shows);
-        menu.findItem(R.id.action_search).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
-                currentFragmentTag == R.string.fragment_tag_shows || currentFragmentTag == R.string.fragment_tag_search);
+        if(currentFragmentTag == R.string.fragment_tag_search){
+            menu.findItem(R.id.action_refresh).setVisible(false);
+        }
 
         return super.onPrepareOptionsMenu(menu);
+
     }
 
     @Override
@@ -302,6 +342,10 @@ public class Main extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
+    public void showToast(String msg, int duration){
+        Toast.makeText(getApplicationContext(),msg,duration).show();
+    }
+
     private class DrawerGroupItemClickListener implements ExpandableListView.OnGroupClickListener {
 		@Override
 		public boolean onGroupClick(ExpandableListView parent, View v,
@@ -314,6 +358,10 @@ public class Main extends Activity{
                 }
                 if(category.equals(getString(R.string.cat_shows))) {
                     currentFragmentTag = R.string.fragment_tag_shows;
+                }
+
+                if(category.equals(getString(R.string.cat_settings))){
+                    currentFragmentTag = R.string.fragment_tag_pref;
                 }
 
                 mDrawerLayout.closeDrawer(mDrawerList);

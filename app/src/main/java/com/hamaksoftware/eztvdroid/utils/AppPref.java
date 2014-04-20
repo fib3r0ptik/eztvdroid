@@ -26,16 +26,33 @@ public class AppPref{
     public SharedPreferences getPreference(){
     	return _sharedPrefs;
     }
-    
-    
-    public boolean getUseProxy(){
-    	return _sharedPrefs.getBoolean("use_proxysite", false);
+
+    public String getClientName(){
+        return _sharedPrefs.getString("client_name", "");
     }
-    
-    public String getProxySite(){
-    	return _sharedPrefs.getString("proxy_site", "http://eztv.it/");
+    public String getIPAddress(){
+        return _sharedPrefs.getString("client_host", "");
     }
-    
+
+    public int getClientPort(){
+        return Integer.parseInt(_sharedPrefs.getString("client_port", "8080"));
+    }
+
+    public boolean getAuth(){
+        return _sharedPrefs.getBoolean("use_auth", true);
+    }
+
+    public String getClientUsername(){
+        return _sharedPrefs.getString("client_username", "");
+    }
+
+    public String getClientPassword(){
+        return _sharedPrefs.getString("client_password", "");
+    }
+    public String getClientType(){
+        return _sharedPrefs.getString("client_type", "");
+    }
+
     public int getConnectionTimeout(){
     	return Integer.valueOf(_sharedPrefs.getString("connection_timeout", "5"));
     }

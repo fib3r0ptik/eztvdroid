@@ -129,8 +129,8 @@ public class RSSHandler extends DefaultHandler {
 		if (localName.equals("item")) {
 			_feed.addItem(_item);
 			count++;
-			listener.onTaskProgressMax(calculatedItemCount);
-			listener.onTaskProgressUpdate(count);
+			//listener.onTaskProgressMax(calculatedItemCount);
+			//listener.onTaskProgressUpdate(count);
 			return;
 		}
 	}

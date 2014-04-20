@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
+    public static final String ASYNC_ID = "SEARCH";
     private Context ctx;
     private ShowHandler sh;
     private String query;
@@ -34,7 +35,7 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
 
     @Override
     protected void onPreExecute(){
-        asyncTaskListener.onTaskWorking();
+        asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
     }
     @Override
     protected void onPostExecute(ArrayList<EZTVRow> data) {
-        asyncTaskListener.onTaskCompleted(data);
+        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 
     public boolean isFavorite(int showId){

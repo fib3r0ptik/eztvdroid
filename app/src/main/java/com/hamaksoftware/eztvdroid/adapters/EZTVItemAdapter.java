@@ -25,7 +25,6 @@ public class EZTVItemAdapter extends BaseAdapter{
         CheckBox chk;
         ImageView watched;
         ImageView fav;
-        ImageView show;
         LinearLayout rowHolder;
 
     }
@@ -67,7 +66,7 @@ public class EZTVItemAdapter extends BaseAdapter{
             holder.title = (TextView) convertView.findViewById(R.id.home_title);
             holder.fav = (ImageView) convertView.findViewById(R.id.imgfav);
             holder.watched = (ImageView) convertView.findViewById(R.id.imgcheck);
-            holder.show = (ImageView) convertView.findViewById(R.id.imgshow);
+            //holder.show = (ImageView) convertView.findViewById(R.id.imgshow);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder)convertView.getTag();
@@ -83,7 +82,7 @@ public class EZTVItemAdapter extends BaseAdapter{
         }
 
         if(entry.showId > 0 && entry.showId != 187){
-            holder.show.setVisibility(View.VISIBLE);
+            //holder.show.setVisibility(View.VISIBLE);
             holder.fav.setVisibility(entry.isFavorite?View.VISIBLE:View.GONE);
             holder.watched.setVisibility(entry.isWatched?View.VISIBLE:View.GONE);
             if(entry.isWatched){
@@ -94,23 +93,8 @@ public class EZTVItemAdapter extends BaseAdapter{
                 holder.extended_info.setTextColor(Color.parseColor("#ff000000"));
             }
 
-            /*if(hasShows){
-                EZTVShowItem sitem = sh.getShow(entry.showId);
-                if(sitem != null){
-                    convertView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View arg0) {
-                            Intent showDetails = new Intent(getApplicationContext(),ShowDetails.class);
-                            showDetails.putExtra("show_id", entry.showId);
-                            startActivity(showDetails);
-                        }
-                    });
-                }
-            }*/
-
         }else{
-            convertView.setOnClickListener(null);
-            holder.show.setVisibility(View.GONE);
+            //holder.show.setVisibility(View.GONE);
             holder.fav.setVisibility(View.GONE);
             holder.watched.setVisibility(View.GONE);
             holder.title.setTextColor(Color.parseColor("#ff000000"));

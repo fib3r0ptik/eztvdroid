@@ -3,6 +3,7 @@ package com.hamaksoftware.eztvdroid.fragments;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.hamaksoftware.eztvdroid.adapters.EZTVItemAdapter;
 import com.hamaksoftware.eztvdroid.adapters.ShowItemAdapter;
 import com.hamaksoftware.eztvdroid.asynctasks.GetLatestShow;
 import com.hamaksoftware.eztvdroid.asynctasks.GetShows;
+import com.hamaksoftware.eztvdroid.asynctasks.Search;
 import com.hamaksoftware.eztvdroid.models.EZTVRow;
 import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
 import com.hamaksoftware.eztvdroid.utils.Utility;
@@ -57,11 +59,18 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
         lv.setAdapter(adapter);
 
-
+        base.invalidateOptionsMenu();
 
         return rootView;
     }
 
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        base.currentFragmentTag = R.string.fragment_tag_shows;
+        base.invalidateOptionsMenu();
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -70,19 +79,29 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     }
 
 	@Override
-	public void onTaskCompleted(ArrayList<?> data) {
-		if(data.size() <= 0){
-			String title = getResources().getString(R.string.loader_title_request_result);
-			String msg = getResources().getString(R.string.result_listing_error);
-			String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
-			Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
-		}else{
-			adapter.listings = (List<EZTVShowItem>)data;
-			adapter.notifyDataSetChanged();
-		}
-		
+	public void onTaskCompleted(Object data,String ASYNC_ID) {
+        if(data != null) {
+            if(ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)){
+                List<EZTVShowItem> d = (List<EZTVShowItem>) data;
+                if (d.size() <= 0) {
+                    String title = getResources().getString(R.string.loader_title_request_result);
+                    String msg = getResources().getString(R.string.result_listing_error);
+                    String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
+                    Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
+                } else {
+                    adapter.listings = (List<EZTVShowItem>) d;
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        }
 		dialog.dismiss();
 	}
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        base.setTitle(getString(R.string.app_name));
+    }
 
 
 	public void onActivityDrawerClosed() {
@@ -95,27 +114,27 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
 
 	@Override
-	public void onTaskWorking() {
+	public void onTaskWorking(String ASYNC_ID) {
 		dialog.show();
 	}
 
 	@Override
-	public void onTaskProgressUpdate(int progress) {
+	public void onTaskProgressUpdate(int progress,String ASYNC_ID) {
         dialog.setProgress(progress);
 	}
 
 	@Override
-	public void onTaskProgressMax(int max) {
+	public void onTaskProgressMax(int max,String ASYNC_ID) {
         dialog.setMax(max);
 	}
 
 	@Override
-	public void onTaskUpdateMessage(String message) {
+	public void onTaskUpdateMessage(String message,String ASYNC_ID) {
         dialog.setMessage(message);
 	}
 
 	@Override
-	public void onTaskError(Exception e) {
+	public void onTaskError(Exception e,String ASYNC_ID) {
         dialog.setMessage("Error: " + e.getMessage());
 	}
 
