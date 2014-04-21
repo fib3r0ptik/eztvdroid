@@ -7,10 +7,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.provider.ContactsContract.Profile;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.hamaksoftware.eztvdroid.asynctasks.MarkDownload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -58,7 +58,7 @@ public class Utility {
     private final static String TAG = "gcm";
 
 
-    private static Context _context;
+    private static Context ctx;
     private static AppPref pref;
 	
 	private Utility(){}
@@ -68,7 +68,7 @@ public class Utility {
 			obj = new Utility();
 			pref = new AppPref(context);
 		}
-		_context = context;
+		ctx = context;
 		return obj;
 	}
 	
@@ -81,8 +81,8 @@ public class Utility {
 	
 	private static int getAppVersion() {
 	    try {
-	        PackageInfo packageInfo = _context.getPackageManager()
-	                .getPackageInfo(_context.getPackageName(), 0);
+	        PackageInfo packageInfo = ctx.getPackageManager()
+	                .getPackageInfo(ctx.getPackageName(), 0);
 	        return packageInfo.versionCode;
 	    } catch (NameNotFoundException e) {
 	        // should never happen
@@ -112,28 +112,7 @@ public class Utility {
 	
 	
 	public void markDownload(String title,int showId){
-		Pattern p = Pattern.compile("(.*?)S?(\\d{1,2})E?(\\d{2})(.*)",Pattern.DOTALL);
-		Matcher matcher = p.matcher(title);
-		String s = "";
-		String e = "";
-		String t = "";
-		if(matcher.find()){
-			t = matcher.group(1);
-			s = matcher.group(2);
-			e = matcher.group(3);
-		}
-		
-		
-		ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(6);
-        param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
-        param.add(new BasicNameValuePair("show_id", showId+""));
-        param.add(new BasicNameValuePair("title", t));
-        param.add(new BasicNameValuePair("s", s));
-        param.add(new BasicNameValuePair("e", e));
-        param.add(new BasicNameValuePair("method", "markDownload"));
-        
-        Log.i("uri",doPostRequest(param));
-        
+        new MarkDownload(ctx, title, showId).execute();
 	}
 	
 	public String doPostRequest(ArrayList<NameValuePair> params){
@@ -177,7 +156,7 @@ public class Utility {
 		new AsyncTask<Void, Void, String>(){
 			@Override
 			protected String doInBackground(Void... params) {
-				GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(_context);
+				GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(ctx);
 	            String msg = "";
 	            try {
 	                String regId = gcm.register(SENDER_ID);
@@ -187,7 +166,7 @@ public class Utility {
 	                data.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
 	        		data.add(new BasicNameValuePair("reg_id", regId));
 	        		data.add(new BasicNameValuePair("method", "regDevice"));
-	        		Utility.getInstance(_context).doPostRequest(data);
+	        		Utility.getInstance(ctx).doPostRequest(data);
 	                pref.setDeviceRegId(regId);
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
@@ -203,7 +182,7 @@ public class Utility {
 	
 	
 	public void saveProfiles() {
-    	ProfileHandler phandler = new ProfileHandler(_context);
+    	ProfileHandler phandler = new ProfileHandler(ctx);
     	final ArrayList<ClientProfile> profiles = phandler.getAllProfiles();
 		for(int i = 0; i < profiles.size();i++){
 			final ClientProfile p = profiles.get(i);
@@ -220,7 +199,7 @@ public class Utility {
 					data.add(new BasicNameValuePair("use_auth", p.useAuth+""));
 					data.add(new BasicNameValuePair("uid", p.username));
 					data.add(new BasicNameValuePair("pwd", p.password));
-					Utility.getInstance(_context).doPostRequest(data);
+					Utility.getInstance(ctx).doPostRequest(data);
 		            return msg;
 				}
 			}.execute();
@@ -236,14 +215,14 @@ public class Utility {
 		new AsyncTask<Void, Void, String>(){
 			@Override
 			protected String doInBackground(Void... params) {
-				GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(_context);
+				GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(ctx);
 	            String msg = "";
 	            try {
 	                gcm.unregister();	                
 	                ArrayList<NameValuePair> data = new ArrayList<NameValuePair>(2);
 	                data.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
 	        		data.add(new BasicNameValuePair("method", "unregDevice"));
-	        		Utility.getInstance(_context).doPostRequest(data);
+	        		Utility.getInstance(ctx).doPostRequest(data);
 	                pref.setDeviceRegId("");
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
@@ -398,7 +377,7 @@ public class Utility {
     public static String getElapsed(String date){
         Date d1 = new Date(date);
         if (d1 instanceof Date) {
-            long[] d = Utility.getInstance(_context).getTimeDifference(d1, new Date());
+            long[] d = Utility.getInstance(ctx).getTimeDifference(d1, new Date());
             String sd = "";
             if (d[0] > 0) {
                 if (d[0] > 1) {

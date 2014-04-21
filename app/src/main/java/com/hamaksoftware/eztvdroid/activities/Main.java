@@ -107,6 +107,8 @@ public class Main extends Activity{
         profiles = ph.getAllProfiles();
         sh = new ShowHandler(getApplicationContext());
 
+        Utility.getInstance(getApplicationContext()).registerInBackground();
+
         fragmentManager = getFragmentManager();
 
         mTitle = mDrawerTitle = getResources().getString(R.string.app_name);
@@ -221,6 +223,8 @@ public class Main extends Activity{
                 if(showFragment == null) {
                     showFragment = new ShowsFragment();
                     showFragment.setArguments(params);
+                }else{
+                    showFragment.refreshData(force);
                 }
                 transaction.replace(R.id.content_frame, showFragment,getString(R.string.fragment_tag_shows));
                 break;
@@ -289,7 +293,26 @@ public class Main extends Activity{
 
                 break;
             case R.string.fragment_tag_shows:
-                inflater.inflate(R.menu.menu_latest, menu); //reuse
+                inflater.inflate(R.menu.menu_latest, menu);
+                final SearchView showSearch = (SearchView)menu.findItem(R.id.action_search).getActionView();
+                showSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        ShowsFragment shows = (ShowsFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_shows));
+                        if(shows != null){
+                            shows.adapter.getFilter().filter(s);
+                            //shows.adapter.notifyDataSetChanged();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
                 break;
         }
 
@@ -332,10 +355,16 @@ public class Main extends Activity{
         switch(item.getItemId()) {
             case R.id.action_refresh:
                 currentPage = 0;
-                if(currentFragmentTag == R.string.fragment_tag_latest || currentFragmentTag == R.string.fragment_tag_search){
+                if(currentFragmentTag == R.string.fragment_tag_latest){
                     Bundle args = new Bundle();
                     args.putBoolean("force",true);
                     launchFragment(R.string.fragment_tag_latest,args,true);
+                }
+
+                if(currentFragmentTag == R.string.fragment_tag_shows){
+                    Bundle args = new Bundle();
+                    args.putBoolean("force",true);
+                    launchFragment(R.string.fragment_tag_shows,args,true);
                 }
         }
 

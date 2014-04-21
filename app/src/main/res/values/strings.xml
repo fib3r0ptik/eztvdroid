@@ -145,6 +145,7 @@
     <string name="dialog_ignore">Ignore</string>
     <string name="dialog_send">Send to Remote Client</string>
     <string name="dialog_view">View Show Page</string>
+    <string name="dialog_subscribe">Subscribe</string>
     <string name="unknown_handler">Sorry, there are currently no handler for this filetype on this device.</string>
     <string name="pref_cat_app_settings">Application Settings</string>
     <string name="pref_cat_app_client">Remote Torrent Clinet Settings</string>

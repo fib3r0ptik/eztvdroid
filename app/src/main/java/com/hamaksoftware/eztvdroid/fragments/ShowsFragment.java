@@ -1,25 +1,28 @@
 package com.hamaksoftware.eztvdroid.fragments;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.activities.Main;
-import com.hamaksoftware.eztvdroid.adapters.EZTVItemAdapter;
 import com.hamaksoftware.eztvdroid.adapters.ShowItemAdapter;
-import com.hamaksoftware.eztvdroid.asynctasks.GetLatestShow;
 import com.hamaksoftware.eztvdroid.asynctasks.GetShows;
-import com.hamaksoftware.eztvdroid.asynctasks.Search;
+import com.hamaksoftware.eztvdroid.asynctasks.SendTorrent;
 import com.hamaksoftware.eztvdroid.models.EZTVRow;
 import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
 import java.util.ArrayList;
@@ -29,12 +32,37 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 	
 
 	protected ListView lv;
-	protected ShowItemAdapter adapter;
+	public ShowItemAdapter adapter;
 	protected Main base;
 	
 	private ProgressDialog dialog;
 
     public boolean force;
+
+
+    AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            final EZTVShowItem show = adapter.shows.get(position);
+            final CharSequence[] items = {getString(R.string.dialog_view)};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(show.title);
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    if(items[item].equals(getString(R.string.dialog_view))){
+                        base = (Main)getActivity();
+                        Bundle args = new Bundle();
+                        args.putInt("show_id", show.showId);
+                        base.launchFragment(R.string.fragment_tag_show_detail, args, false);
+                    }
+
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,8 +72,12 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
         
         lv = (ListView)rootView.findViewById(R.id.lshows_list);
+        lv.setOnItemClickListener(itemClick);
 
-        dialog = new ProgressDialog(getActivity());
+        if(dialog == null) {
+            dialog = new ProgressDialog(getActivity());
+        }
+
         dialog.setIndeterminate(false);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setMessage(getString(R.string.loader_working));
@@ -68,6 +100,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     @Override
     public void onResume(){
         super.onResume();
+        force = false;
         base.currentFragmentTag = R.string.fragment_tag_shows;
         base.invalidateOptionsMenu();
     }
@@ -89,7 +122,8 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
                     String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
                     Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
                 } else {
-                    adapter.listings = (List<EZTVShowItem>) d;
+                    //adapter.listings = (List<EZTVShowItem>) d;
+                    adapter.setShows((ArrayList<EZTVShowItem>) d);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -104,8 +138,14 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     }
 
 
+    public void refreshData(boolean force){
+        this.force = force;
+        onActivityDrawerClosed();
+        force = false;
+    }
+
 	public void onActivityDrawerClosed() {
-        if(force || adapter.listings.size() <=0){
+        if(force || adapter.shows.size() <=0){
             GetShows async =  new GetShows(getActivity(), force);
             async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
             async.execute();

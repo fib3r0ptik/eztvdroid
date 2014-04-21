@@ -57,7 +57,7 @@ public class GetShowPoster extends AsyncTask<Void, Void, Drawable>{
 
             Bitmap croppedBmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getWidth());
             return new BitmapDrawable(ctx.getResources(), croppedBmp);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return null;
         }
     }

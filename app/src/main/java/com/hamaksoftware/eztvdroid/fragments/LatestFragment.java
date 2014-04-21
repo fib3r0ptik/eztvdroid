@@ -73,6 +73,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
+                                    Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -93,6 +94,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener{
                         if(base.pref.getClientName().length() < 2){
                             base.showToast("Set up a profile for a torrent client in the settings first.",Toast.LENGTH_LONG);
                         }else{
+                            Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                             SendTorrent send = new SendTorrent(getActivity(),row);
                             send.asyncTaskListener = LatestFragment.this;
                             send.execute();
@@ -117,6 +119,8 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener{
             alert.show();
         }
     };
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -145,6 +149,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener{
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(itemClick);
         Button btn = (Button)footer.findViewById(R.id.btnLoadMore);
+        btn.setVisibility(View.VISIBLE);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

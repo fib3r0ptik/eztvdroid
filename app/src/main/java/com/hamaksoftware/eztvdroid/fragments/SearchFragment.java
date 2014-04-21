@@ -73,6 +73,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
+                                    Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -93,6 +94,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener{
                         if(base.pref.getClientName().length() < 2){
                             base.showToast("Set up a profile for a torrent client in the settings first.",Toast.LENGTH_LONG);
                         }else{
+                            Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                             SendTorrent send = new SendTorrent(getActivity(),row);
                             send.asyncTaskListener = SearchFragment.this;
                             send.execute();

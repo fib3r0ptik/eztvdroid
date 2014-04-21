@@ -33,6 +33,7 @@ import com.hamaksoftware.eztvdroid.asynctasks.GetShowPoster;
 import com.hamaksoftware.eztvdroid.asynctasks.GetSubscriberCount;
 import com.hamaksoftware.eztvdroid.asynctasks.Search;
 import com.hamaksoftware.eztvdroid.asynctasks.SendTorrent;
+import com.hamaksoftware.eztvdroid.asynctasks.Subscription;
 import com.hamaksoftware.eztvdroid.models.EZTVRow;
 import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
 import com.hamaksoftware.eztvdroid.utils.AppPref;
@@ -79,7 +80,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final EZTVRow row = adapter.listings.get(position);
+            final EZTVRow row = adapter.listings.get(position-1);
             final CharSequence[] items = {getString(R.string.dialog_open),getString(R.string.dialog_send)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -106,6 +107,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
+                                    Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -126,6 +128,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
                         if(base.pref.getClientName().length() < 2){
                             base.showToast("Set up a profile for a torrent client in the settings first.",Toast.LENGTH_LONG);
                         }else{
+                            Utility.getInstance(getActivity()).markDownload(row.title,row.showId);
                             SendTorrent send = new SendTorrent(getActivity(),row);
                             send.asyncTaskListener = ShowDetailsFragment.this;
                             send.execute();
@@ -185,6 +188,15 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
             status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
             status.setTextColor(Color.WHITE);
         }
+
+        status.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Subscription subscription = new Subscription(getActivity(),show);
+                subscription.asyncTaskListener = ShowDetailsFragment.this;
+                subscription.execute();
+            }
+        });
 
         base.invalidateOptionsMenu();
 
@@ -277,11 +289,37 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
                     Log.e("async-info",e.getMessage());
                 }
             }
+
         }
 
         if(ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)){
             boolean success = (Boolean)data;
             base.showToast(success?"Torrent sent successfully.":"Warning: Failed to send torrent.", Toast.LENGTH_LONG);
+        }
+
+        if(ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)){
+            if(data != null){
+                boolean res = (Boolean)data;
+                if(res){
+                    if(show.isSubscribed){
+                        show.isSubscribed = false;
+                        status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
+                        status.setTextColor(Color.WHITE);
+                        status.setText("SUBSCRIBE");
+                    }else{
+                        status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
+                        status.setTextColor(Color.WHITE);
+                        show.isSubscribed = true;
+                        status.setText("UNSUBSCRIBE");
+                    }
+                    base.sh.updateShow(show);
+
+                    GetSubscriberCount getSubscriberCount = new GetSubscriberCount(getActivity(),show);
+                    getSubscriberCount.asyncTaskListener = ShowDetailsFragment.this;
+                    getSubscriberCount.execute();
+
+                }
+            }
         }
 
     }
