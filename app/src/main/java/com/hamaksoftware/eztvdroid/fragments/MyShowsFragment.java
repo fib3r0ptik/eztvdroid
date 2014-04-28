@@ -2,36 +2,34 @@ package com.hamaksoftware.eztvdroid.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.GridView;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.activities.Main;
-import com.hamaksoftware.eztvdroid.adapters.ShowAdapter;
-import com.hamaksoftware.eztvdroid.asynctasks.GetShows;
+import com.hamaksoftware.eztvdroid.adapters.MyShowAdapter;
+import com.hamaksoftware.eztvdroid.asynctasks.CheckForNewEpisode;
+import com.hamaksoftware.eztvdroid.asynctasks.GetMyShows;
 import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.Utility;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowsFragment extends Fragment implements IAsyncTaskListener{
+public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
 	
 
-	protected ListView lv;
-	public ShowAdapter adapter;
+	protected GridView lv;
+	public MyShowAdapter adapter;
 	protected Main base;
-	
-	private ProgressDialog dialog;
-
-    public boolean force;
-
 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -60,26 +58,16 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.shows, container, false);
+        final View rootView = inflater.inflate(R.layout.my_shows, container, false);
         base =  (Main)getActivity();
 
         
-        lv = (ListView)rootView.findViewById(R.id.lshows_list);
+        lv = (GridView)rootView.findViewById(R.id.myshow_grid);
         lv.setOnItemClickListener(itemClick);
 
-        if(dialog == null) {
-            dialog = new ProgressDialog(getActivity());
-        }
-
-        dialog.setIndeterminate(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setMessage(getString(R.string.loader_working));
-
-        View empty = inflater.inflate(R.layout.latest_empty,container,false);
-        lv.setEmptyView(empty);
-
         if(adapter == null) {
-            adapter = new ShowAdapter(getActivity(),new ArrayList<Show>(0));
+            adapter = new MyShowAdapter(getActivity());
+            adapter.setShows(new ArrayList<Show>(0));
         }
 
         lv.setAdapter(adapter);
@@ -93,8 +81,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     @Override
     public void onResume(){
         super.onResume();
-        force = false;
-        base.currentFragmentTag = R.string.fragment_tag_shows;
+        base.currentFragmentTag = R.string.fragment_tag_myshows;
         base.invalidateOptionsMenu();
     }
 
@@ -107,7 +94,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 	@Override
 	public void onTaskCompleted(Object data,String ASYNC_ID) {
         if(data != null) {
-            if(ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)){
+            if(ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)){
                 List<Show> d = (List<Show>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -115,13 +102,42 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
                     String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
                     Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
                 } else {
-                    //adapter.listings = (List<Show>) d;
                     adapter.setShows((ArrayList<Show>) d);
                     adapter.notifyDataSetChanged();
+
+                    if(adapter.shows.size() > 0){
+                        CheckForNewEpisode chk = new CheckForNewEpisode(getActivity());
+                        chk.asyncTaskListener = this;
+                        chk.execute();
+                    }
+
                 }
             }
+
+            if(ASYNC_ID.equalsIgnoreCase(CheckForNewEpisode.ASYNC_ID)){
+                String resp = (String)data;
+                try {
+                    JSONArray arr = new JSONArray(resp);
+                    for(int i = 0; i < arr.length();i++){
+                        JSONObject item = arr.getJSONObject(i);
+                        for(Show showItem:adapter.shows){
+                            //System.out.println(showItem.showId + ":" + item.getInt("id"));
+                            if(showItem.showId == item.getInt("id")){
+                                showItem.hasNewEpisode = true;
+                                break;
+                            }
+
+                        }
+                    }
+
+                    adapter.notifyDataSetChanged();
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+
+            }
         }
-		dialog.dismiss();
+
 	}
 
     @Override
@@ -132,15 +148,14 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
 
     public void refreshData(boolean force){
-        this.force = force;
         onActivityDrawerClosed();
         force = false;
     }
 
 	public void onActivityDrawerClosed() {
-        if(force || adapter.shows.size() <=0){
-            GetShows async =  new GetShows(getActivity(), force);
-            async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
+        if(adapter.shows.size() <=0){
+            GetMyShows async = new GetMyShows(getActivity());
+            async.asyncTaskListener = this;
             async.execute();
         }
 	}
@@ -148,27 +163,26 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
 	@Override
 	public void onTaskWorking(String ASYNC_ID) {
-		dialog.show();
+
 	}
 
 	@Override
 	public void onTaskProgressUpdate(int progress,String ASYNC_ID) {
-        dialog.setProgress(progress);
+
 	}
 
 	@Override
-	public void onTaskProgressMax(int max,String ASYNC_ID) {
-        dialog.setMax(max);
+	public void onTaskProgressMax(int max,String ASYNC_ID){
 	}
 
 	@Override
 	public void onTaskUpdateMessage(String message,String ASYNC_ID) {
-        dialog.setMessage(message);
+
 	}
 
 	@Override
 	public void onTaskError(Exception e,String ASYNC_ID) {
-        dialog.setMessage("Error: " + e.getMessage());
+
 	}
 
 }

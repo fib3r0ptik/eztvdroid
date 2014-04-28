@@ -11,6 +11,7 @@
     <color name="extended_text">#C0D7E0</color>
     <color name="torrent_completed">#ff43ce6a</color>
     <color name="torrent_progress">#ff5bafc7</color>
-    <color name="torrent_paused_stop">#ffdedede</color>
-    <color name="torrent_queued">#ffa3a3a3</color>
+    <color name="torrent_paused">#ffff9900</color>
+    <color name="torrent_stopped">#ffcccccc</color>
+    <color name="torrent_queued">#ffdedede</color>
 </resources>

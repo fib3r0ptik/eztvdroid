@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:textAlignment="center" >
+
+    <ListView
+        android:id="@+id/rssfeed"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:cacheColorHint="#00000000"
+        android:choiceMode="singleChoice"
+        android:clickable="false"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:focusable="true"
+        android:footerDividersEnabled="false" >
+
+    </ListView>
+
+</RelativeLayout>

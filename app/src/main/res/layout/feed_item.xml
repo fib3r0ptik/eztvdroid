@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical"
+    android:id="@+id/feed_row_holder"
+    android:padding="6dp"
+    >
+
+    <TextView
+        android:id="@+id/feed_title"
+        android:text="30 Rock S02E03 HDTV x286 MVGroup"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+    <TextView
+        android:id="@+id/feed_ext_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_weight=".7"
+        android:text="396mb 4d 8hrs 3min" />
+
+</LinearLayout>

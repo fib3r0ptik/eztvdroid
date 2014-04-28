@@ -3,7 +3,7 @@ package com.hamaksoftware.eztvdroid.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EZTVRow implements Cloneable{
+public class Episode implements Cloneable{
 	public List<String> links;
 	public String title;
 	public String elapsed;
@@ -15,7 +15,7 @@ public class EZTVRow implements Cloneable{
 	public int showId;
 	
 	
-	public EZTVRow(){
+	public Episode(){
 		links = new ArrayList<String>(0);
 	}
 

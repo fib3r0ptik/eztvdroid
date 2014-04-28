@@ -1,6 +1,5 @@
 package com.hamaksoftware.eztvdroid.activities;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +9,10 @@ import org.json.JSONException;
 
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,8 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,14 +56,14 @@ public class Main extends Activity{
     public ProfileHandler ph;
     public ArrayList<ClientProfile> profiles;
     private FragmentManager fragmentManager;
+    private int currentSelectedChildPos;
+    private int currentSelectedParentPos;
     
     /* public members */
     
     public int currentPage;
-    //public IActivityListener activityListener;
-
     public int currentFragmentTag;
-    //public List<WeakReference<Fragment>> visibleFragments = new ArrayList<WeakReference<Fragment>>(0);
+
       
     private void prepareListData() {
     	
@@ -88,7 +82,6 @@ public class Main extends Activity{
 					obj.add(jsonarr.getString(j));
 					listDataChild.put(listDataHeader.get(i), obj);
 				}
-
 			} catch (JSONException e) {
 				Log.e("prepareData",e.getMessage());
 			}
@@ -177,6 +170,22 @@ public class Main extends Activity{
                     launchFragment(R.string.fragment_tag_pref,null, false);
                 }
 
+                if(currentFragmentTag == R.string.fragment_tag_myshows){
+                    launchFragment(R.string.fragment_tag_myshows,null,false);
+                }
+
+                if(currentFragmentTag == R.string.fragment_tag_rss){
+                    String uri = Utility.getURL(listDataChild.get(listDataHeader.get(currentSelectedParentPos)).get(currentSelectedChildPos));
+                    Bundle  args = new Bundle();
+                    args.putString("uri",uri);
+                    launchFragment(R.string.fragment_tag_rss,args,true);
+                }
+
+                if(currentFragmentTag == R.string.fragment_tag_downloads){
+                    Bundle  args = new Bundle();
+                    launchFragment(R.string.fragment_tag_downloads, args, true);
+                }
+
             }
 
             public void onDrawerOpened(View drawerView) {
@@ -246,6 +255,7 @@ public class Main extends Activity{
                 }else{
                     detail.setShowDetails(params.getInt("show_id"));
                 }
+
                 transaction.replace(R.id.content_frame, detail,getString(R.string.fragment_tag_show_detail));
                 break;
             case R.string.fragment_tag_pref:
@@ -255,9 +265,39 @@ public class Main extends Activity{
                 }
                 transaction.replace(R.id.content_frame, pref,getString(R.string.fragment_tag_pref));
                 break;
+            case R.string.fragment_tag_myshows:
+                MyShowsFragment myShowsFragment = (MyShowsFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_myshows));
+                if(myShowsFragment == null){
+                    myShowsFragment = new MyShowsFragment();
+                }
+                transaction.replace(R.id.content_frame, myShowsFragment,getString(R.string.fragment_tag_myshows));
+                break;
+            case R.string.fragment_tag_rss:
+                OtherSourceFragment sourceFragment = (OtherSourceFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_rss));
+                if(sourceFragment == null){
+                    sourceFragment = new OtherSourceFragment();
+                    sourceFragment.setArguments(params);
+                }else{
+                    sourceFragment.uri = params.getString("uri");
+                    sourceFragment.onActivityDrawerClosed();
+                }
+                transaction.replace(R.id.content_frame, sourceFragment,getString(R.string.fragment_tag_rss));
+                break;
+            case R.string.fragment_tag_downloads:
+                DownloadsFragment downloadsFragment = (DownloadsFragment)fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_downloads));
+                if(downloadsFragment == null){
+                    downloadsFragment = new DownloadsFragment();
+                    downloadsFragment.setArguments(params);
+                }
+                transaction.replace(R.id.content_frame, downloadsFragment,getString(R.string.fragment_tag_downloads));
+                break;
+
         }
 
-        transaction.addToBackStack(null);
+        if(currentFragmentTag != R.string.fragment_tag_show_detail) {
+            transaction.addToBackStack(null);
+        }
+
         transaction.commit();
         invalidateOptionsMenu();
         currentFragmentTag = fragmentTag; //just in case
@@ -393,6 +433,14 @@ public class Main extends Activity{
                     currentFragmentTag = R.string.fragment_tag_pref;
                 }
 
+                if(category.equals(getString(R.string.cat_myshows))){
+                    currentFragmentTag = R.string.fragment_tag_myshows;
+                }
+
+                if(category.equals(getString(R.string.cat_downloads))){
+                    currentFragmentTag = R.string.fragment_tag_downloads;
+                }
+
                 mDrawerLayout.closeDrawer(mDrawerList);
             }
 
@@ -419,6 +467,12 @@ public class Main extends Activity{
                 currentFragmentTag = R.string.fragment_tag_latest;
             }
 
+            if(cat.equals(getString(R.string.cat_sources))){
+                currentFragmentTag = R.string.fragment_tag_rss;
+            }
+
+            currentSelectedChildPos = childPosition;
+            currentSelectedParentPos = groupPosition;
 
             mDrawerList.setItemChecked(childPosition, true);
         	mDrawerLayout.closeDrawer(mDrawerList);

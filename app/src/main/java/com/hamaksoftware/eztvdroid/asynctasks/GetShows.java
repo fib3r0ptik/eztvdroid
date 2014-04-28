@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.AppPref;
 import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
+public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
     public static final String ASYNC_ID = "GETSHOWS";
     private int page;
     private Context ctx;
@@ -43,8 +43,8 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
     }
 
     @Override
-    protected ArrayList<EZTVShowItem> doInBackground(Void... voids) {
-        ArrayList<EZTVShowItem> shows = new ArrayList<EZTVShowItem>(0);
+    protected ArrayList<Show> doInBackground(Void... voids) {
+        ArrayList<Show> shows = new ArrayList<Show>(0);
         asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...",ASYNC_ID);
         int count = sh.getCount();
         try {
@@ -67,7 +67,7 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
                 asyncTaskListener.onTaskProgressMax(jShows.length(),ASYNC_ID);
                 sh.deleteAll();
                 for(int i = 0;  i < jShows.length();i++){
-                    EZTVShowItem show = new EZTVShowItem();
+                    Show show = new Show();
                     JSONObject item = jShows.getJSONObject(i);
                     show.title = item.getString("title");
                     show.status = item.getString("status");
@@ -106,7 +106,7 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<EZTVShowItem>>{
     }
 
     @Override
-    protected void onPostExecute(ArrayList<EZTVShowItem> data) {
+    protected void onPostExecute(ArrayList<Show> data) {
         asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 }

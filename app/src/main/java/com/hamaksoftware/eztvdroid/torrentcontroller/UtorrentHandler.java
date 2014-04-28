@@ -112,6 +112,7 @@ public class UtorrentHandler {
 		if(useAuth){
 			cn.getCredentialsProvider().setCredentials(new AuthScope(_host, _port), new UsernamePasswordCredentials(_username,_password));
 		}
+
 	}
 
 	private boolean hasStatus(int status, int haystack) {
@@ -129,7 +130,6 @@ public class UtorrentHandler {
 			NodeList div = doc.getElementsByTagName("div");
 			is.close();
 			token=div.item(0).getChildNodes().item(0).getNodeValue();
-			
 		}
 	}
 	
@@ -361,6 +361,7 @@ public class UtorrentHandler {
 		String line;
 		while ((line = rd.readLine()) != null) sb.append(line);
 		String result = sb.toString();
+        System.out.println(result);
 		JSONObject json = new JSONObject(result);
 		String bn = json.get("build").toString();
 		if (bn.equals("")) bn = "0";
@@ -368,7 +369,8 @@ public class UtorrentHandler {
 		lastStatusResult = (buildNo > 0);
 	}
 	
-	public void sendAction(TorrentAction action, String hash){
+	public void sendAction(TorrentAction action, String hash) throws ParserConfigurationException, SAXException, IOException {
+        getToken();
 		String uri = "http://" + _host + ":" + _port + "/gui/";
 		uri += "?token=" + token + "&action=" + getStringAction(action)+ hash;
 		try{

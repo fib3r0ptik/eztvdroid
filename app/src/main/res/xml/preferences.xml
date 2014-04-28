@@ -73,11 +73,6 @@
             android:title="Refresh Interval (in seconds)" />
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="use_landing"
-            android:summary="Check this box if you want start the app with the landing page "
-            android:title="Enable Landing Page" />
-        <CheckBoxPreference
-            android:defaultValue="false"
             android:key="use_subscription"
             android:summary="Check this box if you want to use the subscription and push notification enabled. "
             android:title="Enable Subscription/Push Notification" />

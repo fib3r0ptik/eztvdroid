@@ -13,22 +13,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hamaksoftware.eztvdroid.R;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.models.Show;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowItemAdapter extends BaseAdapter implements Filterable {
+public class ShowAdapter extends BaseAdapter implements Filterable {
     public Context context;
-    public List<EZTVShowItem> shows;
-    public List<EZTVShowItem> copy;
+    public List<Show> shows;
+    public List<Show> copy;
 
     @Override
     public Filter getFilter() {
         Filter filter = new Filter() {
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                shows = (List<EZTVShowItem>) results.values;
+                shows = (List<Show>) results.values;
                 notifyDataSetChanged();
             }
 
@@ -36,12 +36,12 @@ public class ShowItemAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence constraint) {
 
                 FilterResults results = new FilterResults();
-                ArrayList<EZTVShowItem> filteredShows = new ArrayList<EZTVShowItem>();
+                ArrayList<Show> filteredShows = new ArrayList<Show>();
 
                 constraint = constraint.toString().toLowerCase();
                 if(constraint.length() > 0) {
                     for (int i = 0; i < copy.size(); i++) {
-                        EZTVShowItem show = copy.get(i);
+                        Show show = copy.get(i);
                         if (show.title.toLowerCase().startsWith(constraint.toString())) {
                             filteredShows.add(show);
                         }
@@ -68,15 +68,15 @@ public class ShowItemAdapter extends BaseAdapter implements Filterable {
 
     }
 
-    public ShowItemAdapter(Context context, ArrayList<EZTVShowItem> shows) {
+    public ShowAdapter(Context context, ArrayList<Show> shows) {
         this.context = context;
         this.shows = shows;
-        this.copy = new ArrayList<EZTVShowItem>(shows);
+        this.copy = new ArrayList<Show>(shows);
     }
 
-    public void setShows(ArrayList<EZTVShowItem> shows){
+    public void setShows(ArrayList<Show> shows){
         this.shows = shows;
-        this.copy = new ArrayList<EZTVShowItem>(shows);
+        this.copy = new ArrayList<Show>(shows);
     }
 
     public int getCount() {
@@ -111,7 +111,7 @@ public class ShowItemAdapter extends BaseAdapter implements Filterable {
         }
 
 
-        final EZTVShowItem entry = shows.get(position);
+        final Show entry = shows.get(position);
 
         if(position % 2 == 0){
             holder.rowHolder.setBackgroundColor(Color.WHITE);

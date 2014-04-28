@@ -7,6 +7,7 @@
 
         <!-- item name="cat_presence">[\"TPB Status\"]</item -->
         <item name="cat_latest">[\"Latest\"]</item>
+        <item name="cat_myshows">[\"My Shows\"]</item>
         <item name="cat_shows">[\"Shows\"]</item>
         <item name="cat_sources">[\"Load other Sources\",\"EZTVRSS\",\"Yify-720p\",\"Yify-1080p\",\"TPB-HD-TV\",\"TPB-HD-Movies\",\"KAT Movies\",\"KAT-TV\"]</item>
         <item name="cat_downloads">[\"Downloads\"]</item>
@@ -29,11 +30,15 @@
     <string name="fragment_tag_shows">SHOWS_FRAGMENT</string>
     <string name="fragment_tag_show_detail">SHOWS_DETAIL</string>
     <string name="fragment_tag_pref">PREF_SCREEN</string>
+    <string name="fragment_tag_myshows">MYSHOWS_FRAGMENT</string>
+    <string name="fragment_tag_rss">RSS_FRAGMENT</string>
+    <string name="fragment_tag_downloads">DOWNLOAD_FRAGMENT</string>
 
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     <string name="cat_search">Search</string>
     <string name="cat_latest">Latest</string>
+    <string name="cat_myshows">My Shows</string>
     <string name="cat_shows">Shows</string>
     <string name="cat_downloads">Downloads</string>
     <string name="cat_sources">Load other Sources</string>
@@ -119,7 +124,7 @@
     <string name="download_remove">Remove</string>
     <string name="download_remove_data">Remove + Data</string>
     <string name="download_stop">Stop</string>
-    <string name="download_remove_all_completed">Remove All Completed</string>
+    <string name="download_remove_all_completed">Clear Completed</string>
     <string name="download_completed">Completed</string>
     <string name="tab_all">All</string>
     <string name="tab_downloading">Downloading</string>

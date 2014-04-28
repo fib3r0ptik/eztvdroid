@@ -12,29 +12,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.activities.Main;
-import com.hamaksoftware.eztvdroid.adapters.EZTVItemAdapter;
-import com.hamaksoftware.eztvdroid.asynctasks.GetLatestShow;
+import com.hamaksoftware.eztvdroid.adapters.EpisodeAdapter;
 import com.hamaksoftware.eztvdroid.asynctasks.Search;
 import com.hamaksoftware.eztvdroid.asynctasks.SendTorrent;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
+import com.hamaksoftware.eztvdroid.models.Episode;
 import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SearchFragment extends Fragment implements IAsyncTaskListener{
 	
 
 
 	protected ListView lv;
-	protected EZTVItemAdapter adapter;
+	protected EpisodeAdapter adapter;
 	protected View footer;
 	protected Main base;
 	
@@ -46,7 +43,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener{
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final EZTVRow row = adapter.listings.get(position);
+            final Episode row = adapter.listings.get(position);
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -154,7 +151,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener{
         lv = (ListView)rootView.findViewById(R.id.latest_list_feed);
         lv.setOnItemClickListener(itemClick);
         if(adapter == null) {
-            adapter = new EZTVItemAdapter(getActivity(),new ArrayList<EZTVRow>(0));
+            adapter = new EpisodeAdapter(getActivity(),new ArrayList<Episode>(0));
         }
 
         lv.setAdapter(adapter);
@@ -180,7 +177,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener{
 	public void onTaskCompleted(Object data, String ASYNC_ID) {
         if(data != null) {
             if (ASYNC_ID.equalsIgnoreCase(Search.ASYNC_ID)) {
-                ArrayList<EZTVRow> d = (ArrayList<EZTVRow>) data;
+                ArrayList<Episode> d = (ArrayList<Episode>) data;
                 if(d.size() > 0) {
                     adapter.listings = d;
                     adapter.notifyDataSetChanged();

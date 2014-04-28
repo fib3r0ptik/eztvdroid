@@ -1,23 +1,20 @@
 package com.hamaksoftware.eztvdroid.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
 import com.hamaksoftware.eztvdroid.R;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.models.Episode;
 
 import java.util.List;
 
-public class EZTVItemAdapter extends BaseAdapter{
+public class EpisodeAdapter extends BaseAdapter{
     public Context context;
-    public List<EZTVRow> listings;
+    public List<Episode> listings;
 
     private class ViewHolder{
         TextView title;
@@ -29,7 +26,7 @@ public class EZTVItemAdapter extends BaseAdapter{
 
     }
 
-    public EZTVItemAdapter(Context context, List<EZTVRow> listing) {
+    public EpisodeAdapter(Context context, List<Episode> listing) {
         this.context = context;
         this.listings = listing;
     }
@@ -73,7 +70,7 @@ public class EZTVItemAdapter extends BaseAdapter{
         }
 
 
-        final EZTVRow entry = listings.get(position);
+        final Episode entry = listings.get(position);
 
         if(position % 2 == 0){
             holder.rowHolder.setBackgroundColor(Color.WHITE);

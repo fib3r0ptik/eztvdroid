@@ -64,8 +64,8 @@ public class RSSHandler extends DefaultHandler {
 		}
 		if (localName.equals("image")) {
 			// record our feed data - we temporarily stored it in the item :)
-			_feed.title = _item._title;
-			_feed.pubdate = _item._pubdate;
+			_feed.title = _item.title;
+			_feed.pubdate = _item.pubdate;
 		}
 		if (localName.equals("item")) {
 			// create a new item
@@ -85,7 +85,7 @@ public class RSSHandler extends DefaultHandler {
 			return;
 		}
 		if (localName.equals("category")) {
-			_item._showLink = atts.getValue("domain");
+			_item.showLink = atts.getValue("domain");
 			currentstate = RSS_CATEGORY;
 			return;
 		}
@@ -100,8 +100,8 @@ public class RSSHandler extends DefaultHandler {
 		}
 		
 		if (localName.equals("enclosure")) {
-			_item._filesize = Double.parseDouble(atts.getValue("length"));
-			_item._altLInk = atts.getValue("url");
+			_item.filesize = Double.parseDouble(atts.getValue("length"));
+			_item.altLInk = atts.getValue("url");
 			currentstate = RSS_ENCLOSURE;
 			return;
 		}
@@ -129,8 +129,6 @@ public class RSSHandler extends DefaultHandler {
 		if (localName.equals("item")) {
 			_feed.addItem(_item);
 			count++;
-			//listener.onTaskProgressMax(calculatedItemCount);
-			//listener.onTaskProgressUpdate(count);
 			return;
 		}
 	}
@@ -141,39 +139,39 @@ public class RSSHandler extends DefaultHandler {
 
 		switch (currentstate) {
 		case RSS_TITLE:
-			_item._title = theString;
+			_item.title = theString;
 			currentstate = 0;
 			break;
 		case RSS_LINK:
-			_item._link = theString;
+			_item.itemlink = theString;
 			currentstate = 0;
 			break;
 		case RSS_DESCRIPTION:
-			_item._description = theString;
+			_item.description = theString;
 			currentstate = 0;
 			break;
 		case RSS_CATEGORY:
-			_item._category = theString;
+			_item.category = theString;
 			currentstate = 0;
 			break;
 		case RSS_PUBDATE:
-			_item._pubdate = theString;
+			_item.pubdate = theString;
 			currentstate = 0;
 			break;
 		case RSS_ENCLOSURE:
-			_item._enclosure = theString;
+			_item.enclosure = theString;
 			currentstate = 0;
 			break;
 		case RSS_COMMENTS:
-			_item._comments = theString;
+			_item.comments = theString;
 			currentstate = 0;
 			break;
 		case RSS_GUID:
-			_item._guid = theString;
+			_item.guid = theString;
 			currentstate = 0;
 			break;
 		case RSS_LINKS:
-			_item._link = theString;
+			_item.itemlink = theString;
 			currentstate = 0;
 			break;
 		default:

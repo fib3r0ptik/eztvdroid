@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.models.Episode;
+import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
+public class Search extends AsyncTask<Void, Void, ArrayList<Episode>>{
     public static final String ASYNC_ID = "SEARCH";
     private Context ctx;
     private ShowHandler sh;
@@ -39,8 +39,8 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
     }
 
     @Override
-    protected ArrayList<EZTVRow> doInBackground(Void... voids) {
-        ArrayList<EZTVRow> items = new ArrayList<EZTVRow>(0);
+    protected ArrayList<Episode> doInBackground(Void... voids) {
+        ArrayList<Episode> items = new ArrayList<Episode>(0);
         String response = "";
         try{
             ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(4);
@@ -55,7 +55,7 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
                 JSONArray latest = jResponse.getJSONArray("data");
                 for(int i = 0; i < latest.length();i++){
                     JSONObject item = latest.getJSONObject(i);
-                    EZTVRow row = new EZTVRow();
+                    Episode row = new Episode();
                     row.title = item.getString("title");
                     row.filesize = Utility.getFancySize(item.getLong("size"));
                     row.elapsed = Utility.getElapsed(item.getString("pubdate"));
@@ -77,7 +77,7 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
         return items;
     }
     @Override
-    protected void onPostExecute(ArrayList<EZTVRow> data) {
+    protected void onPostExecute(ArrayList<Episode> data) {
         asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 
@@ -85,7 +85,7 @@ public class Search extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
         boolean isFav;
         if(showId==187) return false;
         try{
-            EZTVShowItem row = sh.getShow(showId);
+            Show row = sh.getShow(showId);
             isFav = row.isSubscribed;
         }catch(Exception e){
             return false;

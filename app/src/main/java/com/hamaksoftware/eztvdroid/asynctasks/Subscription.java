@@ -5,9 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
-import com.hamaksoftware.eztvdroid.torrentcontroller.UtorrentHandler;
+import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.AppPref;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
@@ -20,13 +18,13 @@ import java.util.ArrayList;
 
 public class Subscription extends AsyncTask<Void, Void, Boolean>{
     public static final String ASYNC_ID = "SUBSCRIPTION";
-    private EZTVShowItem show;
+    private Show show;
     private Context ctx;
     private AppPref pref;
     public IAsyncTaskListener asyncTaskListener;
 
 
-    public Subscription(Context ctx, EZTVShowItem show){
+    public Subscription(Context ctx, Show show){
         this.show = show;
         this.ctx  = ctx;
         pref = new AppPref(ctx);

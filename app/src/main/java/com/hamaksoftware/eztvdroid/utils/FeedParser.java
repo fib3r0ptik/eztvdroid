@@ -27,17 +27,11 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class FeedParser {
 	private String url;
-	public static int progress = 0;
-	public IAsyncTaskListener l;
-	AppPref pref;
-	boolean _forced;
-	private Context _context;
+	private Context ctx;
 	
-	public FeedParser(String _url, Context context,boolean forced){
-		url = _url;
-		pref = new AppPref(context);
-		_forced = forced;
-		_context = context;
+	public FeedParser(Context ctx, String url){
+		this.url = url;
+		this.ctx = ctx;
 	}
 	
 	
@@ -49,48 +43,42 @@ public class FeedParser {
 			SAXParser parser = factory.newSAXParser();
 			XMLReader xmlreader = parser.getXMLReader();
 			RSSHandler rsshandler = new RSSHandler();
-			rsshandler.setAsyncTaskListener(l);
+			//rsshandler.setAsyncTaskListener(l);
 			xmlreader.setContentHandler(rsshandler);
-			
-			if(pref.getFeedCache().equals("") || _forced){
-	
-				HttpParams params = new BasicHttpParams();
-				HttpConnectionParams.setConnectionTimeout(params, 3000);
-				HttpConnectionParams.setSoTimeout(params, 10000); 
-				DefaultHttpClient cn = new DefaultHttpClient(params);
-				HttpGet httpget = new HttpGet(url);
-				httpget.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.215 Safari/535.1");
-				//httpget.addHeader("Accept-Charset","utf-8");
-				httpget.addHeader("Accept-Encoding", "gzip");
-				
-				HttpResponse response = cn.execute(httpget);
-				InputStream is = response.getEntity().getContent();
-				Header contentEncoding = response.getFirstHeader("Content-Encoding");
-				if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
-				    is = new GZIPInputStream(is);
-				}
-				BufferedReader rd = new BufferedReader(new InputStreamReader(is), 8 * 1024);
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = rd.readLine()) != null) sb.append(line);
-				rawContent = sb.toString();
-				rd.close();
-				pref.setFeedCache(rawContent);
-			}else{
-				rawContent = pref.getFeedCache();
-			}
-			
+
+            HttpParams params = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(params, 3000);
+            HttpConnectionParams.setSoTimeout(params, 10000);
+            DefaultHttpClient cn = new DefaultHttpClient(params);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.215 Safari/535.1");
+            //httpget.addHeader("Accept-Charset","utf-8");
+            httpget.addHeader("Accept-Encoding", "gzip");
+
+            HttpResponse response = cn.execute(httpget);
+            InputStream is = response.getEntity().getContent();
+            Header contentEncoding = response.getFirstHeader("Content-Encoding");
+            if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+                is = new GZIPInputStream(is);
+            }
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = rd.readLine()) != null) sb.append(line);
+            rawContent = sb.toString();
+            rd.close();
+
 			InputStream iss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
 			InputStream icss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
 			InputSource isrc = new InputSource(iss);
-			int count = Utility.getInstance(_context).countElement("//item", new InputSource(icss));
-			//Log.i("count",count+"");
+			int count = Utility.getInstance(ctx).countElement("//item", new InputSource(icss));
 			rsshandler.calculatedItemCount = count;
 			xmlreader.parse(isrc);
 
 			return rsshandler.getFeed();
+
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			return new RSSFeed();
 		}
 	}

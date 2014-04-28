@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
+import com.hamaksoftware.eztvdroid.models.Episode;
+import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
+public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<Episode>>{
     public static final String ASYNC_ID = "GETLATESTSHOW";
     private int page;
     private Context ctx;
@@ -36,20 +36,24 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
     }
 
     @Override
-    protected ArrayList<EZTVRow> doInBackground(Void... voids) {
-        ArrayList<EZTVRow> items = new ArrayList<EZTVRow>(0);
+    protected ArrayList<Episode> doInBackground(Void... voids) {
+
+        ArrayList<Episode> items = new ArrayList<Episode>(0);
         try{
             ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(2);
             param.add(new BasicNameValuePair("page", page+""));
             param.add(new BasicNameValuePair("method", "getLatest"));
             String response = Utility.getInstance(ctx).doPostRequest(param);
             JSONObject jResponse = new JSONObject(response);
+
+
+
             if(jResponse.getInt("err") == 0){
                 JSONArray latest = jResponse.getJSONArray("data");
                 for(int i = 0; i < latest.length();i++){
                     JSONObject item = latest.getJSONObject(i);
                     if(!item.getString("show_id").equals("add")){
-                        EZTVRow row = new EZTVRow();
+                        Episode row = new Episode();
                         row.title = item.getString("title");
                         row.filesize = Utility.getFancySize(item.getLong("size"));
                         row.elapsed = Utility.getElapsed(item.getString("pubdate"));
@@ -75,7 +79,7 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
         return items;
     }
     @Override
-    protected void onPostExecute(ArrayList<EZTVRow> data) {
+    protected void onPostExecute(ArrayList<Episode> data) {
         asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 
@@ -83,7 +87,7 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<EZTVRow>>{
         boolean isFav;
         if(showId==187) return false;
         try{
-            EZTVShowItem row = sh.getShow(showId);
+            Show row = sh.getShow(showId);
             isFav = row.isSubscribed;
         }catch(Exception e){
             return false;

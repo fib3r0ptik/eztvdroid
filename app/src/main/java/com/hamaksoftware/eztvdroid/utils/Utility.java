@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.asynctasks.MarkDownload;
 
 import org.apache.http.HttpResponse;
@@ -31,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -415,6 +417,76 @@ public class Utility {
         }
     }
 
+    public static void CopyStream(InputStream is, OutputStream os) {
+        final int buffer_size = 1024;
+        try {
+            byte[] bytes = new byte[buffer_size];
+            for (;;) {
+                int count = is.read(bytes, 0, buffer_size);
+                if (count == -1)
+                    break;
+                os.write(bytes, 0, count);
+            }
+        } catch (Exception ex) {
+        }
+    }
 
+    public static String getURL(String feed){
+
+        if(ctx.getString(R.string.subcat_sources_eztvrss).equalsIgnoreCase(feed)){
+            return "http://www.ezrss.it/feed/";
+        }
+        if(ctx.getString(R.string.subcat_sources_yify720p).equalsIgnoreCase(feed)){
+            return "http://yify-torrents.com/rss/0/720p/All/0";
+        }
+        if(ctx.getString(R.string.subcat_sources_yify1080p).equalsIgnoreCase(feed)){
+            return "http://yify-torrents.com/rss/0/1080p/All/0";
+        }
+        if(ctx.getString(R.string.subcat_sources_tpbhdmovies).equalsIgnoreCase(feed)){
+            return "http://rss.thepiratebay.org/207";
+        }
+        if(ctx.getString(R.string.subcat_sources_tpbhdtv).equalsIgnoreCase(feed)){
+            return "http://rss.thepiratebay.org/208";
+        }
+        if(ctx.getString(R.string.subcat_sources_katmovies).equalsIgnoreCase(feed)){
+            return "http://kickass.to/movies/?rss=1";
+        }
+        if(ctx.getString(R.string.subcat_sources_kattv).equalsIgnoreCase(feed)){
+            return "http://kickass.to/tv/?rss=1";
+        }
+
+        return null;
+    }
+
+
+    public static String convertSecs(int time) {
+        String ret = "";
+        int w = (time / 86400) / 7;
+        int d = (time / 86400) % 7;
+        int h = (time / 3600) % 24;
+        int m = (time / 60) % 60;
+        if (w > 0) {
+            ret = w + "w ";
+        }
+        if (d > 0) {
+            ret += d + "d ";
+        }
+        if (h > 0) {
+            ret += h + "h ";
+        }
+        if (m > 0) {
+            ret += m + "m";
+        }
+        return ret;
+    }
+
+    public static boolean hasStatus(int status, int haystack) {
+        return status == (status & haystack);
+    }
+
+    public int dip(int pixels) {
+        float scale = ctx.getResources().getDisplayMetrics().density;
+        return (int) (pixels * scale + 0.5f);
+    }
 
 }

@@ -28,7 +28,7 @@ public class DBHandler extends SQLiteOpenHelper{
     final String KEY_STATUS = "show_status";
     final String KEY_ISSELECTED = "show_isselected";
     final String KEY_ISSUBSCRIBE = "show_issubscribe";
-	
+
 	public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	 }
@@ -47,6 +47,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 + KEY_SHOWLINK + " TEXT," +KEY_STATUS+" TEXT, "+ KEY_ISSELECTED + " INTEGER,"
                 + KEY_ISSUBSCRIBE + " INTEGER)";
         db.execSQL(CREATE_SHOWS_TABLE);
+        db.close();
         //Log.i("sql","oncreate");
 	}
 

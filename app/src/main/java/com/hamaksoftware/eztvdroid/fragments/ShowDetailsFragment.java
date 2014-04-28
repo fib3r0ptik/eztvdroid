@@ -18,33 +18,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.activities.Main;
-import com.hamaksoftware.eztvdroid.adapters.EZTVItemAdapter;
-import com.hamaksoftware.eztvdroid.asynctasks.GetLatestShow;
+import com.hamaksoftware.eztvdroid.adapters.EpisodeAdapter;
 import com.hamaksoftware.eztvdroid.asynctasks.GetShowPoster;
 import com.hamaksoftware.eztvdroid.asynctasks.GetSubscriberCount;
 import com.hamaksoftware.eztvdroid.asynctasks.Search;
 import com.hamaksoftware.eztvdroid.asynctasks.SendTorrent;
 import com.hamaksoftware.eztvdroid.asynctasks.Subscription;
-import com.hamaksoftware.eztvdroid.models.EZTVRow;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
-import com.hamaksoftware.eztvdroid.utils.AppPref;
-import com.hamaksoftware.eztvdroid.utils.ShowHandler;
+import com.hamaksoftware.eztvdroid.models.Episode;
+import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
 
@@ -52,19 +46,20 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
 	protected View footer;
 	protected Main base;
 
-    private EZTVShowItem show;
+
+    public Show show;
     private ImageView img;
     private TextView d;
     private TextView s;
     private TextView status;
-    private EZTVItemAdapter adapter;
+    private EpisodeAdapter adapter;
 
 	private ProgressDialog dialog;
     public boolean force;
 
 
     public void setShowDetails(int showId){
-        show =  base.sh.getShow(showId);
+        this.show =  base.sh.getShow(showId);
         base.setTitle(show.title);
         status.setText(show.isSubscribed?"UNSUBSCRIBE":"SUBSCRIBE");
         if(show.isSubscribed){
@@ -80,7 +75,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final EZTVRow row = adapter.listings.get(position-1);
+            final Episode row = adapter.listings.get(position-1);
             final CharSequence[] items = {getString(R.string.dialog_open),getString(R.string.dialog_send)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -152,7 +147,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
         final View headerView = inflater.inflate(R.layout.show_detail_header, null, false);
 
 
-        adapter = new EZTVItemAdapter(getActivity(), new ArrayList<EZTVRow>(0));
+        adapter = new EpisodeAdapter(getActivity(), new ArrayList<Episode>(0));
         img = (ImageView)headerView.findViewById(R.id.poster);
 
 
@@ -254,7 +249,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener{
 
         if(ASYNC_ID.equalsIgnoreCase(Search.ASYNC_ID)){
             if(data != null){
-                ArrayList<EZTVRow> items = (ArrayList<EZTVRow>)data;
+                ArrayList<Episode> items = (ArrayList<Episode>)data;
                 adapter.listings = items;
                 adapter.notifyDataSetChanged();
             }else{

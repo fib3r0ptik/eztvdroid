@@ -128,6 +128,11 @@ public class DrawerGroupAdapter extends BaseExpandableListAdapter {
                     imgCatIcon.setBackgroundResource(R.drawable.ic_action_computer);
                 }
 
+
+                if(category.equals(_context.getResources().getString(R.string.cat_myshows))){
+                    imgCatIcon.setBackgroundResource(R.drawable.ic_action_favorite);
+                }
+
                 if(category.equals(_context.getResources().getString(R.string.cat_downloads))){
                     imgCatIcon.setBackgroundResource(R.drawable.ic_action_download);
                 }

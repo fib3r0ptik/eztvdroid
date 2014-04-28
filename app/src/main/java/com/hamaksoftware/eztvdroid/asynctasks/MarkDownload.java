@@ -2,17 +2,13 @@ package com.hamaksoftware.eztvdroid.asynctasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
-import com.hamaksoftware.eztvdroid.models.EZTVShowItem;
 import com.hamaksoftware.eztvdroid.utils.AppPref;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
