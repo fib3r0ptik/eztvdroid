@@ -16,6 +16,7 @@ import com.hamaksoftware.eztvdroid.activities.Main;
 import com.hamaksoftware.eztvdroid.adapters.ShowAdapter;
 import com.hamaksoftware.eztvdroid.asynctasks.GetShows;
 import com.hamaksoftware.eztvdroid.models.Show;
+import com.hamaksoftware.eztvdroid.utils.ShowHandler;
 import com.hamaksoftware.eztvdroid.utils.Utility;
 
 import java.util.ArrayList;
@@ -134,11 +135,12 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
     public void refreshData(boolean force){
         this.force = force;
         onActivityDrawerClosed();
-        force = false;
+        this.force = false;
     }
 
 	public void onActivityDrawerClosed() {
-        if(force || adapter.shows.size() <=0){
+        ShowHandler sh = new ShowHandler(getActivity());
+        if(force || sh.getCount() <= 0){
             GetShows async =  new GetShows(getActivity(), force);
             async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
             async.execute();
