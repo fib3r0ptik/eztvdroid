@@ -7,18 +7,28 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class ProfileHandler extends DBHandler {
-	ArrayList<ClientProfile> profiles;
-    
-	public ProfileHandler(Context context) {
-		super(context);
+public class ProfileHandler{
+    private Context ctx;
+	private ArrayList<ClientProfile> profiles;
+
+    final String KEY_PROFILE_ID = "client_id";
+    final String KEY_NAME = "client_name";
+    final String KEY_HOST = "client_host";
+    final String KEY_PORT = "client_port";
+    final String KEY_UID = "client_username";
+    final String KEY_PWD = "client_password";
+    final String KEY_AUTH = "client_useauth";
+    final String KEY_TYPE = "client_type";
+    final String TABLE_PROFILES = "profiles";
+
+	public ProfileHandler(Context ctx) {
+        this.ctx = ctx;
 		profiles = new ArrayList<ClientProfile>(0);
-		super.onCreate(this.getWritableDatabase());
 	}
 
 	
 	public void addProfile(ClientProfile profile) {
- 	   SQLiteDatabase db = this.getWritableDatabase();
+ 	   SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
  	   
  	    ContentValues values = new ContentValues();
  	    values.put(KEY_NAME, profile.name);
@@ -30,12 +40,12 @@ public class ProfileHandler extends DBHandler {
  	    values.put(KEY_TYPE, profile.clientType);
  	    
  	    db.insert(TABLE_PROFILES, null, values);
- 	    db.close();
+ 	    //db.close();
  }
  
 	 // Getting single contact
 	 public ClientProfile getProfile(int id) {
-		   SQLiteDatabase db = this.getReadableDatabase();
+		   SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		   
 		    Cursor cursor = db.query(TABLE_PROFILES, new String[] { KEY_PROFILE_ID,
 		            KEY_NAME, KEY_HOST, KEY_PORT, KEY_UID, KEY_PWD, KEY_AUTH, KEY_TYPE}, KEY_PROFILE_ID + "=?",
@@ -54,21 +64,22 @@ public class ProfileHandler extends DBHandler {
 		    profile.clientType = cursor.getInt(7);
 		    
 		    cursor.close();
-		    db.close();
+		    //db.close();
 		    return profile;
 	 }
 
 	 public int getCount(){
 		 int count = 0;
 		 String selectQuery = "SELECT  count(*) FROM " + TABLE_PROFILES;
-		    SQLiteDatabase db = this.getReadableDatabase();
+		    SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		    Cursor cursor = db.rawQuery(selectQuery, null);
 		    if (cursor.moveToFirst()) {
 		        do {
 		        	count = cursor.getInt(0);
 		        } while (cursor.moveToNext());
 		    }
-		  
+           cursor.close();
+          //db.close();
 		  return count;  
 	 }
 	 
@@ -77,7 +88,7 @@ public class ProfileHandler extends DBHandler {
 	 public ArrayList<ClientProfile> getAllProfiles() {
 		    String selectQuery = "SELECT  * FROM " + TABLE_PROFILES;
 		 
-		    SQLiteDatabase db = this.getReadableDatabase();
+		    SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		    Cursor cursor = db.rawQuery(selectQuery, null);
 	
 		    if (cursor.moveToFirst()) {
@@ -96,14 +107,14 @@ public class ProfileHandler extends DBHandler {
 		    }
 		 
 		    cursor.close();
-		    db.close();
+		    //db.close();
 		    return profiles;
 	 }
 	  
 
 
 	 public int updateProfile(ClientProfile profile) {
-	    SQLiteDatabase db = this.getWritableDatabase();
+	    SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
 	    
 	    ContentValues values = new ContentValues();
 	    values.put(KEY_NAME, profile.name);
@@ -114,14 +125,16 @@ public class ProfileHandler extends DBHandler {
 	    values.put(KEY_AUTH, profile.useAuth);
 	    values.put(KEY_TYPE, profile.clientType);
 	    
-	    return db.update(TABLE_PROFILES, values, KEY_PROFILE_ID + " = ?",
+	    int c = db.update(TABLE_PROFILES, values, KEY_PROFILE_ID + " = ?",
 	            new String[] { String.valueOf(profile.id) });
+         //db.close();
+         return c;
 	 }
 	  
 	 public void deleteProfile(ClientProfile profile) {
-		   SQLiteDatabase db = this.getWritableDatabase();
+		   SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
 		    db.delete(TABLE_PROFILES, KEY_PROFILE_ID + " = ?",
 		            new String[] { String.valueOf(profile.id) });
-		    db.close();
+		    //db.close();
 	 }
 }

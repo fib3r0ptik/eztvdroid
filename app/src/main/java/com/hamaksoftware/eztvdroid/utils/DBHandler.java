@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHandler extends SQLiteOpenHelper{
 	private static final int DATABASE_VERSION = 6;
-	private static final String DATABASE_NAME = "EZTVDB";
+	private static final String DATABASE_NAME = "EZTVDroidDB";
 	final String TABLE_PROFILES = "profiles";
-	final String TABLE_SHOWS = "myshows";
+    final String TABLE_SHOWS = "myshows";
 	
     final String KEY_PROFILE_ID = "client_id";
     final String KEY_NAME = "client_name";
@@ -20,8 +20,7 @@ public class DBHandler extends SQLiteOpenHelper{
     final String KEY_PWD = "client_password";
     final String KEY_AUTH = "client_useauth";
     final String KEY_TYPE = "client_type";
-	
-    
+
     final String KEY_SHOW_ID = "show_id";
     final String KEY_TITLE = "show_title";
     final String KEY_SHOWLINK = "show_link";
@@ -29,9 +28,18 @@ public class DBHandler extends SQLiteOpenHelper{
     final String KEY_ISSELECTED = "show_isselected";
     final String KEY_ISSUBSCRIBE = "show_issubscribe";
 
-	public DBHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-	 }
+    private static DBHandler obj;
+
+	private DBHandler(Context ctx) {
+        super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public static synchronized DBHandler getInstance(Context ctx){
+        if(obj == null){
+            obj = new DBHandler(ctx);
+        }
+        return obj;
+    }
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -47,7 +55,7 @@ public class DBHandler extends SQLiteOpenHelper{
                 + KEY_SHOWLINK + " TEXT," +KEY_STATUS+" TEXT, "+ KEY_ISSELECTED + " INTEGER,"
                 + KEY_ISSUBSCRIBE + " INTEGER)";
         db.execSQL(CREATE_SHOWS_TABLE);
-        db.close();
+        //db.close();
         //Log.i("sql","oncreate");
 	}
 

@@ -9,18 +9,27 @@ import com.hamaksoftware.eztvdroid.models.*;
 
 import java.util.ArrayList;
 
-public class ShowHandler extends DBHandler{
+public class ShowHandler{
 
-	ArrayList<Show> shows;
+	private ArrayList<Show> shows;
+    private Context ctx;
 
-    public ShowHandler(Context context) {
-        super(context);
+    final String KEY_SHOW_ID = "show_id";
+    final String KEY_TITLE = "show_title";
+    final String KEY_SHOWLINK = "show_link";
+    final String KEY_STATUS = "show_status";
+    final String KEY_ISSELECTED = "show_isselected";
+    final String KEY_ISSUBSCRIBE = "show_issubscribe";
+
+    final String TABLE_SHOWS = "myshows";
+
+    public ShowHandler(Context ctx) {
+        this.ctx = ctx;
         shows = new ArrayList<Show>(0);
-        super.onCreate(this.getWritableDatabase());
     }
 
     public void addShow(Show show) {
-    	   SQLiteDatabase db = this.getWritableDatabase();
+    	   SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
     	   
     	    ContentValues values = new ContentValues();
     	    values.put(KEY_SHOW_ID,show.showId);
@@ -31,13 +40,13 @@ public class ShowHandler extends DBHandler{
     	    values.put(KEY_ISSUBSCRIBE, show.isSubscribed);
 
     	    db.insert(TABLE_SHOWS, null, values);
-    	    db.close();
+    	    //db.close();
     }
 
 
 	 public Show getShow(int id) {
-		   SQLiteDatabase db = this.getReadableDatabase();
-		   
+
+		   SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		    Cursor cursor = db.query(TABLE_SHOWS, new String[] { KEY_SHOW_ID,KEY_TITLE, KEY_SHOWLINK, KEY_STATUS, KEY_ISSELECTED, KEY_ISSUBSCRIBE}, KEY_SHOW_ID + "=?",
 		            new String[] { String.valueOf(id) }, null, null, null, null);
 		    //if (cursor != null) cursor.moveToFirst();
@@ -53,7 +62,7 @@ public class ShowHandler extends DBHandler{
 		    }
 		    
 		    cursor.close();
-            db.close();
+            //db.close();
 		    return show;
 	 }
 	  
@@ -61,7 +70,7 @@ public class ShowHandler extends DBHandler{
 	 public int getCount(){
 		 int count = 0;
 		 String selectQuery = "SELECT  count(*) FROM " + TABLE_SHOWS;
-		    SQLiteDatabase db = this.getReadableDatabase();
+		    SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		    Cursor cursor = db.rawQuery(selectQuery, null);
 		    if (cursor.moveToFirst()) {
 		        do {
@@ -70,7 +79,7 @@ public class ShowHandler extends DBHandler{
 		    }
 
           cursor.close();
-          db.close();
+          //db.close();
 		  return count;  
 	 }
 	 
@@ -78,7 +87,7 @@ public class ShowHandler extends DBHandler{
 	 public int getSubscribeCount(){
         int count = 0;
         String selectQuery = "SELECT  count(*) FROM " + TABLE_SHOWS + " where " + KEY_ISSUBSCRIBE + "=1" ;
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
@@ -86,7 +95,7 @@ public class ShowHandler extends DBHandler{
             }while(cursor.moveToNext());
         }
         cursor.close();
-        db.close();
+        //db.close();
         return count;
 	 }
 	 
@@ -96,7 +105,7 @@ public class ShowHandler extends DBHandler{
 		    // Select All Query
 		    String selectQuery = "SELECT  * FROM " + TABLE_SHOWS;
 		 
-		    SQLiteDatabase db = this.getReadableDatabase();
+		    SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
 		    Cursor cursor = db.rawQuery(selectQuery, null);
 		 
 		    // looping through all rows and adding to list
@@ -114,12 +123,12 @@ public class ShowHandler extends DBHandler{
 		    }
 		 
 		    cursor.close();
-		    db.close();
+		    //db.close();
 		    return shows;
 	 }
 
     public void deleteAll(){
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
         db.delete(TABLE_SHOWS, null, null);
         db.close();
     }
@@ -129,7 +138,7 @@ public class ShowHandler extends DBHandler{
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_SHOWS + " where " + KEY_ISSUBSCRIBE+ "=1";
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = DBHandler.getInstance(ctx).getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -147,12 +156,12 @@ public class ShowHandler extends DBHandler{
         }
 
         cursor.close();
-        db.close();
+        //db.close();
         return shows;
     }
 
 	 public int updateShow(Show show) {
-	    SQLiteDatabase db = this.getWritableDatabase();
+	    SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
 	    
 	    ContentValues values = new ContentValues();
          values.put(KEY_SHOW_ID, show.showId);
@@ -164,16 +173,16 @@ public class ShowHandler extends DBHandler{
 	    
 	    int count = db.update(TABLE_SHOWS, values, KEY_SHOW_ID + " = ?",
 	            new String[] { String.valueOf(show.showId) });
-        db.close();
+        //db.close();
         return count;
 	 }
 	  
 	 // Deleting single contact
 	 public void deleteShow(Show show) {
-		   SQLiteDatabase db = this.getWritableDatabase();
+		   SQLiteDatabase db = DBHandler.getInstance(ctx).getWritableDatabase();
 		    db.delete(TABLE_SHOWS, KEY_SHOW_ID + " = ?",
 		            new String[] { String.valueOf(show.showId) });
-		    db.close();
+		    //db.close();
 	 }
     
     

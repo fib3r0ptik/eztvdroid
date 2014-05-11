@@ -98,8 +98,6 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
             //cloneShowItems();
         } catch (JSONException e) {
             Log.e("err", e.getMessage());
-        }finally{
-            sh.close();
         }
 
         return shows;

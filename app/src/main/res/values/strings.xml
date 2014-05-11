@@ -155,5 +155,6 @@
     <string name="pref_cat_app_settings">Application Settings</string>
     <string name="pref_cat_app_client">Remote Torrent Clinet Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="message_verify_profile_success">Successfully Verified your Settings.</string>
+    <string name="message_verify_profile_failed">Unable to verify your Settings. Please check the values, or check your FIREWALL settings.</string>
 </resources>

@@ -88,7 +88,14 @@ public class Main extends Activity{
         }
        
     }
-    
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        DBHandler.getInstance(getApplicationContext()).close();
+    }
+
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +103,8 @@ public class Main extends Activity{
         setContentView(R.layout.activity_main);
 
         pref = new AppPref(getApplicationContext());
-        ph = new ProfileHandler(getApplicationContext());
-        profiles = ph.getAllProfiles();
+        //ph = new ProfileHandler(getApplicationContext());
+        //profiles = ph.getAllProfiles();
         sh = new ShowHandler(getApplicationContext());
 
         Utility.getInstance(getApplicationContext()).registerInBackground();
@@ -133,7 +140,7 @@ public class Main extends Activity{
             public void onGroupExpand(int i) {
                 LinearLayout parent = (LinearLayout)mDrawerList.getChildAt(i);
                 ImageView collapse = (ImageView)parent.findViewById(R.id.drawer_collapse);
-                collapse.setImageResource(R.drawable.ic_action_collapse);
+                if(collapse != null) collapse.setImageResource(R.drawable.ic_action_collapse);
             }
         });
 

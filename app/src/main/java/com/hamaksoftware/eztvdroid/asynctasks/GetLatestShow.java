@@ -64,7 +64,7 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<Episode>>{
                             row.links.add(jLinks.getString(j));
                         }
 
-                        row.isFavorite = isFavorite(row.showId);
+                        //row.isFavorite = isFavorite(row.showId);
                         items.add(row);
                     }
                 }
@@ -83,8 +83,9 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<Episode>>{
         asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
     }
 
+    /*
     public boolean isFavorite(int showId){
-        boolean isFav;
+        boolean isFav = false;
         if(showId==187) return false;
         try{
             Show row = sh.getShow(showId);
@@ -92,7 +93,7 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<Episode>>{
         }catch(Exception e){
             return false;
         }
-
         return isFav;
     }
+    */
 }

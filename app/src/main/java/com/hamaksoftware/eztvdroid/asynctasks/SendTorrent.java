@@ -2,7 +2,6 @@ package com.hamaksoftware.eztvdroid.asynctasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.hamaksoftware.eztvdroid.fragments.IAsyncTaskListener;
 import com.hamaksoftware.eztvdroid.models.Episode;
@@ -37,13 +36,13 @@ public class SendTorrent extends AsyncTask<Void, Void, Boolean>{
             switch (type) {
                 case UTORRENT:
                     UtorrentHandler uh = new UtorrentHandler(ctx);
-                    uh.setOptions(pref.getIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    uh.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     uh.addTorrent(item.links.get(0));
                     return uh.lastStatusResult;
                 case TRANSMISSION:
                     TransmissionHandler th = new TransmissionHandler(ctx);
-                    th.setOptions(pref.getIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    th.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     th.addTorrent(item.links.get(0));
                     return th.lastStatusResult;

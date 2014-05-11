@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,9 +15,7 @@ import com.hamaksoftware.eztvdroid.R;
 import com.hamaksoftware.eztvdroid.activities.Main;
 import com.hamaksoftware.eztvdroid.adapters.DownloadAdapter;
 import com.hamaksoftware.eztvdroid.asynctasks.GetTorrents;
-import com.hamaksoftware.eztvdroid.asynctasks.SendTorrent;
 import com.hamaksoftware.eztvdroid.asynctasks.SendTorrentAction;
-import com.hamaksoftware.eztvdroid.models.Show;
 import com.hamaksoftware.eztvdroid.torrentcontroller.TorrentAction;
 import com.hamaksoftware.eztvdroid.torrentcontroller.TorrentItem;
 import com.hamaksoftware.eztvdroid.torrentcontroller.ViewFilter;
@@ -29,8 +26,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class DownloadsFragment extends Fragment implements IAsyncTaskListener{
 	
@@ -227,7 +222,7 @@ public class DownloadsFragment extends Fragment implements IAsyncTaskListener{
         if(ASYNC_ID.equalsIgnoreCase(GetTorrents.ASYNC_ID)){
             String msg = "";
             if(e instanceof IOException){
-                msg = "Warning: Unable to Connect to " + pref.getIPAddress();
+                msg = "Warning: Unable to Connect to " + pref.getClientIPAddress();
             }
 
             if(e instanceof JSONException){

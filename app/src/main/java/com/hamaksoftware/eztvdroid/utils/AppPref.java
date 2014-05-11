@@ -30,7 +30,7 @@ public class AppPref{
     public String getClientName(){
         return _sharedPrefs.getString("client_name", "");
     }
-    public String getIPAddress(){
+    public String getClientIPAddress(){
         return _sharedPrefs.getString("client_host", "");
     }
 
