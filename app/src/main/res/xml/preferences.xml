@@ -51,6 +51,8 @@
 
     <PreferenceCategory android:title="Application Settings">
         <EditTextPreference
+            android:enabled="false"
+            android:visibility="gone"
             android:defaultValue="10"
             android:dialogTitle="Request Timeout"
             android:inputType="number"
@@ -58,7 +60,9 @@
             android:summary="A specified amount of time until the request is considered timeout."
             android:title="Request timeout (in seconds)" />
         <EditTextPreference
-            android:defaultValue="5"
+            android:enabled="false"
+            android:visibility="gone"
+            android:defaultValue="10"
             android:dialogTitle="Connection Timeout"
             android:inputType="number"
             android:key="connection_timeout"
@@ -76,12 +80,12 @@
             android:key="use_subscription"
             android:summary="Check this box if you want to use the subscription and push notification enabled. "
             android:title="Enable Subscription/Push Notification" />
-        <!--CheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="false"
             android:dependency="use_subscription"
             android:key="auto_send_torrent"
             android:summary="Auto send to the first torrent client available"
-            android:title="Attempt auto send of torrents" /-->
+            android:title="Attempt auto send of torrents"/>
         <ListPreference
             android:defaultValue="1"
             android:dependency="auto_send_torrent"

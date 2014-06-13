@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
@@ -9,7 +9,83 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"/>
+    <TextView
+        android:id="@+id/show_description"
+        android:padding="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/poster"
+        />
+    <TextView
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@id/show_description"
+        android:id="@+id/show_detail_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="SUBSCRIBED"
+        android:textStyle="bold" />
+    <ImageView
+        android:layout_marginTop="-5dp"
+        android:id="@+id/divider"
+        android:scaleType="center"
+        android:layout_below="@id/show_description"
+        android:src="@drawable/divider_1"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
+        android:id="@+id/show_stats"
+        android:layout_below="@id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:clickable="false"
+        android:divider="@color/background_holo_dark">
+        <ImageView
+            android:gravity="center_vertical"
+            android:src="@drawable/ic_action_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent" />
+        <TextView
+            android:id="@+id/show_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".2"
+            android:gravity="center_vertical"/>
+        <TextView
+            android:id="@+id/show_play_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".2"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="5dp"/>
+        <TextView
+            android:id="@+id/show_play_watchers"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".2"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="5dp"/>
+        <TextView
+            android:id="@+id/show_detail_subcount"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".2"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="5dp"/>
+        <TextView
+            android:id="@+id/show_detail_downcount"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight=".2"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="5dp"/>
+
+    </LinearLayout>
+    <!--LinearLayout
+        android:layout_below="@id/show_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/border_bottom" >
@@ -60,5 +136,5 @@
             android:text="The Daily Show"
             android:textColor="#ffffffff" />
 
-    </LinearLayout>
-</LinearLayout>
+    </LinearLayout-->
+</RelativeLayout>

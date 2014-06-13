@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">EZTVDroid</string>
+    <string name="app_name">EZTVPal</string>
 
     <string-array name="categories">
 
@@ -15,7 +15,7 @@
         <item name="cat_app_settings">[\"Application Settings\"]</item>
         <item name="cat_settings">[\"Settings\"]</item>
         <item name="cat_support">[\"Help/Support\"]</item>
-        <item name="cat_like">[\"Rate\"]</item>
+        <item name="cat_like">[\"Send Feedback\"]</item>
     </string-array>
 
     <string-array name="client_type">
@@ -45,7 +45,7 @@
     <string name="cat_app_settings">Application Settings</string>
     <string name="cat_settings">Settings</string>
     <string name="cat_support">Help/Support</string>
-    <string name="cat_like">Rate</string>
+    <string name="cat_like">Send Feedback</string>
     <string name="subcat_sources_eztvrss">EZTVRSS</string>
     <string name="subcat_sources_yify720p">Yify-720p</string>
     <string name="subcat_sources_yify1080p">Yify-1080p</string>
@@ -72,6 +72,7 @@
     <string name="message_loading">Loading Please wait…</string>
     <string name="message_searching">Searching, please wait…</string>
     <string name="message_search_input">Search for TV Show</string>
+    <string name="message_no_subscription">You have not subscribed a to show yet.</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_latest_episodes">Latest Episodes</string>
     <string name="menu_send">Send</string>
@@ -116,6 +117,7 @@
     <string name="id_fragment_send_profiles_ex">Send to</string>
     <string name="id_fragment_send_all">Send All</string>
     <string name="id_fragment_settings">Settings</string>
+    <string name="download_select_action">Select Action</string>
     <string name="download_pause_all">Pause All</string>
     <string name="download_resume_all">Resume All</string>
     <string name="download_force_start">Force Start</string>
@@ -147,14 +149,22 @@
     <string name="landing_latest">Latest Shows</string>
     <string name="landing_airing">Airing</string>
     <string name="dialog_open">Open</string>
+    <string name="dialog_copy">Copy To Clipboard</string>
     <string name="dialog_ignore">Ignore</string>
     <string name="dialog_send">Send to Remote Client</string>
     <string name="dialog_view">View Show Page</string>
     <string name="dialog_subscribe">Subscribe</string>
+    <string name="dialog_unsubscribe">Unsubscribe</string>
     <string name="unknown_handler">Sorry, there are currently no handler for this filetype on this device.</string>
     <string name="pref_cat_app_settings">Application Settings</string>
     <string name="pref_cat_app_client">Remote Torrent Clinet Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="message_verify_profile_success">Successfully Verified your Settings.</string>
     <string name="message_verify_profile_failed">Unable to verify your Settings. Please check the values, or check your FIREWALL settings.</string>
+    <string name="message_verify_profile_working">Verifying connection to $</string>
+    <string name="message_copy_text_successful">Successfully copied link to clipboard.</string>
+    <string name="message_subscription_successful">Successfully subscribe.</string>
+    <string name="message_subscription_failure">Failed to subscribe.</string>
+    <string name="message_unsubscribe_successful">Successfully Unsubscribe.</string>
+    <string name="message_unsubscribe_failure">Failed to Unsubscribe.</string>
 </resources>
