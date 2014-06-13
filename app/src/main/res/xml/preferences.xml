@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:key="eztvpal_prefs">
+    android:key="tvbrowser_prefs">
     <PreferenceCategory android:title="Remote Torrent Client Settings">
         <ListPreference
             android:key="client_type"
