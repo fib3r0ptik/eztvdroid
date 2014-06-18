@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hamaksoftware.tvbrowser.R;
@@ -136,6 +138,28 @@ public class Main extends Activity{
         //mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ExpandableListView) findViewById(R.id.left_drawer);
+
+        View v = getLayoutInflater().inflate(R.layout.sidebar_header, null);
+        if(v != null){
+            TextView t = (TextView)v.findViewById(R.id.header_title);
+            String title = getString(R.string.app_name);
+            String versionName = null;
+            try {
+                versionName = getApplicationContext().getPackageManager()
+                        .getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+            }catch(PackageManager.NameNotFoundException e){
+
+            }
+
+            if(versionName != null){
+                title += " v" + versionName;
+            }
+
+            t.setText(title);
+
+            mDrawerList.addHeaderView(v);
+        }
+
         hintHolder = findViewById(R.id.hints);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         prepareListData();

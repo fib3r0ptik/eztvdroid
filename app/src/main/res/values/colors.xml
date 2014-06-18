@@ -14,4 +14,6 @@
     <color name="torrent_paused">#ffff9900</color>
     <color name="torrent_stopped">#ffcccccc</color>
     <color name="torrent_queued">#ffdedede</color>
+    <color name="dark_blue">#1A2E4D</color>
+    <color name="light_white">#F4F4F4</color>
 </resources>
