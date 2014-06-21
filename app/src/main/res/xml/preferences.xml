@@ -50,7 +50,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Application Settings">
-        <EditTextPreference
+        <!--EditTextPreference
             android:enabled="false"
             android:visibility="gone"
             android:defaultValue="10"
@@ -67,7 +67,7 @@
             android:inputType="number"
             android:key="connection_timeout"
             android:summary="A specified amount of time until the connection is considered unreachable."
-            android:title="Connection timeout (in seconds)" />
+            android:title="Connection timeout (in seconds)" /-->
         <EditTextPreference
             android:defaultValue="15"
             android:dialogTitle="Refresh Interval"
@@ -85,7 +85,7 @@
             android:dependency="use_subscription"
             android:key="auto_send_torrent"
             android:summary="Auto send to the first torrent client available"
-            android:title="Attempt auto send of torrents"/>
+            android:title="Attempt auto send of torrents" />
         <ListPreference
             android:defaultValue="1"
             android:dependency="auto_send_torrent"

@@ -10,18 +10,17 @@ import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.models.Show;
-import com.hamaksoftware.tvbrowser.utils.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyShowAdapter extends BaseAdapter{
+public class MyShowAdapter extends BaseAdapter {
     public Context ctx;
     public List<Show> shows;
 
-    private ImageLoader imageLoader;
 
-    private class ViewHolder{
+    private class ViewHolder {
         ImageView img;
         TextView txt;
         TextView title;
@@ -29,10 +28,9 @@ public class MyShowAdapter extends BaseAdapter{
 
     public MyShowAdapter(Context context) {
         this.ctx = context;
-        imageLoader = new ImageLoader(context);
     }
 
-    public void setShows(ArrayList<Show> shows){
+    public void setShows(ArrayList<Show> shows) {
         this.shows = shows;
     }
 
@@ -49,7 +47,6 @@ public class MyShowAdapter extends BaseAdapter{
     }
 
 
-
     public View getView(int position, View convertView, ViewGroup viewGroup) {
 
         ViewHolder holder = null;
@@ -61,10 +58,10 @@ public class MyShowAdapter extends BaseAdapter{
             holder = new ViewHolder();
             holder.img = (ImageView) convertView.findViewById(R.id.imgGrid);
             holder.txt = (TextView) convertView.findViewById(R.id.notification);
-            holder.title = (TextView)convertView.findViewById(R.id.myshow_title);
+            holder.title = (TextView) convertView.findViewById(R.id.myshow_title);
             convertView.setTag(holder);
-        }else{
-            holder = (ViewHolder)convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
 
@@ -72,8 +69,9 @@ public class MyShowAdapter extends BaseAdapter{
         String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.showId;
         //String url = "http://hamaksoftware.com/myeztv/tvimg/" + entry.showId + ".jpg";
         holder.title.setText(entry.title);
-        holder.txt.setVisibility(entry.hasNewEpisode?View.VISIBLE:View.GONE);
-        imageLoader.DisplayImage(url, holder.img);
+        holder.txt.setVisibility(entry.hasNewEpisode ? View.VISIBLE : View.GONE);
+        ImageLoader.getInstance().displayImage(url, holder.img);
+
         return convertView;
     }
 }

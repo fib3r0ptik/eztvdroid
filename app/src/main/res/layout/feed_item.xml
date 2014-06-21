@@ -5,8 +5,7 @@
     android:descendantFocusability="blocksDescendants"
     android:orientation="vertical"
     android:id="@+id/feed_row_holder"
-    android:padding="6dp"
-    >
+    android:padding="6dp">
 
     <TextView
         android:id="@+id/feed_title"

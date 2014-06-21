@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:textAlignment="center" >
+    android:textAlignment="center">
 
     <ListView
         android:id="@+id/latest_list_feed"
@@ -18,7 +18,7 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:focusable="true"
-        android:footerDividersEnabled="false" >
+        android:footerDividersEnabled="false">
 
     </ListView>
 

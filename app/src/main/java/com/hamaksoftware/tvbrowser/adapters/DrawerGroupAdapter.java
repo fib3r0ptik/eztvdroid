@@ -103,13 +103,14 @@ public class DrawerGroupAdapter extends BaseExpandableListAdapter {
         TextView lblListHeader = (TextView) convertView
                 .findViewById(R.id.drawer_list_item_text);
 
-        ImageView imgCatIcon = (ImageView) convertView.findViewById(R.id.drawer_list_item_icon);
+        //ImageView imgCatIcon = (ImageView) convertView.findViewById(R.id.drawer_list_item_icon);
 
         ImageView imgCollapse = (ImageView) convertView.findViewById(R.id.drawer_collapse);
 
         if (this._listDataHeader.size() > 0) {
             String category = this._listDataHeader.get(groupPosition);
 
+            /*
             if (category.equals(_context.getResources().getString(R.string.cat_search))) {
                 imgCatIcon.setBackgroundResource(R.drawable.ic_action_search);
             }
@@ -151,6 +152,7 @@ public class DrawerGroupAdapter extends BaseExpandableListAdapter {
             if (category.equals(_context.getResources().getString(R.string.cat_like))) {
                 imgCatIcon.setBackgroundResource(R.drawable.ic_action_share);
             }
+            */
 
             LinearLayout l = (LinearLayout) convertView.findViewById(R.id.group_container);
 
@@ -159,13 +161,11 @@ public class DrawerGroupAdapter extends BaseExpandableListAdapter {
             if (category.equals(_context.getResources().getString(R.string.cat_app_settings))) {
                 lblListHeader.setTextColor(_context.getResources().getColor(R.color.light_white));
                 l.setBackgroundColor(_context.getResources().getColor(R.color.dark_blue));
-                imgCatIcon.setVisibility(View.GONE);
+                //imgCatIcon.setVisibility(View.GONE);
             } else {
-                //l.setPadding(3, 10, 3, 10);
                 l.setBackgroundColor(Color.WHITE);
-                //lblListHeader.setTextAppearance(_context, android.R.attr.textAppearanceSmall);
                 lblListHeader.setTextColor(_context.getResources().getColor(R.color.light_black));
-                imgCatIcon.setVisibility(View.VISIBLE);
+                //imgCatIcon.setVisibility(View.VISIBLE);
             }
         }
 

@@ -6,12 +6,12 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 4
+        versionCode 5
         versionName "1.0"
     }
 
     signingConfigs {
-        release{
+        release {
             storeFile file("key.jks")
             storePassword "l3tm3in"
             keyAlias "eztvdroid"
@@ -36,4 +36,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v4:+'
     compile 'com.google.android.gms:play-services:+'
+    compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.2'
 }

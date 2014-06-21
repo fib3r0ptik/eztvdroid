@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MarkDownload extends AsyncTask<Void, Void, Void>{
+public class MarkDownload extends AsyncTask<Void, Void, Void> {
     public static final String ASYNC_ID = "MARKDOWNLOAD";
     private int showId;
     private String title;
@@ -23,21 +23,21 @@ public class MarkDownload extends AsyncTask<Void, Void, Void>{
     public IAsyncTaskListener asyncTaskListener;
 
 
-    public MarkDownload(Context ctx, String title, int showId){
+    public MarkDownload(Context ctx, String title, int showId) {
         this.title = title;
         this.showId = showId;
-        this.ctx  = ctx;
+        this.ctx = ctx;
         pref = new AppPref(ctx);
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
-        Pattern p = Pattern.compile("(.*?)S?(\\d{1,2})E?(\\d{2})(.*)",Pattern.DOTALL);
+        Pattern p = Pattern.compile("(.*?)S?(\\d{1,2})E?(\\d{2})(.*)", Pattern.DOTALL);
         Matcher matcher = p.matcher(title);
         String s = "";
         String e = "";
         String t = "";
-        if(matcher.find()){
+        if (matcher.find()) {
             t = matcher.group(1);
             s = matcher.group(2);
             e = matcher.group(3);
@@ -46,7 +46,7 @@ public class MarkDownload extends AsyncTask<Void, Void, Void>{
 
         ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(6);
         param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
-        param.add(new BasicNameValuePair("show_id", showId+""));
+        param.add(new BasicNameValuePair("show_id", showId + ""));
         param.add(new BasicNameValuePair("title", t));
         param.add(new BasicNameValuePair("s", s));
         param.add(new BasicNameValuePair("e", e));

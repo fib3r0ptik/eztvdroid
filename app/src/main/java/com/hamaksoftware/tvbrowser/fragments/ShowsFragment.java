@@ -24,14 +24,14 @@ import com.hamaksoftware.tvbrowser.utils.Utility;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowsFragment extends Fragment implements IAsyncTaskListener{
-	
+public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
-	protected ListView lv;
-	public ShowAdapter adapter;
-	protected Main base;
-	
-	private ProgressDialog dialog;
+
+    protected ListView lv;
+    public ShowAdapter adapter;
+    protected Main base;
+
+    private ProgressDialog dialog;
 
     public boolean force;
 
@@ -40,21 +40,21 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Show show = adapter.shows.get(position);
-            final CharSequence[] items = {getString(R.string.dialog_subscribe),getString(R.string.dialog_view)};
+            final CharSequence[] items = {getString(R.string.dialog_subscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(show.title);
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    if(items[item].equals(getString(R.string.dialog_view))){
-                        base = (Main)getActivity();
+                    if (items[item].equals(getString(R.string.dialog_view))) {
+                        base = (Main) getActivity();
                         Bundle args = new Bundle();
                         args.putInt("show_id", show.showId);
                         base.launchFragment(R.string.fragment_tag_show_detail, args, false);
                     }
 
-                    if(items[item].equals(getString(R.string.dialog_subscribe))){
-                        Subscription s = new Subscription(getActivity(),show);
+                    if (items[item].equals(getString(R.string.dialog_subscribe))) {
+                        Subscription s = new Subscription(getActivity(), show);
                         s.asyncTaskListener = ShowsFragment.this;
                         s.execute();
                     }
@@ -68,15 +68,15 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.shows, container, false);
-        base =  (Main)getActivity();
+        base = (Main) getActivity();
         base.toggleHintLayout(false);
-        
-        lv = (ListView)rootView.findViewById(R.id.lshows_list);
+
+        lv = (ListView) rootView.findViewById(R.id.lshows_list);
         lv.setOnItemClickListener(itemClick);
 
-        if(dialog == null) {
+        if (dialog == null) {
             dialog = new ProgressDialog(getActivity());
         }
 
@@ -84,11 +84,11 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setMessage(getString(R.string.loader_working));
 
-        View empty = inflater.inflate(R.layout.latest_empty,container,false);
+        View empty = inflater.inflate(R.layout.latest_empty, container, false);
         lv.setEmptyView(empty);
 
-        if(adapter == null) {
-            adapter = new ShowAdapter(getActivity(),new ArrayList<Show>(0));
+        if (adapter == null) {
+            adapter = new ShowAdapter(getActivity(), new ArrayList<Show>(0));
         }
 
         lv.setAdapter(adapter);
@@ -96,8 +96,8 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
         base.invalidateOptionsMenu();
 
         Bundle payload = getArguments();
-        if(payload != null){
-            if(payload.containsKey("force")){
+        if (payload != null) {
+            if (payload.containsKey("force")) {
                 force = payload.getBoolean("force");
             }
         }
@@ -107,7 +107,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
 
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         force = false;
         base.currentFragmentTag = R.string.fragment_tag_shows;
@@ -120,10 +120,10 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
         onActivityDrawerClosed();
     }
 
-	@Override
-	public void onTaskCompleted(Object data,String ASYNC_ID) {
-        if(data != null) {
-            if(ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)){
+    @Override
+    public void onTaskCompleted(Object data, String ASYNC_ID) {
+        if (data != null) {
+            if (ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)) {
                 List<Show> d = (List<Show>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -137,65 +137,65 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener{
                 }
             }
 
-            if(ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)){
-                boolean success = (Boolean)data;
-                base.showToast(success ? getString(R.string.message_subscription_successful): getString(R.string.message_subscription_failure)
+            if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
+                boolean success = (Boolean) data;
+                base.showToast(success ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
                         , Toast.LENGTH_LONG);
             }
 
         }
-		dialog.dismiss();
-	}
+        dialog.dismiss();
+    }
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         base.currentFragmentTag = 0;
         base.invalidateOptionsMenu();
-        base.setTitle(getString(R.string.app_name));
+        //base.setTitle(getString(R.string.app_name));
         base.toggleHintLayout(true);
     }
 
 
-    public void refreshData(boolean force){
+    public void refreshData(boolean force) {
         this.force = force;
         onActivityDrawerClosed();
         this.force = false;
     }
 
-	public void onActivityDrawerClosed() {
+    public void onActivityDrawerClosed() {
         ShowHandler sh = new ShowHandler(getActivity());
-        if(force || sh.getCount() <= 0 || adapter.getCount() <= 0){
-            GetShows async =  new GetShows(getActivity(), force);
+        if (force || sh.getCount() <= 0 || adapter.getCount() <= 0) {
+            GetShows async = new GetShows(getActivity(), force);
             async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
             async.execute();
         }
-	}
+    }
 
 
-	@Override
-	public void onTaskWorking(String ASYNC_ID) {
-		dialog.show();
-	}
+    @Override
+    public void onTaskWorking(String ASYNC_ID) {
+        dialog.show();
+    }
 
-	@Override
-	public void onTaskProgressUpdate(int progress,String ASYNC_ID) {
+    @Override
+    public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
         dialog.setProgress(progress);
-	}
+    }
 
-	@Override
-	public void onTaskProgressMax(int max,String ASYNC_ID) {
+    @Override
+    public void onTaskProgressMax(int max, String ASYNC_ID) {
         dialog.setMax(max);
-	}
+    }
 
-	@Override
-	public void onTaskUpdateMessage(String message,String ASYNC_ID) {
+    @Override
+    public void onTaskUpdateMessage(String message, String ASYNC_ID) {
         dialog.setMessage(message);
-	}
+    }
 
-	@Override
-	public void onTaskError(Exception e,String ASYNC_ID) {
+    @Override
+    public void onTaskError(Exception e, String ASYNC_ID) {
         dialog.setMessage("Error: " + e.getMessage());
-	}
+    }
 
 }

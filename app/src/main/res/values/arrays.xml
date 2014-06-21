@@ -10,7 +10,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-    
+
     <string-array name="entries_list_client_type">
         <item>uTorrent</item>
         <item>Transmission</item>
@@ -19,7 +19,7 @@
         <item>0</item>
         <item>1</item>
     </integer-array>
-    
+
     <string-array name="entryvalues_list_rss_feeds">
         <item>EZTV RSS</item>
         <item>YIFY 1080p</item>
@@ -38,7 +38,7 @@
         <item>http://kickass.to/movies/?rss=1</item>
         <item>http://kickass.to/tv/?rss=1</item>
     </string-array>
-    
+
     <string-array name="entryvalues_list_proxysite">
         <item>eztv-proxy.net (SSL)</item>
         <item>eztv.torrenticity.com</item>
@@ -55,5 +55,5 @@
         <item>http://eztv.it.prx2.unblocksit.es/</item>
         <item>http://eztv.come.in/</item>
     </string-array>
-    
+
 </resources>

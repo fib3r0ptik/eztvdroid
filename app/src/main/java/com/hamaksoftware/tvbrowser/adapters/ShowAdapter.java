@@ -39,14 +39,14 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
                 ArrayList<Show> filteredShows = new ArrayList<Show>();
 
                 constraint = constraint.toString().toLowerCase();
-                if(constraint.length() > 0) {
+                if (constraint.length() > 0) {
                     for (int i = 0; i < copy.size(); i++) {
                         Show show = copy.get(i);
                         if (show.title.toLowerCase().startsWith(constraint.toString())) {
                             filteredShows.add(show);
                         }
                     }
-                }else{
+                } else {
                     filteredShows.addAll(copy);
                 }
 
@@ -61,7 +61,7 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
         return filter;
     }
 
-    private class ViewHolder{
+    private class ViewHolder {
         LinearLayout rowHolder;
         TextView title;
         CheckBox chk;
@@ -74,7 +74,7 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
         this.copy = new ArrayList<Show>(shows);
     }
 
-    public void setShows(ArrayList<Show> shows){
+    public void setShows(ArrayList<Show> shows) {
         this.shows = shows;
         this.copy = new ArrayList<Show>(shows);
     }
@@ -92,7 +92,6 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
     }
 
 
-
     public View getView(int position, View convertView, ViewGroup viewGroup) {
 
         ViewHolder holder = null;
@@ -102,20 +101,20 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.shows_row, null);
             holder = new ViewHolder();
-            holder.rowHolder = (LinearLayout)convertView.findViewById(R.id.show_row_holder);
+            holder.rowHolder = (LinearLayout) convertView.findViewById(R.id.show_row_holder);
             holder.title = (TextView) convertView.findViewById(R.id.show_title);
             holder.chk = (CheckBox) convertView.findViewById(R.id.shows_chk_item);
             convertView.setTag(holder);
-        }else{
-            holder = (ViewHolder)convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
 
         final Show entry = shows.get(position);
 
-        if(position % 2 == 0){
+        if (position % 2 == 0) {
             holder.rowHolder.setBackgroundColor(Color.WHITE);
-        }else{
+        } else {
             holder.rowHolder.setBackgroundResource(R.color.alt_blue);
         }
 

@@ -13,7 +13,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 
-public class GetSubscriberCount extends AsyncTask<Void, Void, String>{
+public class GetSubscriberCount extends AsyncTask<Void, Void, String> {
     public static final String ASYNC_ID = "GETSUBSCRIBERCOUNT";
     private Show show;
     private Context ctx;
@@ -21,26 +21,27 @@ public class GetSubscriberCount extends AsyncTask<Void, Void, String>{
     public IAsyncTaskListener asyncTaskListener;
 
 
-    public GetSubscriberCount(Context ctx, Show show){
+    public GetSubscriberCount(Context ctx, Show show) {
         this.show = show;
         sh = new ShowHandler(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
     protected String doInBackground(Void... voids) {
         ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(2);
-        param.add(new BasicNameValuePair("show_id", show.showId+""));
+        param.add(new BasicNameValuePair("show_id", show.showId + ""));
         param.add(new BasicNameValuePair("method", "getShowExtendedInfo"));
         return Utility.getInstance(ctx).doPostRequest(param);
     }
+
     @Override
     protected void onPostExecute(String response) {
-       asyncTaskListener.onTaskCompleted(response,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(response, ASYNC_ID);
     }
 }

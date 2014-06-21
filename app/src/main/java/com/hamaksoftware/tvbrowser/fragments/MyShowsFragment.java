@@ -26,32 +26,32 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
-	
+public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
-	protected GridView lv;
-	public MyShowAdapter adapter;
-	protected Main base;
+
+    protected GridView lv;
+    public MyShowAdapter adapter;
+    protected Main base;
 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Show show = adapter.shows.get(position);
-            final CharSequence[] items = {getString(R.string.dialog_unsubscribe),getString(R.string.dialog_view)};
+            final CharSequence[] items = {getString(R.string.dialog_unsubscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(show.title);
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    if(items[item].equals(getString(R.string.dialog_view))){
-                        base = (Main)getActivity();
+                    if (items[item].equals(getString(R.string.dialog_view))) {
+                        base = (Main) getActivity();
                         Bundle args = new Bundle();
                         args.putInt("show_id", show.showId);
                         base.launchFragment(R.string.fragment_tag_show_detail, args, false);
                     }
 
-                    if(items[item].equals(getString(R.string.dialog_unsubscribe))){
-                        Subscription s = new Subscription(getActivity(),show);
+                    if (items[item].equals(getString(R.string.dialog_unsubscribe))) {
+                        Subscription s = new Subscription(getActivity(), show);
                         s.asyncTaskListener = MyShowsFragment.this;
                         s.isSubscribe = false;
                         s.execute();
@@ -68,16 +68,16 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.my_shows, container, false);
-        base =  (Main)getActivity();
+        base = (Main) getActivity();
         base.toggleHintLayout(false);
-        
-        lv = (GridView)rootView.findViewById(R.id.myshow_grid);
+
+        lv = (GridView) rootView.findViewById(R.id.myshow_grid);
         lv.setOnItemClickListener(itemClick);
 
 
-        if(adapter == null) {
+        if (adapter == null) {
             adapter = new MyShowAdapter(getActivity());
             adapter.setShows(new ArrayList<Show>(0));
         }
@@ -91,7 +91,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
 
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         base.currentFragmentTag = R.string.fragment_tag_myshows;
         base.invalidateOptionsMenu();
@@ -103,10 +103,10 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
         onActivityDrawerClosed();
     }
 
-	@Override
-	public void onTaskCompleted(Object data,String ASYNC_ID) {
-        if(data != null) {
-            if(ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)){
+    @Override
+    public void onTaskCompleted(Object data, String ASYNC_ID) {
+        if (data != null) {
+            if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
                 List<Show> d = (List<Show>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -117,7 +117,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
                     adapter.setShows((ArrayList<Show>) d);
                     adapter.notifyDataSetChanged();
 
-                    if(adapter.shows.size() > 0){
+                    if (adapter.shows.size() > 0) {
                         CheckForNewEpisode chk = new CheckForNewEpisode(getActivity());
                         chk.asyncTaskListener = this;
                         chk.execute();
@@ -126,15 +126,15 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
                 }
             }
 
-            if(ASYNC_ID.equalsIgnoreCase(CheckForNewEpisode.ASYNC_ID)){
-                String resp = (String)data;
+            if (ASYNC_ID.equalsIgnoreCase(CheckForNewEpisode.ASYNC_ID)) {
+                String resp = (String) data;
                 try {
                     JSONArray arr = new JSONArray(resp);
-                    for(int i = 0; i < arr.length();i++){
+                    for (int i = 0; i < arr.length(); i++) {
                         JSONObject item = arr.getJSONObject(i);
-                        for(Show showItem:adapter.shows){
+                        for (Show showItem : adapter.shows) {
                             //System.out.println(showItem.showId + ":" + item.getInt("id"));
-                            if(showItem.showId == item.getInt("id")){
+                            if (showItem.showId == item.getInt("id")) {
                                 showItem.hasNewEpisode = true;
                                 break;
                             }
@@ -143,17 +143,17 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
                     }
 
                     adapter.notifyDataSetChanged();
-                }catch (Exception e){
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
 
             }
 
-            if(ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)){
-                boolean success = (Boolean)data;
-                base.showToast(success ? getString(R.string.message_unsubscribe_successful): getString(R.string.message_unsubscribe_failure)
+            if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
+                boolean success = (Boolean) data;
+                base.showToast(success ? getString(R.string.message_unsubscribe_successful) : getString(R.string.message_unsubscribe_failure)
                         , Toast.LENGTH_LONG);
-                if(success){
+                if (success) {
                     GetMyShows async = new GetMyShows(getActivity());
                     async.asyncTaskListener = this;
                     async.execute();
@@ -163,52 +163,52 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener{
 
         }
 
-	}
+    }
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         base.currentFragmentTag = 0;
         base.invalidateOptionsMenu();
-        base.setTitle(getString(R.string.app_name));
+        //base.setTitle(getString(R.string.app_name));
         base.toggleHintLayout(true);
     }
 
 
-    public void refreshData(boolean force){
+    public void refreshData(boolean force) {
         onActivityDrawerClosed();
         force = false;
     }
 
-	public void onActivityDrawerClosed() {
+    public void onActivityDrawerClosed() {
         GetMyShows async = new GetMyShows(getActivity());
         async.asyncTaskListener = this;
         async.execute();
-	}
+    }
 
 
-	@Override
-	public void onTaskWorking(String ASYNC_ID) {
+    @Override
+    public void onTaskWorking(String ASYNC_ID) {
 
-	}
+    }
 
-	@Override
-	public void onTaskProgressUpdate(int progress,String ASYNC_ID) {
+    @Override
+    public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
 
-	}
+    }
 
-	@Override
-	public void onTaskProgressMax(int max,String ASYNC_ID){
-	}
+    @Override
+    public void onTaskProgressMax(int max, String ASYNC_ID) {
+    }
 
-	@Override
-	public void onTaskUpdateMessage(String message,String ASYNC_ID) {
+    @Override
+    public void onTaskUpdateMessage(String message, String ASYNC_ID) {
 
-	}
+    }
 
-	@Override
-	public void onTaskError(Exception e,String ASYNC_ID) {
+    @Override
+    public void onTaskError(Exception e, String ASYNC_ID) {
 
-	}
+    }
 
 }

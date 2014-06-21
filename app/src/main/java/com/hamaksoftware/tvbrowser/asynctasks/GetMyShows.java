@@ -9,7 +9,7 @@ import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 
 import java.util.ArrayList;
 
-public class GetMyShows extends AsyncTask<Void, Void, ArrayList<Show>>{
+public class GetMyShows extends AsyncTask<Void, Void, ArrayList<Show>> {
     public static final String ASYNC_ID = "GETMYSHOWS";
     private int page;
     private Context ctx;
@@ -17,13 +17,13 @@ public class GetMyShows extends AsyncTask<Void, Void, ArrayList<Show>>{
 
     public IAsyncTaskListener asyncTaskListener;
 
-    public GetMyShows(Context ctx){
+    public GetMyShows(Context ctx) {
         sh = new ShowHandler(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
@@ -34,6 +34,6 @@ public class GetMyShows extends AsyncTask<Void, Void, ArrayList<Show>>{
 
     @Override
     protected void onPostExecute(ArrayList<Show> data) {
-        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
 }

@@ -10,7 +10,7 @@ import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 
 import java.util.ArrayList;
 
-public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>>{
+public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>> {
     public static final String ASYNC_ID = "GETFEED";
     private String uri;
     private Context ctx;
@@ -18,15 +18,15 @@ public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>>{
     public IAsyncTaskListener asyncTaskListener;
     private FeedParser fp;
 
-    public GetOtherSource(Context ctx, String uri){
+    public GetOtherSource(Context ctx, String uri) {
         this.uri = uri;
         sh = new ShowHandler(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
         fp = new FeedParser(ctx, uri);
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
@@ -35,9 +35,10 @@ public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>>{
         ArrayList<RSSItem> items = new ArrayList<RSSItem>(0);
         return fp.getFeed().itemlist;
     }
+
     @Override
     protected void onPostExecute(ArrayList<RSSItem> data) {
-        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
 
 }

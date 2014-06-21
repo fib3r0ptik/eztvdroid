@@ -13,14 +13,18 @@ import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.models.RSSItem;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class RSSAdapter extends BaseAdapter{
+public class RSSAdapter extends BaseAdapter {
     public Context ctx;
     public ArrayList<RSSItem> items;
 
 
-    private class ViewHolder{
+    private class ViewHolder {
         LinearLayout holder;
         TextView title;
         TextView info;
@@ -46,35 +50,41 @@ public class RSSAdapter extends BaseAdapter{
     }
 
 
-
     public View getView(int position, View convertView, ViewGroup viewGroup) {
 
         ViewHolder holder = null;
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater)ctx
+            LayoutInflater inflater = (LayoutInflater) ctx
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.feed_item, null);
             holder = new ViewHolder();
-            holder.holder = (LinearLayout)convertView.findViewById(R.id.feed_row_holder);
-            holder.title = (TextView)convertView.findViewById(R.id.feed_title);
-            holder.info = (TextView)convertView.findViewById(R.id.feed_ext_info);
+            holder.holder = (LinearLayout) convertView.findViewById(R.id.feed_row_holder);
+            holder.title = (TextView) convertView.findViewById(R.id.feed_title);
+            holder.info = (TextView) convertView.findViewById(R.id.feed_ext_info);
             convertView.setTag(holder);
-        }else{
-            holder = (ViewHolder)convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
 
         final RSSItem entry = items.get(position);
 
-        if(position % 2 == 0){
+        if (position % 2 == 0) {
             holder.holder.setBackgroundColor(Color.WHITE);
-        }else{
+        } else {
             holder.holder.setBackgroundResource(R.color.alt_blue);
         }
 
         holder.title.setText(entry.title);
-        holder.info.setText(Utility.getFancySize(entry.filesize) + " " + Utility.getElapsed(entry.pubdate));
+
+        try {
+            DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+            Date dte = formatter.parse(entry.pubdate);
+            holder.info.setText(Utility.getFancySize(entry.filesize) + " - " + Utility.getInstance(ctx).getPrettytime().format(dte));
+        } catch (ParseException e) {
+            holder.info.setText("Unknown");
+        }
 
         return convertView;
     }

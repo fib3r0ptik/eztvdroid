@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
+public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
     public static final String ASYNC_ID = "GETSHOWS";
     private int page;
     private Context ctx;
@@ -29,44 +29,44 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
 
     public IAsyncTaskListener asyncTaskListener;
 
-    public GetShows(Context ctx, boolean forced){
+    public GetShows(Context ctx, boolean forced) {
         this.page = page;
         sh = new ShowHandler(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
         this.forced = forced;
         pref = new AppPref(ctx);
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
     protected ArrayList<Show> doInBackground(Void... voids) {
         ArrayList<Show> shows = new ArrayList<Show>(0);
-        asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...",ASYNC_ID);
+        asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...", ASYNC_ID);
         int count = sh.getCount();
         try {
 
-            if(forced || count<= 0){
+            if (forced || count <= 0) {
                 int ctr = 0;
                 ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
                 param.add(new BasicNameValuePair("method", "getShows"));
                 String response = Utility.getInstance(ctx).doPostRequest(param);
                 JSONArray jShows = new JSONArray(response);
-                Log.i("api", "ttl shows:"+ jShows.length());
+                Log.i("api", "ttl shows:" + jShows.length());
                 //my shows
                 param = new ArrayList<NameValuePair>(3);
-                param.add(new BasicNameValuePair("dev_id",pref.getDeviceId()));
+                param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
                 param.add(new BasicNameValuePair("method", "getMyshows"));
                 response = Utility.getInstance(ctx).doPostRequest(param);
                 JSONArray myShows = new JSONArray(response);
-                Log.i("api", "ttl my shows:"+ myShows.length());
+                Log.i("api", "ttl my shows:" + myShows.length());
 
-                asyncTaskListener.onTaskProgressMax(jShows.length(),ASYNC_ID);
+                asyncTaskListener.onTaskProgressMax(jShows.length(), ASYNC_ID);
                 sh.deleteAll();
-                for(int i = 0;  i < jShows.length();i++){
+                for (int i = 0; i < jShows.length(); i++) {
                     Show show = new Show();
                     JSONObject item = jShows.getJSONObject(i);
                     show.title = item.getString("title");
@@ -74,25 +74,25 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
                     show.showId = Integer.parseInt(item.getString("id"));
 
                     String append = null;
-                    for(int j = 0; j < myShows.length();j++){
+                    for (int j = 0; j < myShows.length(); j++) {
                         JSONObject obj = myShows.getJSONObject(j);
                         int id = obj.getInt("id");
-                        if(id == show.showId){
+                        if (id == show.showId) {
                             append = ctx.getResources().getString(R.string.tab_show_myshow);
                             show.isSubscribed = true;
                             break;
-                        }else{
+                        } else {
                             append = "";
                         }
                     }
 
                     sh.addShow(show);
                     shows.add(show);
-                    asyncTaskListener.onTaskProgressUpdate(ctr,ASYNC_ID);
+                    asyncTaskListener.onTaskProgressUpdate(ctr, ASYNC_ID);
                     ctr++;
                 }
 
-            }else{
+            } else {
                 shows = sh.getAllShows();
             }
             //cloneShowItems();
@@ -105,6 +105,6 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>>{
 
     @Override
     protected void onPostExecute(ArrayList<Show> data) {
-        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
 }

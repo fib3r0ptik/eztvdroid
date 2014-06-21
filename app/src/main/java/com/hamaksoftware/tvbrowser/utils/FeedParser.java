@@ -22,27 +22,25 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 
-
 public class FeedParser {
-	private String url;
-	private Context ctx;
-	
-	public FeedParser(Context ctx, String url){
-		this.url = url;
-		this.ctx = ctx;
-	}
-	
-	
-	
-	public RSSFeed getFeed() {
-		try {
-			String rawContent = "";
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			SAXParser parser = factory.newSAXParser();
-			XMLReader xmlreader = parser.getXMLReader();
-			RSSHandler rsshandler = new RSSHandler();
-			//rsshandler.setAsyncTaskListener(l);
-			xmlreader.setContentHandler(rsshandler);
+    private String url;
+    private Context ctx;
+
+    public FeedParser(Context ctx, String url) {
+        this.url = url;
+        this.ctx = ctx;
+    }
+
+
+    public RSSFeed getFeed() {
+        try {
+            String rawContent = "";
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser parser = factory.newSAXParser();
+            XMLReader xmlreader = parser.getXMLReader();
+            RSSHandler rsshandler = new RSSHandler();
+            //rsshandler.setAsyncTaskListener(l);
+            xmlreader.setContentHandler(rsshandler);
 
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, 3000);
@@ -66,18 +64,18 @@ public class FeedParser {
             rawContent = sb.toString();
             rd.close();
 
-			InputStream iss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
-			InputStream icss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
-			InputSource isrc = new InputSource(iss);
-			int count = Utility.getInstance(ctx).countElement("//item", new InputSource(icss));
-			rsshandler.calculatedItemCount = count;
-			xmlreader.parse(isrc);
+            InputStream iss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
+            InputStream icss = new ByteArrayInputStream(rawContent.getBytes("UTF-8"));
+            InputSource isrc = new InputSource(iss);
+            int count = Utility.getInstance(ctx).countElement("//item", new InputSource(icss));
+            rsshandler.calculatedItemCount = count;
+            xmlreader.parse(isrc);
 
-			return rsshandler.getFeed();
+            return rsshandler.getFeed();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new RSSFeed();
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new RSSFeed();
+        }
+    }
 }

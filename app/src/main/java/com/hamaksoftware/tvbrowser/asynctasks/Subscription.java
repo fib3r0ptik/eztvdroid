@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Subscription extends AsyncTask<Void, Void, Boolean>{
+public class Subscription extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "SUBSCRIPTION";
     private Show show;
     private Context ctx;
@@ -25,14 +25,14 @@ public class Subscription extends AsyncTask<Void, Void, Boolean>{
     public IAsyncTaskListener asyncTaskListener;
     public boolean isSubscribe;
 
-    public Subscription(Context ctx, Show show){
+    public Subscription(Context ctx, Show show) {
         this.show = show;
-        this.ctx  = ctx;
+        this.ctx = ctx;
         pref = new AppPref(ctx);
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
@@ -48,15 +48,15 @@ public class Subscription extends AsyncTask<Void, Void, Boolean>{
         }
         */
 
-        param.add(new BasicNameValuePair("method", isSubscribe? "subscribe" : "unsubscribe"));
+        param.add(new BasicNameValuePair("method", isSubscribe ? "subscribe" : "unsubscribe"));
         param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
-        param.add(new BasicNameValuePair("show_id", show.showId+""));
+        param.add(new BasicNameValuePair("show_id", show.showId + ""));
         String res = Utility.getInstance(ctx).doPostRequest(param);
-        Log.i("uri",res);
+        Log.i("uri", res);
         try {
             JSONObject obj = new JSONObject(res);
             ret = (obj.getInt("success") == 1);
-            if(ret){
+            if (ret) {
                 show.isSubscribed = !show.isSubscribed;
                 ShowHandler sh = new ShowHandler(ctx);
                 sh.updateShow(show);
@@ -69,8 +69,9 @@ public class Subscription extends AsyncTask<Void, Void, Boolean>{
         return ret;
 
     }
+
     @Override
     protected void onPostExecute(Boolean d) {
-       asyncTaskListener.onTaskCompleted(d,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(d, ASYNC_ID);
     }
 }

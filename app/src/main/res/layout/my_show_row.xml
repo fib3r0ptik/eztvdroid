@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout
-    android:layout_width="120dp"
+    android:layout_width="128dp"
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <ImageView
-        android:layout_margin = "5dp"
-        android:layout_width="95dp"
-        android:layout_height="95dp"
-        android:id="@+id/imgGrid"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"/>
+
+    <FrameLayout
+        android:id="@+id/rounded_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:id="@+id/imgGrid"
+            android:adjustViewBounds="true"
+            android:layout_marginRight="15dp"
+            android:padding="3dp" />
+
+        <ImageView
+            android:src="@drawable/rounded_border_frame"
+            android:layout_width="96dp"
+            android:layout_height="96dp" />
+    </FrameLayout>
+
     <TextView
         android:padding="5dp"
         android:background="@drawable/new_rounded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New"
-        android:layout_toEndOf="@id/imgGrid"
+        android:layout_centerHorizontal="true"
         android:id="@+id/notification"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="-25dp"
-        android:layout_alignParentEnd="false"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentEnd="true"
         android:textColor="#ffffff"
-        android:textSize="14sp"
-         />
+        android:textSize="14sp" />
+
     <TextView
         android:id="@+id/myshow_title"
         android:gravity="center_vertical"
-        android:layout_below="@+id/imgGrid"
+        android:layout_below="@+id/rounded_frame"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Salem"

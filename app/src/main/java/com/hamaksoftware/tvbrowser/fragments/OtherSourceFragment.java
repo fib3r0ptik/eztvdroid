@@ -26,14 +26,14 @@ import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import java.util.ArrayList;
 
-public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
+public class OtherSourceFragment extends Fragment implements IAsyncTaskListener {
 
-	protected ListView lv;
-	protected RSSAdapter adapter;
-	protected Main base;
+    protected ListView lv;
+    protected RSSAdapter adapter;
+    protected Main base;
 
-	
-	private ProgressDialog dialog;
+
+    private ProgressDialog dialog;
     public boolean force;
     public String uri;
 
@@ -41,39 +41,39 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final RSSItem row = adapter.items.get(position);
-            final CharSequence[] items = {getString(R.string.dialog_open),getString(R.string.dialog_send)};
+            final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(row.title);
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
-                    if(items[item].equals(getString(R.string.dialog_open))){
+                    if (items[item].equals(getString(R.string.dialog_open))) {
                         final ArrayList<String> links = new ArrayList<String>(0);
-                        links.add(row.itemlink == null || row.itemlink.equals("")? row.altLInk:row.itemlink);
+                        links.add(row.itemlink == null || row.itemlink.equals("") ? row.altLInk : row.itemlink);
                         AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
-                        final String[] slinks  = new String[links.size()];
+                        final String[] slinks = new String[links.size()];
                         int ctr = 0;
-                        for(String link: links){
-                            if(link.toLowerCase().contains("magnet")){
+                        for (String link : links) {
+                            if (link.toLowerCase().contains("magnet")) {
                                 slinks[ctr] = "Magnet Link";
-                            }else{
+                            } else {
                                 slinks[ctr] = "Link # " + (ctr + 1);
                             }
 
                             ctr++;
                         }
 
-                        linkbuilder.setItems(slinks,new DialogInterface.OnClickListener() {
+                        linkbuilder.setItems(slinks, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
-                                }catch(ActivityNotFoundException e){
-                                    Utility.showDialog(getActivity(),getString(R.string.dialog_title_info),
-                                            getString(R.string.unknown_handler),getString(R.string.dialog_button_ok),
-                                            getString(R.string.dialog_button_close),true,null);
+                                } catch (ActivityNotFoundException e) {
+                                    Utility.showDialog(getActivity(), getString(R.string.dialog_title_info),
+                                            getString(R.string.unknown_handler), getString(R.string.dialog_button_ok),
+                                            getString(R.string.dialog_button_close), true, null);
                                 }
                             }
                         });
@@ -83,14 +83,14 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
 
                     }
 
-                    if(items[item].equals(getString(R.string.dialog_send))){
-                        if(base.pref.getClientName().length() < 2){
-                            base.showToast("Set up a profile for a torrent client in the settings first.",Toast.LENGTH_LONG);
-                        }else{
+                    if (items[item].equals(getString(R.string.dialog_send))) {
+                        if (base.pref.getClientName().length() < 2) {
+                            base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
+                        } else {
                             Episode ep = new Episode();
-                            ep.links.add(row.altLInk == null || row.altLInk.equals("")? row.itemlink: row.altLInk);
+                            ep.links.add(row.altLInk == null || row.altLInk.equals("") ? row.itemlink : row.altLInk);
                             //ep.links.add(row.altLInk);
-                            SendTorrent send = new SendTorrent(getActivity(),ep);
+                            SendTorrent send = new SendTorrent(getActivity(), ep);
                             send.asyncTaskListener = OtherSourceFragment.this;
                             send.execute();
                         }
@@ -105,20 +105,19 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
     };
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.feeds, container, false);
-        base =  (Main)getActivity();
+        base = (Main) getActivity();
         base.toggleHintLayout(false);
-        lv = (ListView)rootView.findViewById(R.id.rssfeed);
+        lv = (ListView) rootView.findViewById(R.id.rssfeed);
 
 
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
 
-        if(adapter == null) {
+        if (adapter == null) {
             adapter = new RSSAdapter(getActivity());
         }
 
@@ -133,7 +132,7 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         base.currentFragmentTag = R.string.fragment_tag_rss;
         base.invalidateOptionsMenu();
@@ -141,16 +140,16 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if(force || adapter.items.size() <= 0){
+        if (force || adapter.items.size() <= 0) {
             adapter.items.clear();
             onActivityDrawerClosed();
         }
     }
 
-	@Override
-	public void onTaskCompleted(Object data, String ASYNC_ID) {
-        if(data != null){
-            if(ASYNC_ID.equalsIgnoreCase(GetOtherSource.ASYNC_ID)) {
+    @Override
+    public void onTaskCompleted(Object data, String ASYNC_ID) {
+        if (data != null) {
+            if (ASYNC_ID.equalsIgnoreCase(GetOtherSource.ASYNC_ID)) {
                 ArrayList<RSSItem> d = (ArrayList<RSSItem>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -163,65 +162,64 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener{
                 }
             }
 
-            if(ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)){
-                boolean success = (Boolean)data;
-                base.showToast(success?"Torrent sent successfully.":"Warning: Failed to send torrent.", Toast.LENGTH_LONG);
+            if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
+                boolean success = (Boolean) data;
+                base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
             }
         }
 
-		
-		dialog.dismiss();
+
+        dialog.dismiss();
         force = false;
-	}
+    }
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         base.currentFragmentTag = 0;
         base.invalidateOptionsMenu();
-        base.setTitle(getString(R.string.app_name));
+        //base.setTitle(getString(R.string.app_name));
         base.toggleHintLayout(true);
     }
 
 
+    public void onActivityDrawerClosed() {
+        if (force) adapter.items.clear();
+        GetOtherSource async = new GetOtherSource(getActivity(), uri);
+        async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
+        async.execute();
 
-	public void onActivityDrawerClosed() {
-        if(force) adapter.items.clear();
-        GetOtherSource async = new GetOtherSource(getActivity(),uri);
-		async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
-		async.execute();
-
-	}
+    }
 
 
-	@Override
-	public void onTaskWorking(String ASYNC_ID) {
+    @Override
+    public void onTaskWorking(String ASYNC_ID) {
         dialog.setMessage(getString(R.string.loader_working));
-		dialog.show();
-	}
+        dialog.show();
+    }
 
-	@Override
-	public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void onTaskProgressMax(int max, String ASYNC_ID) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void onTaskUpdateMessage(String message, String ASYNC_ID) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void onTaskProgressMax(int max, String ASYNC_ID) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void onTaskError(Exception e, String ASYNC_ID) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void onTaskUpdateMessage(String message, String ASYNC_ID) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onTaskError(Exception e, String ASYNC_ID) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

@@ -14,21 +14,21 @@ import com.hamaksoftware.tvbrowser.utils.AppPref;
 
 import java.util.ArrayList;
 
-public class GetTorrents extends AsyncTask<Void, Void, ArrayList<TorrentItem>>{
+public class GetTorrents extends AsyncTask<Void, Void, ArrayList<TorrentItem>> {
     public static final String ASYNC_ID = "GETTORRENTS";
     private Context ctx;
     private AppPref pref;
     public IAsyncTaskListener asyncTaskListener;
     private ViewFilter filter;
 
-    public GetTorrents(Context ctx, ViewFilter filter){
+    public GetTorrents(Context ctx, ViewFilter filter) {
         pref = new AppPref(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
         this.filter = filter;
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
@@ -36,30 +36,31 @@ public class GetTorrents extends AsyncTask<Void, Void, ArrayList<TorrentItem>>{
     protected ArrayList<TorrentItem> doInBackground(Void... voids) {
         ArrayList<Episode> items = new ArrayList<Episode>(0);
         ClientType type = ClientType.valueOf(pref.getClientType());
-        try{
+        try {
             switch (type) {
                 case UTORRENT:
                     UtorrentHandler uh = new UtorrentHandler(ctx);
-                    uh.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    uh.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     uh.currentFilter = filter;
                     return uh.getTorrents();
                 case TRANSMISSION:
                     TransmissionHandler th = new TransmissionHandler(ctx);
-                    th.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    th.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     th.currentFilter = filter;
                     return th.getTorrents();
             }
-        }catch(Exception e){
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+        } catch (Exception e) {
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 
         return null;
     }
+
     @Override
     protected void onPostExecute(ArrayList<TorrentItem> data) {
-        asyncTaskListener.onTaskCompleted(data,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
 
 }

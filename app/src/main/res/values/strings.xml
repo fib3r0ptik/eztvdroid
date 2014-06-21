@@ -6,7 +6,7 @@
     <string-array name="categories">
 
         <!-- item name="cat_presence">[\"TPB Status\"]</item -->
-        <item name="cat_latest">[\"Latest\"]</item>
+        <item name="cat_latest">[\"Latest Episodes\"]</item>
         <item name="cat_myshows">[\"My Shows\"]</item>
         <item name="cat_shows">[\"Shows\"]</item>
         <item name="cat_sources">[\"Load other Sources\",\"EZTVRSS\",\"Yify-720p\",\"Yify-1080p\",\"TPB-HD-TV\",\"TPB-HD-Movies\",\"KAT Movies\",\"KAT-TV\"]</item>
@@ -37,7 +37,7 @@
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     <string name="cat_search">Search</string>
-    <string name="cat_latest">Latest</string>
+    <string name="cat_latest">Latest Episodes</string>
     <string name="cat_myshows">My Shows</string>
     <string name="cat_shows">Shows</string>
     <string name="cat_downloads">Downloads</string>

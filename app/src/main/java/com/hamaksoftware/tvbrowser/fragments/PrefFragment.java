@@ -1,4 +1,5 @@
 package com.hamaksoftware.tvbrowser.fragments;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -10,12 +11,12 @@ import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.asynctasks.VerifyClient;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
-public class PrefFragment extends PreferenceFragment implements IAsyncTaskListener{
+public class PrefFragment extends PreferenceFragment implements IAsyncTaskListener {
     private AppPref pref;
     protected Main base;
     private SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if(key.equalsIgnoreCase("client_type") || key.equalsIgnoreCase("client_name") ||
+            if (key.equalsIgnoreCase("client_type") || key.equalsIgnoreCase("client_name") ||
                     key.equalsIgnoreCase("client_host") || key.equalsIgnoreCase("client_port") ||
                     key.equalsIgnoreCase("use_auth") || key.equalsIgnoreCase("client_username") || key.equalsIgnoreCase("client_password")) {
                 boolean canVerify = !pref.getClientType().equals("") && !pref.getClientIPAddress().equals("") &&
@@ -41,13 +42,13 @@ public class PrefFragment extends PreferenceFragment implements IAsyncTaskListen
         pref = new AppPref(getActivity());
         SharedPreferences _pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         _pref.registerOnSharedPreferenceChangeListener(listener);
-        base =  (Main)getActivity();
+        base = (Main) getActivity();
         base.toggleHintLayout(false);
     }
 
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         base.currentFragmentTag = 0;
         base.invalidateOptionsMenu();
@@ -58,17 +59,17 @@ public class PrefFragment extends PreferenceFragment implements IAsyncTaskListen
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
-        if(data !=null){
-            Boolean success = (Boolean)data;
-            String msg  = success? getString(R.string.message_verify_profile_success):getString(R.string.message_verify_profile_failed);
-            Toast.makeText(getActivity(),msg,Toast.LENGTH_LONG).show();
+        if (data != null) {
+            Boolean success = (Boolean) data;
+            String msg = success ? getString(R.string.message_verify_profile_success) : getString(R.string.message_verify_profile_failed);
+            Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
         Toast.makeText(getActivity(),
-                getString(R.string.message_verify_profile_working).replace("$",pref.getClientIPAddress()),Toast.LENGTH_LONG).show();
+                getString(R.string.message_verify_profile_working).replace("$", pref.getClientIPAddress()), Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -16,11 +16,11 @@ import com.hamaksoftware.tvbrowser.models.Episode;
 
 import java.util.List;
 
-public class EpisodeAdapter extends BaseAdapter{
+public class EpisodeAdapter extends BaseAdapter {
     public Context context;
     public List<Episode> listings;
 
-    private class ViewHolder{
+    private class ViewHolder {
         TextView title;
         TextView extended_info;
         CheckBox chk;
@@ -49,7 +49,6 @@ public class EpisodeAdapter extends BaseAdapter{
     }
 
 
-
     public View getView(int position, View convertView, ViewGroup viewGroup) {
 
         ViewHolder holder = null;
@@ -60,7 +59,7 @@ public class EpisodeAdapter extends BaseAdapter{
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.home_row, null);
             holder = new ViewHolder();
-            holder.rowHolder = (LinearLayout)convertView.findViewById(R.id.row_holder);
+            holder.rowHolder = (LinearLayout) convertView.findViewById(R.id.row_holder);
             holder.title = (TextView) convertView.findViewById(R.id.home_title);
             holder.chk = (CheckBox) convertView.findViewById(R.id.home_chk_item);
             holder.extended_info = (TextView) convertView.findViewById(R.id.home_ext_info);
@@ -69,32 +68,32 @@ public class EpisodeAdapter extends BaseAdapter{
             holder.watched = (ImageView) convertView.findViewById(R.id.imgcheck);
             //holder.show = (ImageView) convertView.findViewById(R.id.imgshow);
             convertView.setTag(holder);
-        }else{
-            holder = (ViewHolder)convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
 
         final Episode entry = listings.get(position);
 
-        if(position % 2 == 0){
+        if (position % 2 == 0) {
             holder.rowHolder.setBackgroundColor(Color.WHITE);
-        }else{
+        } else {
             holder.rowHolder.setBackgroundResource(R.color.alt_blue);
         }
 
-        if(entry.showId > 0 && entry.showId != 187){
+        if (entry.showId > 0 && entry.showId != 187) {
             //holder.show.setVisibility(View.VISIBLE);
-            holder.fav.setVisibility(entry.isFavorite?View.VISIBLE:View.GONE);
-            holder.watched.setVisibility(entry.isWatched?View.VISIBLE:View.GONE);
-            if(entry.isWatched){
+            holder.fav.setVisibility(entry.isFavorite ? View.VISIBLE : View.GONE);
+            holder.watched.setVisibility(entry.isWatched ? View.VISIBLE : View.GONE);
+            if (entry.isWatched) {
                 holder.title.setTextColor(Color.parseColor("#ff999999"));
                 holder.extended_info.setTextColor(Color.parseColor("#ff999999"));
-            }else{
+            } else {
                 holder.title.setTextColor(Color.parseColor("#ff000000"));
                 holder.extended_info.setTextColor(Color.parseColor("#ff000000"));
             }
 
-        }else{
+        } else {
             //holder.show.setVisibility(View.GONE);
             holder.fav.setVisibility(View.GONE);
             holder.watched.setVisibility(View.GONE);

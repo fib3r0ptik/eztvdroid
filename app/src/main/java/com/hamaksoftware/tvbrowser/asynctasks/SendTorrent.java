@@ -10,7 +10,7 @@ import com.hamaksoftware.tvbrowser.torrentcontroller.TransmissionHandler;
 import com.hamaksoftware.tvbrowser.torrentcontroller.UtorrentHandler;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
-public class SendTorrent extends AsyncTask<Void, Void, Boolean>{
+public class SendTorrent extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "SENDTORRENT";
     private Episode item;
     private Context ctx;
@@ -18,43 +18,44 @@ public class SendTorrent extends AsyncTask<Void, Void, Boolean>{
     public IAsyncTaskListener asyncTaskListener;
 
 
-    public SendTorrent(Context ctx, Episode item){
+    public SendTorrent(Context ctx, Episode item) {
         this.item = item;
-        this.ctx  = ctx;
+        this.ctx = ctx;
         pref = new AppPref(ctx);
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
         ClientType type = ClientType.valueOf(pref.getClientType());
-        try{
+        try {
             switch (type) {
                 case UTORRENT:
                     UtorrentHandler uh = new UtorrentHandler(ctx);
-                    uh.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    uh.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     uh.addTorrent(item.links.get(0));
                     return uh.lastStatusResult;
                 case TRANSMISSION:
                     TransmissionHandler th = new TransmissionHandler(ctx);
-                    th.setOptions(pref.getClientIPAddress(),pref.getClientUsername(), pref.getClientPassword(),
+                    th.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(),
                             pref.getClientPort(), pref.getAuth());
                     th.addTorrent(item.links.get(0));
                     return th.lastStatusResult;
             }
-        }catch(Exception e){
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+        } catch (Exception e) {
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 
         return false;
     }
+
     @Override
     protected void onPostExecute(Boolean d) {
-       asyncTaskListener.onTaskCompleted(d,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(d, ASYNC_ID);
     }
 }

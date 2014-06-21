@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_search"
+    <item
+        android:id="@+id/action_search"
         android:icon="@drawable/ic_action_search"
         android:title="@string/cat_search"
         android:showAsAction="collapseActionView|always"
-        android:actionViewClass="android.widget.SearchView"
-        />
-    <item android:id="@+id/action_refresh"
+        android:actionViewClass="android.widget.SearchView" />
+    <item
+        android:id="@+id/action_refresh"
         android:icon="@drawable/action_refresh"
         android:title="@string/menu_refresh"
-        android:showAsAction="always"
-        />
+        android:showAsAction="always" />
 </menu>

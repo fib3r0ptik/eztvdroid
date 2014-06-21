@@ -19,7 +19,7 @@ import com.hamaksoftware.tvbrowser.utils.Utility;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class DownloadAdapter extends BaseAdapter{
+public class DownloadAdapter extends BaseAdapter {
     private Context ctx;
     private AppPref pref;
 
@@ -46,34 +46,34 @@ public class DownloadAdapter extends BaseAdapter{
         this.ctx = ctx;
         pref = new AppPref(ctx);
         this.items = new ArrayList<TorrentItem>(0);
-        inflater = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         type = ClientType.valueOf(pref.getClientType());
         //type = ClientType.values()[Integer.parseInt(pref.getClientType())];
     }
 
-    public int getTotalUploadSpeed(){
+    public int getTotalUploadSpeed() {
         int ttl = 0;
-        for(TorrentItem item: items){
-            ttl+=item.getUploadSpeed();
+        for (TorrentItem item : items) {
+            ttl += item.getUploadSpeed();
         }
 
         return ttl;
     }
 
-    public int getTotalDownloadSpeed(){
+    public int getTotalDownloadSpeed() {
         int ttl = 0;
-        for(TorrentItem item: items){
-            ttl+=item.getDownloadSpeed();
+        for (TorrentItem item : items) {
+            ttl += item.getDownloadSpeed();
         }
         return ttl;
     }
 
-    public String getCompletedHashes(){
-        try{
+    public String getCompletedHashes() {
+        try {
             StringBuilder sb = new StringBuilder();
-            if(type==ClientType.UTORRENT) sb.append("&");
-            for(TorrentItem item: items){
-                if(item.getPercent() >= 1000) {
+            if (type == ClientType.UTORRENT) sb.append("&");
+            for (TorrentItem item : items) {
+                if (item.getPercent() >= 1000) {
                     switch (type) {
                         case UTORRENT:
                             sb.append("hash=").append(item.getHash())
@@ -87,55 +87,55 @@ public class DownloadAdapter extends BaseAdapter{
 
             }
 
-            if(items.size()>0){
+            if (items.size() > 0) {
                 return sb.toString().substring(0, sb.toString().length() - 1);
-            }else{
+            } else {
                 return "";
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
 
-    public String getHash(TorrentItem item){
+    public String getHash(TorrentItem item) {
         StringBuilder sb = new StringBuilder();
         switch (type) {
             case UTORRENT:
                 sb.append("&hash=").append(item.getHash());
                 break;
             case TRANSMISSION:
-                sb.append("\""+item.getHash()).append("\"");
+                sb.append("\"" + item.getHash()).append("\"");
                 break;
         }
         return sb.toString();
     }
 
-    public String getHashes(){
-        try{
+    public String getHashes() {
+        try {
             StringBuilder sb = new StringBuilder();
-            if(type==ClientType.UTORRENT) sb.append("&");
-            for(TorrentItem item: items){
+            if (type == ClientType.UTORRENT) sb.append("&");
+            for (TorrentItem item : items) {
                 switch (type) {
                     case UTORRENT:
                         sb.append("hash=").append(item.getHash())
                                 .append("&");
                         break;
                     case TRANSMISSION:
-                        sb.append("\""+item.getHash()).append("\",");
+                        sb.append("\"" + item.getHash()).append("\",");
                         break;
                 }
 
             }
 
-            if(items.size()>0){
+            if (items.size() > 0) {
                 return sb.toString().substring(0, sb.toString().length() - 1);
-            }else{
+            } else {
                 return "";
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
@@ -155,7 +155,7 @@ public class DownloadAdapter extends BaseAdapter{
         return i;
     }
 
-    class ViewHolder{
+    class ViewHolder {
         TextView title;
         LinearLayout barHolder;
         View txtPercent;
@@ -169,7 +169,7 @@ public class DownloadAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup viewGroup) {
 
         try {
-            WindowManager windowManager = (WindowManager)ctx
+            WindowManager windowManager = (WindowManager) ctx
                     .getSystemService(Context.WINDOW_SERVICE);
 
             Display display = windowManager.getDefaultDisplay();
@@ -183,13 +183,13 @@ public class DownloadAdapter extends BaseAdapter{
                 holder.title = (TextView) convertView.findViewById(R.id.downloads_title);
                 holder.barHolder = (LinearLayout) convertView.findViewById(R.id.download_bar);
                 holder.txtPercent = (View) convertView.findViewById(R.id.download_percent);
-                holder.eta = (TextView)convertView.findViewById(R.id.downloads_eta);
+                holder.eta = (TextView) convertView.findViewById(R.id.downloads_eta);
                 holder.tvDownloaded = (TextView) convertView.findViewById(R.id.downloads_downloaded);
                 holder.tvPeers = (TextView) convertView.findViewById(R.id.download_peers);
                 holder.tvConnection = (TextView) convertView.findViewById(R.id.download_connection);
                 convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder)convertView.getTag();
+            } else {
+                holder = (ViewHolder) convertView.getTag();
             }
 
             TorrentItem entry = items.get(position);
@@ -198,9 +198,9 @@ public class DownloadAdapter extends BaseAdapter{
             holder.title.setText(title);
 
             double size = (double) entry.getSize();
-            if(size < 0) size *= -1.0;
+            if (size < 0) size *= -1.0;
             double downloaded = (((double) entry.getPercent() / 10) / 100) * (double) size;
-            if(downloaded < 0) downloaded *= -1.0;
+            if (downloaded < 0) downloaded *= -1.0;
 
             DecimalFormat Currency = new DecimalFormat("#0.00");
             String sd = "";
@@ -229,9 +229,8 @@ public class DownloadAdapter extends BaseAdapter{
             String sETA = "";
 
 
-
-            if (type== ClientType.UTORRENT) {
-                if (entry.getPercent() >= PERCENT_COMPLETED){
+            if (type == ClientType.UTORRENT) {
+                if (entry.getPercent() >= PERCENT_COMPLETED) {
                     holder.barHolder.setBackgroundResource(R.drawable.shape_completed);
                     holder.txtPercent.setBackgroundResource(R.drawable.shape_completed);
 
@@ -241,7 +240,7 @@ public class DownloadAdapter extends BaseAdapter{
                     holder.txtPercent.setLayoutParams(layoutParams);
 
                     holder.eta.setText(ctx.getResources().getString(R.string.download_completed));
-                }else{
+                } else {
                     double finalW = (((double) percentage_remaining / 100) * (double) (sw - 10));
                     holder.txtPercent.setBackgroundResource(R.drawable.shape_started);
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -250,22 +249,22 @@ public class DownloadAdapter extends BaseAdapter{
                     holder.txtPercent.setLayoutParams(layoutParams);
                     holder.barHolder.setBackgroundResource(R.drawable.shape_queued);
 
-                    if(Utility.hasStatus(STATUS_STARTED, entry.getStatus())){
+                    if (Utility.hasStatus(STATUS_STARTED, entry.getStatus())) {
                         holder.eta.setText(Utility.convertSecs(entry.getETA()));
                         holder.txtPercent.setBackgroundResource(R.drawable.shape_started);
-                    }else{
+                    } else {
                         System.out.println(entry.getStatus());
 
-                        if(entry.getStatus() == STATUS_CHECKED + STATUS_LOADED){
+                        if (entry.getStatus() == STATUS_CHECKED + STATUS_LOADED) {
                             holder.eta.setText("Stopped");
                             holder.txtPercent.setBackgroundResource(R.drawable.shape_stopped);
-                        }else if(entry.getStatus() == STATUS_CHECKED + STATUS_LOADED + STATUS_QUEUED) {
+                        } else if (entry.getStatus() == STATUS_CHECKED + STATUS_LOADED + STATUS_QUEUED) {
                             holder.eta.setText("Queued");
                             holder.txtPercent.setBackgroundResource(R.drawable.shape_queued);
-                        }else if(entry.getStatus() == STATUS_CHECKED + STATUS_LOADED + STATUS_QUEUED + STATUS_PAUSED){
+                        } else if (entry.getStatus() == STATUS_CHECKED + STATUS_LOADED + STATUS_QUEUED + STATUS_PAUSED) {
                             holder.eta.setText("Paused");
                             holder.txtPercent.setBackgroundResource(R.drawable.shape_paused);
-                        }else if(entry.getStatus() == STATUS_ERROR){
+                        } else if (entry.getStatus() == STATUS_ERROR) {
                             holder.eta.setText("Error");
                             holder.txtPercent.setBackgroundResource(R.drawable.shape_error);
                         }
@@ -315,7 +314,7 @@ public class DownloadAdapter extends BaseAdapter{
             }
 
 
-            if (type==ClientType.TRANSMISSION) {
+            if (type == ClientType.TRANSMISSION) {
                 switch (entry.getStatus()) {
                     case 0:
                     case 1:
@@ -343,10 +342,10 @@ public class DownloadAdapter extends BaseAdapter{
                         break;
                 }
 
-                if(entry.getStatus() < 5){
-                    sETA = converted.equals("")? "N/A":converted;
-                }else{
-                    sETA = converted.equals("")? "Completed":converted;
+                if (entry.getStatus() < 5) {
+                    sETA = converted.equals("") ? "N/A" : converted;
+                } else {
+                    sETA = converted.equals("") ? "Completed" : converted;
                 }
                 holder.eta.setText(sETA);
             }
@@ -372,19 +371,19 @@ public class DownloadAdapter extends BaseAdapter{
                         .getUploadSpeed() / KILOBYTE)) + " KB";
             }
 
-            if (type==ClientType.UTORRENT) {
+            if (type == ClientType.UTORRENT) {
                 finaltxt = entry.getSeedersCon() + "("
                         + entry.getSeedersAll() + ") Seeders, "
                         + entry.getPeersCon() + "(" + entry.getPeersAll()
                         + ") Peers.";
-            } else if (type==ClientType.TRANSMISSION) {
+            } else if (type == ClientType.TRANSMISSION) {
                 finaltxt = entry.getPeersCon() + "(" + entry.getPeersAll() + ") Peers.";
             }
 
 
             holder.tvPeers.setText(finaltxt);
-            holder.tvConnection.setText(ctx.getResources().getString(R.string.arrow_down) +ds+"/s "
-                    + ctx.getResources().getString(R.string.arrow_up)+ us+"/s");
+            holder.tvConnection.setText(ctx.getResources().getString(R.string.arrow_down) + ds + "/s "
+                    + ctx.getResources().getString(R.string.arrow_up) + us + "/s");
 
 
         } catch (Exception e) {

@@ -7,7 +7,7 @@ import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
-public class GetShowDetails extends AsyncTask<Void, Void, String>{
+public class GetShowDetails extends AsyncTask<Void, Void, String> {
     public static final String ASYNC_ID = "GETSHOWDETAILS";
     private Show show;
     private Context ctx;
@@ -15,14 +15,14 @@ public class GetShowDetails extends AsyncTask<Void, Void, String>{
     public IAsyncTaskListener asyncTaskListener;
 
 
-    public GetShowDetails(Context ctx, Show show){
+    public GetShowDetails(Context ctx, Show show) {
         this.show = show;
         //sh = new ShowHandler(ctx);
-        this.ctx  = ctx;
+        this.ctx = ctx;
     }
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
@@ -33,6 +33,6 @@ public class GetShowDetails extends AsyncTask<Void, Void, String>{
 
     @Override
     protected void onPostExecute(String response) {
-       asyncTaskListener.onTaskCompleted(response,ASYNC_ID);
+        asyncTaskListener.onTaskCompleted(response, ASYNC_ID);
     }
 }
