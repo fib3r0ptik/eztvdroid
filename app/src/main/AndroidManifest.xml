@@ -17,10 +17,19 @@
     <uses-permission android:name="com.hamaksoftware.tvbrowser.permission.C2D_MESSAGE" />
 
     <application
+        android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
+
+
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="eztvdroid.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="2" />
 
         <receiver
             android:name="com.hamaksoftware.tvbrowser.gcm.GcmBroadcastReceiver"

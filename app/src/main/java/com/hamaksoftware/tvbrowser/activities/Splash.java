@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
+import com.hamaksoftware.tvbrowser.utils.Utility;
 
 public class Splash extends Activity {
 
@@ -25,6 +26,8 @@ public class Splash extends Activity {
         } catch (PackageManager.NameNotFoundException e) {
             t.setVisibility(View.GONE);
         }
+
+        Utility.getInstance(getApplicationContext()).getProfile();
 
         new Handler().postDelayed(new Runnable() {
             @Override

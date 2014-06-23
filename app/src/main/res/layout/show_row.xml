@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="128dp"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal|center_vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:id="@+id/rounded_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:id="@+id/imgGrid"
+            android:adjustViewBounds="true"
+            android:layout_marginRight="15dp"
+            android:padding="3dp" />
+
+        <ImageView
+            android:src="@drawable/rounded_border_frame"
+            android:layout_width="96dp"
+            android:layout_height="96dp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/show_title"
+        android:gravity="center_vertical"
+        android:layout_below="@+id/rounded_frame"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Salem"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+</RelativeLayout>

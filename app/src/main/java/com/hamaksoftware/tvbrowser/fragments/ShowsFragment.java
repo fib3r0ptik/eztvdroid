@@ -9,16 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.ShowAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.GetShows;
 import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Show;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.List;
 public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected ListView lv;
+    protected GridView lv;
     public ShowAdapter adapter;
     protected Main base;
 
@@ -69,11 +69,11 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.shows, container, false);
+        final View rootView = inflater.inflate(R.layout.my_shows, container, false);
         base = (Main) getActivity();
         base.toggleHintLayout(false);
 
-        lv = (ListView) rootView.findViewById(R.id.lshows_list);
+        lv = (GridView) rootView.findViewById(R.id.myshow_grid);
         lv.setOnItemClickListener(itemClick);
 
         if (dialog == null) {
@@ -138,8 +138,8 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
             }
 
             if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                boolean success = (Boolean) data;
-                base.showToast(success ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
+                Show show = (Show) data;
+                base.showToast(show != null ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
                         , Toast.LENGTH_LONG);
             }
 
@@ -164,8 +164,8 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
     }
 
     public void onActivityDrawerClosed() {
-        ShowHandler sh = new ShowHandler(getActivity());
-        if (force || sh.getCount() <= 0 || adapter.getCount() <= 0) {
+        int count = new Select().from(Show.class).count();
+        if (force || count <= 0 || adapter.getCount() <= 0) {
             GetShows async = new GetShows(getActivity(), force);
             async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
             async.execute();

@@ -27,28 +27,63 @@ public class AppPref {
         return _sharedPrefs;
     }
 
+    public void setClientName(String data) {
+        editor.putString("client_name", data);
+        editor.commit();
+    }
+
     public String getClientName() {
         return _sharedPrefs.getString("client_name", "");
+    }
+
+    public void setClientIPAddress(String data) {
+        editor.putString("client_host", data);
+        editor.commit();
     }
 
     public String getClientIPAddress() {
         return _sharedPrefs.getString("client_host", "");
     }
 
+    public void setClientPort(String data) {
+        editor.putString("client_port", data);
+        editor.commit();
+    }
+
     public int getClientPort() {
         return Integer.parseInt(_sharedPrefs.getString("client_port", "8080"));
+    }
+
+    public void setAuth(boolean data) {
+        editor.putBoolean("use_auth", data);
+        editor.commit();
     }
 
     public boolean getAuth() {
         return _sharedPrefs.getBoolean("use_auth", true);
     }
 
+    public void setClientUsername(String data) {
+        editor.putString("client_username", data);
+        editor.commit();
+    }
+
     public String getClientUsername() {
         return _sharedPrefs.getString("client_username", "");
     }
 
+    public void setClientPassword(String data) {
+        editor.putString("client_password", data);
+        editor.commit();
+    }
+
     public String getClientPassword() {
         return _sharedPrefs.getString("client_password", "");
+    }
+
+    public void setClientType(String data) {
+        editor.putString("client_type", data);
+        editor.commit();
     }
 
     public String getClientType() {
@@ -63,106 +98,9 @@ public class AppPref {
         return Integer.valueOf(_sharedPrefs.getString("request_timeout", "10"));
     }
 
-    public int getFeedRefreshInterval() {
-        return Integer.valueOf(_sharedPrefs.getString("refresh_interval_feed", "15"));
-    }
-
-    public int getRefreshInterval() {
-        return Integer.valueOf(_sharedPrefs.getString("refresh_interval_torrent", "15"));
-    }
-
-
-    public void setRefreshInterval(int val) {
-        editor.putString("refresh_interval_torrent", val + "");
-        editor.commit();
-    }
-
-    public void setFeedCache(String feed_cache) {
-        editor.putString("feed_cache", feed_cache);
-        editor.commit();
-    }
-
-    public String getFeedCache() {
-        return _sharedPrefs.getString("feed_cache", "");
-    }
-
-    public String getEZTVUsername() {
-        return _sharedPrefs.getString("eztv_username", "");
-    }
-
-    public String getEZTVPassword() {
-        return _sharedPrefs.getString("eztv_password", "");
-    }
-
-    public void setEZTVUsername(String username) {
-        editor.putString("eztv_username", username);
-        editor.commit();
-    }
-
-    public void setEZTVPassword(String password) {
-        editor.putString("eztv_password", password);
-        editor.commit();
-    }
-
-
-    public String getEZTVHashedPassword() {
-        return _sharedPrefs.getString("eztv_hashed_password", "");
-    }
-
-
-    public void setEZTVHashedPassword(String password) {
-        editor.putString("eztv_hashed_password", password);
-        editor.commit();
-    }
-
-    public void setMyShowCache(String data) {
-        editor.putString("shows_cache", data);
-        editor.commit();
-    }
-
-    public String getMyshowCache() {
-        return _sharedPrefs.getString("shows_cache", "");
-    }
-
-    public void setEZTVLatestEpisodeCache(String data) {
-        editor.putString("eztv_latest_cache", data);
-        editor.commit();
-    }
-
-    public String getEZTVLatestEpisodeCache() {
-        return _sharedPrefs.getString("eztv_latest_cache", "");
-    }
-
-    public void setEZTVShowsCache(String data) {
-        editor.putString("eztv_shows_cache", data);
-        editor.commit();
-    }
-
-    public String getEZTVShowsCache() {
-        return _sharedPrefs.getString("eztv_shows_cache", "");
-    }
-
-
-    public void setEZTVRequestSesID(String data) {
-        editor.putString("eztv_ses_id", data);
-        editor.commit();
-    }
-
-    public String getEZTVRequestSesID() {
-        return _sharedPrefs.getString("eztv_ses_id", "");
-    }
 
     public boolean getUseSubscription() {
         return _sharedPrefs.getBoolean("use_subscription", false);
-    }
-
-    public boolean getUseEZTV() {
-        return _sharedPrefs.getBoolean("use_eztv", false);
-    }
-
-    public void setUseSubscription(boolean data) {
-        editor.putBoolean("use_subscription", data);
-        editor.commit();
     }
 
 
@@ -192,11 +130,6 @@ public class AppPref {
         return Integer.parseInt(_sharedPrefs.getString("auto_send_quality", "1"));
     }
 
-
-    public void setAutoSend(boolean data) {
-        editor.putBoolean("auto_send_torrent", data);
-        editor.commit();
-    }
 
     public void setDeviceId(String id) {
         editor.putString("info", id).commit();

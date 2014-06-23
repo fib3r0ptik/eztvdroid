@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.adapters.DrawerGroupAdapter;
 import com.hamaksoftware.tvbrowser.fragments.DownloadsFragment;
@@ -32,11 +33,10 @@ import com.hamaksoftware.tvbrowser.fragments.PrefFragment;
 import com.hamaksoftware.tvbrowser.fragments.SearchFragment;
 import com.hamaksoftware.tvbrowser.fragments.ShowDetailsFragment;
 import com.hamaksoftware.tvbrowser.fragments.ShowsFragment;
+import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 import com.hamaksoftware.tvbrowser.utils.ClientProfile;
 import com.hamaksoftware.tvbrowser.utils.DBHandler;
-import com.hamaksoftware.tvbrowser.utils.ProfileHandler;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -70,8 +70,6 @@ public class Main extends Activity {
     //private Fragment gridFragment;
 
     public AppPref pref;
-    public ShowHandler sh;
-    public ProfileHandler ph;
     public ArrayList<ClientProfile> profiles;
     private FragmentManager fragmentManager;
     private int currentSelectedChildPos;
@@ -127,7 +125,6 @@ public class Main extends Activity {
         setContentView(R.layout.activity_main);
 
         pref = new AppPref(getApplicationContext());
-        sh = new ShowHandler(getApplicationContext());
 
         Utility.getInstance(getApplicationContext()).registerInBackground();
 
@@ -179,6 +176,7 @@ public class Main extends Activity {
         getActionBar().setHomeButtonEnabled(true);
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .delayBeforeLoading(0)
                 .cacheInMemory(false)
                 .cacheOnDisk(true)
                 .build();
@@ -217,8 +215,11 @@ public class Main extends Activity {
                 }
 
                 if (currentFragmentTag == R.string.fragment_tag_myshows) {
-                    if (sh.getCount() > 0) {
-                        if (sh.getSubscribeCount() > 0) {
+
+                    int count = new Select().from(Show.class).count();
+                    int subCount = new Select().from(Show.class).where("isSubscribed=?", true).count();
+                    if (count > 0) {
+                        if (subCount > 0) {
                             launchFragment(R.string.fragment_tag_myshows, null, false);
                         } else {
                             showToast(getString(R.string.message_no_subscription), Toast.LENGTH_LONG);

@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Episode;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import org.apache.http.NameValuePair;
@@ -22,14 +21,12 @@ import java.util.Date;
 public class Search extends AsyncTask<Void, Void, ArrayList<Episode>> {
     public static final String ASYNC_ID = "SEARCH";
     private Context ctx;
-    private ShowHandler sh;
     private String query;
     private boolean byId;
 
     public IAsyncTaskListener asyncTaskListener;
 
     public Search(Context ctx, String query, boolean byId) {
-        sh = new ShowHandler(ctx);
         this.ctx = ctx;
         this.query = query;
         this.byId = byId;

@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
@@ -40,6 +41,8 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     protected ListView lv;
     protected View footer;
     protected Main base;
+
+
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -110,7 +113,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     private TextView watcherCount;
     private TextView rating;
     private TextView showDescription;
-    private TextView status;
+    private Button status;
     private EpisodeAdapter adapter;
     private ProgressDialog dialog;
 
@@ -129,7 +132,8 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     }
 
     public void setShowDetails(int showId) {
-        this.show = base.sh.getShow(showId);
+        show = new Select().from(Show.class).where("showId=?", showId)
+                .executeSingle();
         base.setTitle(show.title);
         status.setText(show.isSubscribed ? "UNSUBSCRIBE" : "SUBSCRIBE");
         if (show.isSubscribed) {
@@ -164,8 +168,9 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
         dialog.setIndeterminate(true);
 
         Bundle payload = getArguments();
+        show = new Select().from(Show.class).where("showId=?", payload.getInt("show_id"))
+                .executeSingle();
 
-        show = base.sh.getShow(payload.getInt("show_id"));
         ImageView img = (ImageView) headerView.findViewById(R.id.poster);
         ImageLoader.getInstance().displayImage("http://hamaksoftware.com/myeztv/tvimg/" + show.showId + ".jpg", img);
 
@@ -197,7 +202,8 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
             showDescription = (TextView) rootView.findViewById(R.id.show_description);
             */
 
-            status = (TextView) rootView.findViewById(R.id.show_detail_status);
+            status = (Button) rootView.findViewById(R.id.show_detail_status);
+
             status.setText(show.isSubscribed ? "UNSUBSCRIBE" : "SUBSCRIBE");
             if (show.isSubscribed) {
                 status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
@@ -213,7 +219,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
                     Button btn = (Button) view;
                     Subscription subscription = new Subscription(getActivity(), show);
                     subscription.asyncTaskListener = ShowDetailsFragment.this;
-                    subscription.isSubscribe = btn.getText().toString().equals("SUBSCRIBE");
+                    subscription.isSubscribe = !show.isSubscribed;
                     subscription.execute();
                 }
             });
@@ -325,8 +331,9 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
         if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
             if (data != null) {
-                boolean res = (Boolean) data;
-                if (res) {
+                Show s = (Show) data;
+                if (s != null) {
+                    /*
                     if (show.isSubscribed) {
                         show.isSubscribed = false;
                         status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
@@ -339,11 +346,8 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
                         status.setText("UNSUBSCRIBE");
                     }
                     base.sh.updateShow(show);
-                    /*
-                    GetSubscriberCount getSubscriberCount = new GetSubscriberCount(getActivity(),show);
-                    getSubscriberCount.asyncTaskListener = ShowDetailsFragment.this;
-                    getSubscriberCount.execute();
                     */
+                    setShowDetails(s.showId);
                 }
             }
         }

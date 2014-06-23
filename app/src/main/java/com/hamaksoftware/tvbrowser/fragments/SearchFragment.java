@@ -15,13 +15,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.Search;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
 import com.hamaksoftware.tvbrowser.models.Episode;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
+import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import java.util.ArrayList;
@@ -99,8 +100,8 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
                     if (items[item].equals(getString(R.string.dialog_view))) {
                         base = (Main) getActivity();
-                        ShowHandler showHandler = new ShowHandler(getActivity());
-                        if (showHandler.getCount() > 0) {
+                        int count = new Select().from(Show.class).count();
+                        if (count > 0) {
                             Bundle args = new Bundle();
                             args.putInt("show_id", row.showId);
                             base.launchFragment(R.string.fragment_tag_show_detail, args, false);

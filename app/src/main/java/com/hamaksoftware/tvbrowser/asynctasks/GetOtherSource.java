@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.RSSItem;
 import com.hamaksoftware.tvbrowser.utils.FeedParser;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 
 import java.util.ArrayList;
 
@@ -14,13 +13,13 @@ public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>> {
     public static final String ASYNC_ID = "GETFEED";
     private String uri;
     private Context ctx;
-    private ShowHandler sh;
+
     public IAsyncTaskListener asyncTaskListener;
     private FeedParser fp;
 
     public GetOtherSource(Context ctx, String uri) {
         this.uri = uri;
-        sh = new ShowHandler(ctx);
+
         this.ctx = ctx;
         fp = new FeedParser(ctx, uri);
     }

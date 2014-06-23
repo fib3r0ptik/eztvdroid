@@ -253,7 +253,7 @@ public class DownloadAdapter extends BaseAdapter {
                         holder.eta.setText(Utility.convertSecs(entry.getETA()));
                         holder.txtPercent.setBackgroundResource(R.drawable.shape_started);
                     } else {
-                        System.out.println(entry.getStatus());
+                        //System.out.println(entry.getStatus());
 
                         if (entry.getStatus() == STATUS_CHECKED + STATUS_LOADED) {
                             holder.eta.setText("Stopped");

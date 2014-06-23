@@ -4,11 +4,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import org.apache.http.NameValuePair;
@@ -18,12 +20,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
     public static final String ASYNC_ID = "GETSHOWS";
     private int page;
     private Context ctx;
-    private ShowHandler sh;
     private boolean forced;
     private AppPref pref;
 
@@ -31,7 +33,6 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
 
     public GetShows(Context ctx, boolean forced) {
         this.page = page;
-        sh = new ShowHandler(ctx);
         this.ctx = ctx;
         this.forced = forced;
         pref = new AppPref(ctx);
@@ -46,8 +47,11 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
     protected ArrayList<Show> doInBackground(Void... voids) {
         ArrayList<Show> shows = new ArrayList<Show>(0);
         asyncTaskListener.onTaskUpdateMessage("Reloading/Caching shows...", ASYNC_ID);
-        int count = sh.getCount();
         try {
+
+
+            int count = new Select().from(Show.class).count();
+
 
             if (forced || count <= 0) {
                 int ctr = 0;
@@ -65,35 +69,48 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
                 Log.i("api", "ttl my shows:" + myShows.length());
 
                 asyncTaskListener.onTaskProgressMax(jShows.length(), ASYNC_ID);
-                sh.deleteAll();
-                for (int i = 0; i < jShows.length(); i++) {
-                    Show show = new Show();
-                    JSONObject item = jShows.getJSONObject(i);
-                    show.title = item.getString("title");
-                    show.status = item.getString("status");
-                    show.showId = Integer.parseInt(item.getString("id"));
 
-                    String append = null;
-                    for (int j = 0; j < myShows.length(); j++) {
-                        JSONObject obj = myShows.getJSONObject(j);
-                        int id = obj.getInt("id");
-                        if (id == show.showId) {
-                            append = ctx.getResources().getString(R.string.tab_show_myshow);
-                            show.isSubscribed = true;
-                            break;
-                        } else {
-                            append = "";
+                new Delete().from(Show.class).execute();
+                Show _show = new Select().from(Show.class).orderBy("RANDOM()").executeSingle();
+                //System.out.println(_show);
+
+
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (int i = 0; i < jShows.length(); i++) {
+                        Show show = new Show();
+                        JSONObject item = jShows.getJSONObject(i);
+                        show.title = item.getString("title");
+                        show.status = item.getString("status");
+                        show.showId = Integer.parseInt(item.getString("id"));
+
+                        String append = null;
+                        for (int j = 0; j < myShows.length(); j++) {
+                            JSONObject obj = myShows.getJSONObject(j);
+                            int id = obj.getInt("id");
+                            if (id == show.showId) {
+                                append = ctx.getResources().getString(R.string.tab_show_myshow);
+                                show.isSubscribed = true;
+                                break;
+                            } else {
+                                append = "";
+                            }
                         }
-                    }
 
-                    sh.addShow(show);
-                    shows.add(show);
-                    asyncTaskListener.onTaskProgressUpdate(ctr, ASYNC_ID);
-                    ctr++;
+
+                        show.save();
+                        shows.add(show);
+                        asyncTaskListener.onTaskProgressUpdate(ctr, ASYNC_ID);
+                        ctr++;
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
                 }
 
             } else {
-                shows = sh.getAllShows();
+                List<Show> _shows = new Select().from(Show.class).execute();
+                shows = (ArrayList<Show>) _shows;
             }
             //cloneShowItems();
         } catch (JSONException e) {

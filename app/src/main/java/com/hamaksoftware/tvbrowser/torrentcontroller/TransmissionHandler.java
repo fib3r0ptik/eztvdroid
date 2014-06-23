@@ -285,7 +285,7 @@ public class TransmissionHandler {
         //String data = "{\"method\":\"torrent-set\",\"arguments\":{\"ids\":[],"+temp+"}}";
         String data = "{\"method\":\"session-set\",\"arguments\":{" + temp + "}}";
 
-        System.out.println(data);
+        //System.out.println(data);
 
         HttpPost httppost = new HttpPost(_endpointURI);
         httppost.addHeader("X-Transmission-Session-Id", code);

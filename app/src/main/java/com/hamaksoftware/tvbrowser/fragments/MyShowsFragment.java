@@ -144,7 +144,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
                     adapter.notifyDataSetChanged();
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    //System.out.println(e.getMessage());
                 }
 
             }

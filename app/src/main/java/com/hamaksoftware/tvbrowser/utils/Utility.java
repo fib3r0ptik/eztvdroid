@@ -27,6 +27,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -150,7 +152,7 @@ public class Utility {
             String line;
             while ((line = rd.readLine()) != null) sb.append(line);
 
-            System.out.println(sb.toString());
+            //System.out.println(sb.toString());
 
             return sb.toString();
 
@@ -251,31 +253,53 @@ public class Utility {
     }
 
 
-    public void saveProfiles() {
-        ProfileHandler phandler = new ProfileHandler(ctx);
-        final ArrayList<ClientProfile> profiles = phandler.getAllProfiles();
-        for (int i = 0; i < profiles.size(); i++) {
-            final ClientProfile p = profiles.get(i);
-            new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    String msg = "";
-                    ArrayList<NameValuePair> data = new ArrayList<NameValuePair>(8);
-                    data.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
-                    data.add(new BasicNameValuePair("method", "saveProfile"));
-                    data.add(new BasicNameValuePair("name", p.name));
-                    data.add(new BasicNameValuePair("host", p.host));
-                    data.add(new BasicNameValuePair("port", p.port + ""));
-                    data.add(new BasicNameValuePair("use_auth", p.useAuth + ""));
-                    data.add(new BasicNameValuePair("uid", p.username));
-                    data.add(new BasicNameValuePair("pwd", p.password));
-                    Utility.getInstance(ctx).doPostRequest(data);
-                    return msg;
+    public void getProfile() {
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ArrayList<NameValuePair> data = new ArrayList<NameValuePair>(2);
+                data.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
+                data.add(new BasicNameValuePair("method", "getProfile"));
+                String msg = Utility.getInstance(ctx).doPostRequest(data);
+
+                try {
+                    JSONObject json = new JSONObject(msg);
+                    pref.setClientType(json.getString("client_type"));
+                    pref.setClientName(json.getString("name"));
+                    pref.setClientIPAddress(json.getString("host"));
+                    pref.setClientPort(json.getString("port"));
+                    pref.setAuth(json.getString("use_auth").equals("1"));
+                    pref.setClientUsername(json.getString("uid"));
+                    pref.setClientPassword(json.getString("pwd"));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            }.execute();
-        }
+                return null;
+            }
+        }.execute();
+    }
 
+    public void saveProfile() {
 
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                ArrayList<NameValuePair> data = new ArrayList<NameValuePair>(10);
+                data.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
+                data.add(new BasicNameValuePair("method", "saveProfile"));
+                data.add(new BasicNameValuePair("client_type", pref.getClientType()));
+                data.add(new BasicNameValuePair("name", pref.getClientName()));
+                data.add(new BasicNameValuePair("host", pref.getClientIPAddress()));
+                data.add(new BasicNameValuePair("port", pref.getClientPort() + ""));
+                data.add(new BasicNameValuePair("use_auth", pref.getAuth() + ""));
+                data.add(new BasicNameValuePair("uid", pref.getClientUsername()));
+                data.add(new BasicNameValuePair("pwd", pref.getClientPassword()));
+                return Utility.getInstance(ctx).doPostRequest(data);
+                //return msg;
+            }
+        }.execute();
     }
 
 
@@ -341,7 +365,7 @@ public class Utility {
         long m = diff / ONE_MINUTE;
         diff %= ONE_MINUTE;
         /*
-		 * long s = diff / ONE_SECOND; long ms = diff % ONE_SECOND;
+         * long s = diff / ONE_SECOND; long ms = diff % ONE_SECOND;
 		 */
         result[0] = d;
         result[1] = h;

@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Episode;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import org.apache.http.NameValuePair;
@@ -23,12 +22,10 @@ public class GetLatestShow extends AsyncTask<Void, Void, ArrayList<Episode>> {
     public static final String ASYNC_ID = "GETLATESTSHOW";
     private int page;
     private Context ctx;
-    private ShowHandler sh;
     public IAsyncTaskListener asyncTaskListener;
 
     public GetLatestShow(Context ctx, int page) {
         this.page = page;
-        sh = new ShowHandler(ctx);
         this.ctx = ctx;
     }
 

@@ -7,7 +7,6 @@ import android.util.Log;
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import org.apache.http.NameValuePair;
@@ -17,7 +16,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class Subscription extends AsyncTask<Void, Void, Boolean> {
+public class Subscription extends AsyncTask<Void, Void, Show> {
     public static final String ASYNC_ID = "SUBSCRIPTION";
     private Show show;
     private Context ctx;
@@ -37,7 +36,7 @@ public class Subscription extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(Void... voids) {
+    protected Show doInBackground(Void... voids) {
         boolean ret;
         ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(2);
         /*
@@ -57,21 +56,20 @@ public class Subscription extends AsyncTask<Void, Void, Boolean> {
             JSONObject obj = new JSONObject(res);
             ret = (obj.getInt("success") == 1);
             if (ret) {
-                show.isSubscribed = !show.isSubscribed;
-                ShowHandler sh = new ShowHandler(ctx);
-                sh.updateShow(show);
+                show.isSubscribed = isSubscribe;
+                show.save();
             }
         } catch (JSONException e) {
             ret = false;
         }
 
 
-        return ret;
+        return show;
 
     }
 
     @Override
-    protected void onPostExecute(Boolean d) {
+    protected void onPostExecute(Show d) {
         asyncTaskListener.onTaskCompleted(d, ASYNC_ID);
     }
 }

@@ -10,6 +10,7 @@ import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.asynctasks.VerifyClient;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
+import com.hamaksoftware.tvbrowser.utils.Utility;
 
 public class PrefFragment extends PreferenceFragment implements IAsyncTaskListener {
     private AppPref pref;
@@ -63,6 +64,9 @@ public class PrefFragment extends PreferenceFragment implements IAsyncTaskListen
             Boolean success = (Boolean) data;
             String msg = success ? getString(R.string.message_verify_profile_success) : getString(R.string.message_verify_profile_failed);
             Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+            if (success) {
+                Utility.getInstance(getActivity()).saveProfile();
+            }
         }
     }
 

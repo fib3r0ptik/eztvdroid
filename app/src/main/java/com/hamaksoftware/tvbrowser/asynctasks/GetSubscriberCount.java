@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.models.Show;
-import com.hamaksoftware.tvbrowser.utils.ShowHandler;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import org.apache.http.NameValuePair;
@@ -17,13 +16,11 @@ public class GetSubscriberCount extends AsyncTask<Void, Void, String> {
     public static final String ASYNC_ID = "GETSUBSCRIBERCOUNT";
     private Show show;
     private Context ctx;
-    private ShowHandler sh;
     public IAsyncTaskListener asyncTaskListener;
 
 
     public GetSubscriberCount(Context ctx, Show show) {
         this.show = show;
-        sh = new ShowHandler(ctx);
         this.ctx = ctx;
     }
 

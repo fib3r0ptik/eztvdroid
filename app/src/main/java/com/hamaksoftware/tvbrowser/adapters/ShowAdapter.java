@@ -1,19 +1,18 @@
 package com.hamaksoftware.tvbrowser.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.models.Show;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +61,8 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
     }
 
     private class ViewHolder {
-        LinearLayout rowHolder;
         TextView title;
-        CheckBox chk;
+        ImageView img;
 
     }
 
@@ -99,11 +97,10 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.shows_row, null);
+            convertView = inflater.inflate(R.layout.show_row, null);
             holder = new ViewHolder();
-            holder.rowHolder = (LinearLayout) convertView.findViewById(R.id.show_row_holder);
             holder.title = (TextView) convertView.findViewById(R.id.show_title);
-            holder.chk = (CheckBox) convertView.findViewById(R.id.shows_chk_item);
+            holder.img = (ImageView) convertView.findViewById(R.id.imgGrid);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -111,14 +108,9 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
 
 
         final Show entry = shows.get(position);
-
-        if (position % 2 == 0) {
-            holder.rowHolder.setBackgroundColor(Color.WHITE);
-        } else {
-            holder.rowHolder.setBackgroundResource(R.color.alt_blue);
-        }
-
         holder.title.setText(entry.title);
+        String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.showId;
+        ImageLoader.getInstance().displayImage(url, holder.img);
 
         return convertView;
     }
