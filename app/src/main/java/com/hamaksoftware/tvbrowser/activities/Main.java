@@ -156,7 +156,7 @@ public class Main extends Activity {
             public void onGroupCollapse(int i) {
                 LinearLayout parent = (LinearLayout) mDrawerList.getChildAt(i + 1);
                 ImageView expand = (ImageView) parent.findViewById(R.id.drawer_collapse);
-                expand.setImageResource(R.drawable.ic_action_expand);
+                if(expand != null) expand.setImageResource(R.drawable.ic_action_expand);
             }
         });
 
@@ -165,7 +165,7 @@ public class Main extends Activity {
             public void onGroupExpand(int i) {
                 LinearLayout parent = (LinearLayout) mDrawerList.getChildAt(i + 1);
                 ImageView collapse = (ImageView) parent.findViewById(R.id.drawer_collapse);
-                collapse.setImageResource(R.drawable.ic_action_collapse);
+                if(collapse != null) collapse.setImageResource(R.drawable.ic_action_collapse);
             }
         });
 
@@ -344,7 +344,8 @@ public class Main extends Activity {
                     sourceFragment = new OtherSourceFragment();
                     sourceFragment.setArguments(params);
                 } else {
-                    sourceFragment.getArguments().putString("uri", params.getString("uri"));
+                    sourceFragment.uri = params.getString("uri");
+                    sourceFragment.onActivityDrawerClosed();
                 }
                 transaction.replace(R.id.content_frame, sourceFragment, getString(R.string.fragment_tag_rss));
                 setTitle("Other RSS");

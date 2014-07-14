@@ -76,12 +76,12 @@
             android:summary="Refresh Interval when viewing current items on the download section."
             android:title="Refresh Interval (in seconds)" />
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="use_subscription"
             android:summary="Check this box if you want to use the subscription and push notification enabled. "
             android:title="Enable Subscription/Push Notification" />
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:dependency="use_subscription"
             android:key="auto_send_torrent"
             android:summary="Auto send to the first torrent client available"

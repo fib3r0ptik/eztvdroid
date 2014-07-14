@@ -131,6 +131,10 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
         return rootView;
     }
 
+    public void refreshView(){
+
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -169,7 +173,7 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
         }
 
 
-        dialog.dismiss();
+        if(dialog.isShowing()) dialog.dismiss();
         force = false;
     }
 
@@ -195,8 +199,9 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
         dialog.setMessage(getString(R.string.loader_working));
-        dialog.show();
+        if(!dialog.isShowing()) dialog.show();
     }
+
 
     @Override
     public void onTaskProgressUpdate(int progress, String ASYNC_ID) {

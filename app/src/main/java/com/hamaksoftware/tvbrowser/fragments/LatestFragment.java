@@ -21,6 +21,7 @@ import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.GetLatestShow;
+import com.hamaksoftware.tvbrowser.asynctasks.GetShows;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
 import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Episode;
@@ -230,6 +231,14 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+
+        int count = new Select().from(Show.class).count();
+        if(count <= 0) {
+            GetShows getShows = new GetShows(getActivity(), true);
+            getShows.asyncTaskListener = this;
+            getShows.execute();
+        }
+
         if (force || adapter.listings.size() <= 0) {
             adapter.listings.clear();
             onActivityDrawerClosed();

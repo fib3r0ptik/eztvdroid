@@ -24,13 +24,14 @@ import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
 import com.hamaksoftware.tvbrowser.models.Episode;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 
 public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected ListView lv;
+    protected PullToRefreshListView lv;
     protected EpisodeAdapter adapter;
     protected View footer;
     protected Main base;
@@ -43,7 +44,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final Episode row = adapter.listings.get(position);
+            final Episode row = adapter.listings.get(position-1);
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -148,13 +149,13 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
         dialog.setIndeterminate(true);
         dialog.setMessage(getString(R.string.loader_searching));
 
-        lv = (ListView) rootView.findViewById(R.id.latest_list_feed);
-        lv.setOnItemClickListener(itemClick);
+        lv = (PullToRefreshListView) rootView.findViewById(R.id.latest_list_feed);
+        lv.getRefreshableView().setOnItemClickListener(itemClick);
         if (adapter == null) {
             adapter = new EpisodeAdapter(getActivity(), new ArrayList<Episode>(0));
         }
 
-        lv.setAdapter(adapter);
+        lv.getRefreshableView().setAdapter(adapter);
 
 
         query = getArguments().getString("query");

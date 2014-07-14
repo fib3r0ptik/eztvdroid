@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hamaksoftware.tvbrowser.R;
@@ -19,6 +20,8 @@ import com.hamaksoftware.tvbrowser.asynctasks.GetMyShows;
 import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,7 +32,7 @@ import java.util.List;
 public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected GridView lv;
+    protected PullToRefreshGridView lv;
     public MyShowAdapter adapter;
     protected Main base;
 
@@ -73,8 +76,15 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
         base = (Main) getActivity();
         base.toggleHintLayout(false);
 
-        lv = (GridView) rootView.findViewById(R.id.myshow_grid);
-        lv.setOnItemClickListener(itemClick);
+        lv = (PullToRefreshGridView) rootView.findViewById(R.id.myshow_grid);
+        lv.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<GridView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+                lv.setRefreshing();
+                onActivityDrawerClosed();
+            }
+        });
+        lv.getRefreshableView().setOnItemClickListener(itemClick);
 
 
         if (adapter == null) {
@@ -82,7 +92,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
             adapter.setShows(new ArrayList<Show>(0));
         }
 
-        lv.setAdapter(adapter);
+        lv.getRefreshableView().setAdapter(adapter);
 
         base.invalidateOptionsMenu();
 
@@ -107,6 +117,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
     public void onTaskCompleted(Object data, String ASYNC_ID) {
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
+                lv.onRefreshComplete();
                 List<Show> d = (List<Show>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
