@@ -29,6 +29,7 @@ import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Episode;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.text.DecimalFormat;
@@ -38,7 +39,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
     public Show show;
     public boolean force;
-    protected ListView lv;
+    protected PullToRefreshListView lv;
     protected View footer;
     protected Main base;
 
@@ -156,13 +157,13 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
         adapter = new EpisodeAdapter(getActivity(), new ArrayList<Episode>(0));
 
-        lv = (ListView) rootView.findViewById(R.id.latest_list_feed);
-        lv.setVerticalScrollBarEnabled(false);
-        lv.setScrollBarStyle(ListView.SCROLLBARS_OUTSIDE_OVERLAY);
-        lv.setOnItemClickListener(itemClick);
-        lv.addHeaderView(headerView);
+        lv = (PullToRefreshListView) rootView.findViewById(R.id.latest_list_feed);
+        lv.getRefreshableView().setVerticalScrollBarEnabled(false);
+        lv.getRefreshableView().setScrollBarStyle(ListView.SCROLLBARS_OUTSIDE_OVERLAY);
+        lv.getRefreshableView().setOnItemClickListener(itemClick);
+        lv.getRefreshableView().addHeaderView(headerView);
 
-        lv.setAdapter(adapter);
+        lv.getRefreshableView().setAdapter(adapter);
 
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);

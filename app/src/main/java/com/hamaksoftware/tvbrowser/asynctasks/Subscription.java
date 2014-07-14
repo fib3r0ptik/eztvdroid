@@ -38,14 +38,7 @@ public class Subscription extends AsyncTask<Void, Void, Show> {
     @Override
     protected Show doInBackground(Void... voids) {
         boolean ret;
-        ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(2);
-        /*
-        if(show.isSubscribed){
-            param.add(new BasicNameValuePair("method", "unsubscribe"));
-        }else{
-            param.add(new BasicNameValuePair("method", "subscribe"));
-        }
-        */
+        ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(3);
 
         param.add(new BasicNameValuePair("method", isSubscribe ? "subscribe" : "unsubscribe"));
         param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));

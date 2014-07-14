@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
@@ -20,6 +21,8 @@ import com.hamaksoftware.tvbrowser.asynctasks.GetShows;
 import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,7 @@ import java.util.List;
 public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected GridView lv;
+    protected PullToRefreshGridView lv;
     public ShowAdapter adapter;
     protected Main base;
 
@@ -55,6 +58,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
                     if (items[item].equals(getString(R.string.dialog_subscribe))) {
                         Subscription s = new Subscription(getActivity(), show);
+                        s.isSubscribe = true;
                         s.asyncTaskListener = ShowsFragment.this;
                         s.execute();
                     }
@@ -73,8 +77,8 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         base = (Main) getActivity();
         base.toggleHintLayout(false);
 
-        lv = (GridView) rootView.findViewById(R.id.myshow_grid);
-        lv.setOnItemClickListener(itemClick);
+        lv = (PullToRefreshGridView) rootView.findViewById(R.id.myshow_grid);
+        lv.getRefreshableView().setOnItemClickListener(itemClick);
 
         if (dialog == null) {
             dialog = new ProgressDialog(getActivity());
@@ -85,13 +89,21 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         dialog.setMessage(getString(R.string.loader_working));
 
         View empty = inflater.inflate(R.layout.latest_empty, container, false);
-        lv.setEmptyView(empty);
+        lv.getRefreshableView().setEmptyView(empty);
 
         if (adapter == null) {
             adapter = new ShowAdapter(getActivity(), new ArrayList<Show>(0));
         }
 
-        lv.setAdapter(adapter);
+        lv.getRefreshableView().setAdapter(adapter);
+        lv.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<GridView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<GridView> refreshView) {
+                lv.setRefreshing();
+                force = true;
+                onActivityDrawerClosed();
+            }
+        });
 
         base.invalidateOptionsMenu();
 
@@ -124,6 +136,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
     public void onTaskCompleted(Object data, String ASYNC_ID) {
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)) {
+                lv.onRefreshComplete();
                 List<Show> d = (List<Show>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -131,7 +144,6 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
                     String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
                     Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
                 } else {
-                    //adapter.listings = (List<Show>) d;
                     adapter.setShows((ArrayList<Show>) d);
                     adapter.notifyDataSetChanged();
                 }

@@ -26,12 +26,14 @@ import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
 import com.hamaksoftware.tvbrowser.models.Episode;
 import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 
 public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
-    protected ListView lv;
+    protected PullToRefreshListView lv;
     protected EpisodeAdapter adapter;
     protected View footer;
     protected Main base;
@@ -43,7 +45,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final Episode row = adapter.listings.get(position);
+            final Episode row = adapter.listings.get(position-1);
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_copy), getString(R.string.dialog_send), getString(R.string.dialog_subscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -170,9 +172,9 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
         footer = inflater.inflate(R.layout.footer, null, false);
         footer.setVisibility(View.GONE);
 
-        lv = (ListView) rootView.findViewById(R.id.latest_list_feed);
-        lv.setFooterDividersEnabled(true);
-        lv.addFooterView(footer);
+        lv = (PullToRefreshListView) rootView.findViewById(R.id.latest_list_feed);
+        lv.getRefreshableView().setFooterDividersEnabled(true);
+        lv.getRefreshableView().addFooterView(footer);
 
 
         dialog = new ProgressDialog(getActivity());
@@ -186,8 +188,18 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
         }
 
 
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(itemClick);
+        lv.getRefreshableView().setAdapter(adapter);
+        lv.getRefreshableView().setOnItemClickListener(itemClick);
+        lv.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                lv.setRefreshing();
+                force = true;
+                onActivityDrawerClosed();
+            }
+        });
+
+
         Button btn = (Button) footer.findViewById(R.id.btnLoadMore);
         btn.setVisibility(View.VISIBLE);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -228,6 +240,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
     public void onTaskCompleted(Object data, String ASYNC_ID) {
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetLatestShow.ASYNC_ID)) {
+                lv.onRefreshComplete();
                 ArrayList<Episode> d = (ArrayList<Episode>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
@@ -235,6 +248,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
                     String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
                     Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
                 } else {
+                    if (force) adapter.listings.clear();
                     adapter.listings.addAll(d);
                     adapter.notifyDataSetChanged();
                     footer.setVisibility(View.VISIBLE);
@@ -247,14 +261,14 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
             }
 
             if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                boolean success = (Boolean) data;
-                base.showToast(success ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
+                Show show = (Show) data;
+                base.showToast((show instanceof Show) ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
                         , Toast.LENGTH_LONG);
             }
         }
 
 
-        dialog.dismiss();
+        if(dialog.isShowing()) dialog.dismiss();
         force = false;
     }
 
@@ -269,18 +283,20 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
 
     public void onActivityDrawerClosed() {
-        if (force) adapter.listings.clear();
+        if(lv.isRefreshing()) base.currentPage = 0;
         GetLatestShow async = new GetLatestShow(getActivity(), base.currentPage++);
         async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
         async.execute();
-
     }
 
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
-        dialog.setMessage(getString(R.string.loader_working));
-        dialog.show();
+        if(!lv.isRefreshing()){
+            dialog.setMessage(getString(R.string.loader_working));
+            dialog.show();
+        }
+
     }
 
     @Override

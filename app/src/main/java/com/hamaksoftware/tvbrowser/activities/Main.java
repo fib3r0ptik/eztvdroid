@@ -296,7 +296,7 @@ public class Main extends Activity {
                     showFragment = new ShowsFragment();
                     showFragment.setArguments(params);
                 } else {
-                    showFragment.refreshData(force);
+                    showFragment.getArguments().putBoolean("force",true);
                 }
                 transaction.replace(R.id.content_frame, showFragment, getString(R.string.fragment_tag_shows));
                 setTitle("TV Shows");
@@ -318,7 +318,7 @@ public class Main extends Activity {
                     detail = new ShowDetailsFragment();
                     detail.setArguments(params);
                 } else {
-                    detail.setShowDetails(params.getInt("show_id"));
+                    detail.getArguments().putInt("show_id",params.getInt("show_id"));
                 }
 
                 transaction.replace(R.id.content_frame, detail, getString(R.string.fragment_tag_show_detail));
@@ -344,8 +344,7 @@ public class Main extends Activity {
                     sourceFragment = new OtherSourceFragment();
                     sourceFragment.setArguments(params);
                 } else {
-                    sourceFragment.uri = params.getString("uri");
-                    sourceFragment.onActivityDrawerClosed();
+                    sourceFragment.getArguments().putString("uri", params.getString("uri"));
                 }
                 transaction.replace(R.id.content_frame, sourceFragment, getString(R.string.fragment_tag_rss));
                 setTitle("Other RSS");
@@ -429,14 +428,8 @@ public class Main extends Activity {
     /* Called whenever we call invalidateOptionsMenu() */
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        /*If the nav drawer is open, hide action items related to the content view
-        final boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        menu.findItem(R.id.action_server_status_on).setVisible(false);
-        menu.findItem(R.id.action_server_status_off).setVisible(true);
-        */
         if (currentFragmentTag == R.string.fragment_tag_latest || currentFragmentTag == R.string.fragment_tag_shows) {
-            menu.findItem(R.id.action_refresh).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
-                    currentFragmentTag == R.string.fragment_tag_shows);
+            menu.findItem(R.id.action_refresh).setVisible(false);
             menu.findItem(R.id.action_search).setVisible(currentFragmentTag == R.string.fragment_tag_latest ||
                     currentFragmentTag == R.string.fragment_tag_shows || currentFragmentTag == R.string.fragment_tag_search);
         }

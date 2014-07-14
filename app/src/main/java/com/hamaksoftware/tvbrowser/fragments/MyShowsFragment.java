@@ -150,10 +150,10 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
             }
 
             if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                boolean success = (Boolean) data;
-                base.showToast(success ? getString(R.string.message_unsubscribe_successful) : getString(R.string.message_unsubscribe_failure)
+                Show show = (Show) data;
+                base.showToast((show instanceof Show) ? getString(R.string.message_unsubscribe_successful) : getString(R.string.message_unsubscribe_failure)
                         , Toast.LENGTH_LONG);
-                if (success) {
+                if ((show instanceof Show)) {
                     GetMyShows async = new GetMyShows(getActivity());
                     async.asyncTaskListener = this;
                     async.execute();
