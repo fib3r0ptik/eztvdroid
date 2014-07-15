@@ -47,7 +47,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final Episode row = adapter.listings.get(position - 1);
+            final Episode row = adapter.listings.get(position - 2);
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

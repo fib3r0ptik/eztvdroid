@@ -173,7 +173,7 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
         }
 
 
-        if(dialog.isShowing()) dialog.dismiss();
+        dialog.dismiss();
         force = false;
     }
 
@@ -199,7 +199,7 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
         dialog.setMessage(getString(R.string.loader_working));
-        if(!dialog.isShowing()) dialog.show();
+        dialog.show();
     }
 
 
