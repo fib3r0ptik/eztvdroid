@@ -253,38 +253,40 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
-        if (data != null) {
-            if (ASYNC_ID.equalsIgnoreCase(GetLatestShow.ASYNC_ID)) {
-                lv.onRefreshComplete();
-                ArrayList<Episode> d = (ArrayList<Episode>) data;
-                if (d.size() <= 0) {
-                    String title = getResources().getString(R.string.loader_title_request_result);
-                    String msg = getResources().getString(R.string.result_listing_error);
-                    String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
-                    Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
-                } else {
-                    if (force) adapter.listings.clear();
-                    adapter.listings.addAll(d);
-                    adapter.notifyDataSetChanged();
-                    footer.setVisibility(View.VISIBLE);
+        if(this.isAdded()) {
+            if (data != null) {
+                if (ASYNC_ID.equalsIgnoreCase(GetLatestShow.ASYNC_ID)) {
+                    lv.onRefreshComplete();
+                    ArrayList<Episode> d = (ArrayList<Episode>) data;
+                    if (d.size() <= 0) {
+                        String title = getResources().getString(R.string.loader_title_request_result);
+                        String msg = getResources().getString(R.string.result_listing_error);
+                        String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
+                        Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
+                    } else {
+                        if (force) adapter.listings.clear();
+                        adapter.listings.addAll(d);
+                        adapter.notifyDataSetChanged();
+                        footer.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
+                    boolean success = (Boolean) data;
+                    base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
+                }
+
+                if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
+                    Show show = (Show) data;
+                    base.showToast((show instanceof Show) ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
+                            , Toast.LENGTH_LONG);
                 }
             }
 
-            if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
-                boolean success = (Boolean) data;
-                base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
-            }
 
-            if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                Show show = (Show) data;
-                base.showToast((show instanceof Show) ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
-                        , Toast.LENGTH_LONG);
-            }
+            if (dialog.isShowing()) dialog.dismiss();
+            force = false;
         }
-
-
-        if(dialog.isShowing()) dialog.dismiss();
-        force = false;
     }
 
     @Override

@@ -91,11 +91,11 @@ public class AppPref {
     }
 
     public int getConnectionTimeout() {
-        return Integer.valueOf(_sharedPrefs.getString("connection_timeout", "5"));
+        return Integer.valueOf(_sharedPrefs.getString("connection_timeout", "30"));
     }
 
     public int getRequestTimeout() {
-        return Integer.valueOf(_sharedPrefs.getString("request_timeout", "10"));
+        return Integer.valueOf(_sharedPrefs.getString("request_timeout", "180"));
     }
 
 
