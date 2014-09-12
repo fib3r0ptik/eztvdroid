@@ -34,10 +34,12 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.squareup:pollexor:2.0.2'
     compile 'com.android.support:support-v4:+'
     compile 'com.google.android.gms:play-services:+'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.5.Final'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.2'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'com.navercorp.pulltorefresh:library:3.2.0@aar'
-    compile files('libs/activeandroid.jar')
+    compile 'info.besiera:api:1.0'
+
 }

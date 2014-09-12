@@ -12,34 +12,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
-import com.hamaksoftware.tvbrowser.asynctasks.Search;
+import com.hamaksoftware.tvbrowser.asynctasks.SearchById;
+import com.hamaksoftware.tvbrowser.asynctasks.SearchByKeyword;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
-import com.hamaksoftware.tvbrowser.models.Episode;
-import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Episode;
 
 public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
 
     protected PullToRefreshListView lv;
     protected EpisodeAdapter adapter;
-    protected View footer;
     protected Main base;
 
     private ProgressDialog dialog;
     private String query;
-    private boolean byId;
-    private boolean force;
 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
@@ -54,12 +52,12 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(row.title);
+            builder.setTitle(row.getTitle());
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     if (items[item].equals(getString(R.string.dialog_open))) {
 
-                        final ArrayList<String> links = (ArrayList<String>) row.links;
+                        final List<String> links = row.getLinks();
                         AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
                         final String[] slinks = new String[links.size()];
                         int ctr = 0;
@@ -77,7 +75,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
-                                    Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                                    //Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -98,7 +96,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                         if (base.pref.getClientName().length() < 2) {
                             base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
                         } else {
-                            Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                            //Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
                             SendTorrent send = new SendTorrent(getActivity(), row);
                             send.asyncTaskListener = SearchFragment.this;
                             send.execute();
@@ -106,15 +104,9 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                     }
 
                     if (items[item].equals(getString(R.string.dialog_view))) {
-                        base = (Main) getActivity();
-                        int count = new Select().from(Show.class).count();
-                        if (count > 0) {
-                            Bundle args = new Bundle();
-                            args.putInt("show_id", row.showId);
-                            base.launchFragment(R.string.fragment_tag_show_detail, args, false);
-                        } else {
-                            base.showToast("Please refresh shows section first.", Toast.LENGTH_LONG);
-                        }
+                        Bundle args = new Bundle();
+                        args.putInt("show_id", Integer.parseInt(row.getShow_id()));
+                        base.launchFragment(R.string.fragment_tag_show_detail, args, false);
                     }
 
                 }
@@ -134,11 +126,8 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
     public void search(String query) {
         if (query == null || query.equals("") || !query.equalsIgnoreCase(this.query)) {
-            this.force = true;
             this.query = query;
-            this.byId = false;
             onActivityDrawerClosed();
-            this.force = false;
         }
     }
 
@@ -165,7 +154,6 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
 
         query = getArguments().getString("query");
-        byId = getArguments().getBoolean("byId");
 
         base.invalidateOptionsMenu();
 
@@ -174,7 +162,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (force || adapter.listings.size() <= 0) {
+        if (adapter.listings.size() <= 0) {
             adapter.listings.clear();
             onActivityDrawerClosed();
         }
@@ -183,8 +171,8 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
         if (data != null) {
-            if (ASYNC_ID.equalsIgnoreCase(Search.ASYNC_ID)) {
-                ArrayList<Episode> d = (ArrayList<Episode>) data;
+            if (ASYNC_ID.equalsIgnoreCase(SearchByKeyword.ASYNC_ID)) {
+                List<Episode> d = (List<Episode>) data;
                 if (d.size() > 0) {
                     adapter.listings = d;
                     adapter.notifyDataSetChanged();
@@ -214,7 +202,7 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
     }
 
     public void onActivityDrawerClosed() {
-        Search async = new Search(getActivity(), query, byId);
+        SearchByKeyword async = new SearchByKeyword(query);
         async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
         async.execute();
     }
@@ -245,11 +233,17 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
     }
 
     @Override
-    public void onTaskError(Exception e, String ASYNC_ID) {
-        // TODO Auto-generated method stub
-        base.showToast("An error has occured while doing the search.", Toast.LENGTH_SHORT);
-        dialog.dismiss();
-
+    public void onTaskError(final Exception e, String ASYNC_ID) {
+        final APIRequestException apiRequestException = (APIRequestException)e;
+        if(ASYNC_ID.equalsIgnoreCase(SearchByKeyword.ASYNC_ID)){
+            base.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    base.showToast("Error: " + apiRequestException.getStatus().toString(), Toast.LENGTH_SHORT);
+                    dialog.dismiss();
+                }
+            });
+        }
     }
 
 }

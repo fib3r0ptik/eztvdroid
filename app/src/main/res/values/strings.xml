@@ -144,6 +144,7 @@
     <string name="eztv_settings">My EZTV Login</string>
     <string name="message_no_data_found">No Data Found</string>
     <string name="message_try_again">(Nothing to see here)</string>
+    <string name="message_empty_link">Sorry, This option has no link.</string>
     <string name="landing_popular">Popular Shows</string>
     <string name="landing_subscribed">Subscribed Shows</string>
     <string name="landing_latest">Latest Shows</string>
@@ -154,6 +155,8 @@
     <string name="dialog_send">Send to Remote Client</string>
     <string name="dialog_view">View Show Page</string>
     <string name="dialog_subscribe">Subscribe</string>
+    <string name="dialog_getlink">Get Latest Link (SD)</string>
+    <string name="dialog_gethdlink">Get Latest Link (HD)</string>
     <string name="dialog_unsubscribe">Unsubscribe</string>
     <string name="unknown_handler">Sorry, there are currently no handler for this filetype on this device.</string>
     <string name="pref_cat_app_settings">Application Settings</string>
@@ -163,8 +166,8 @@
     <string name="message_verify_profile_failed">Unable to verify your Settings. Please check the values, or check your FIREWALL settings.</string>
     <string name="message_verify_profile_working">Verifying connection to $</string>
     <string name="message_copy_text_successful">Successfully copied link to clipboard.</string>
-    <string name="message_subscription_successful">Successfully subscribe.</string>
+    <string name="message_subscription_successful">Successfully subscribed.</string>
     <string name="message_subscription_failure">Failed to subscribe.</string>
-    <string name="message_unsubscribe_successful">Successfully Unsubscribe.</string>
+    <string name="message_unsubscribe_successful">Successfully Unsubscribed.</string>
     <string name="message_unsubscribe_failure">Failed to Unsubscribe.</string>
 </resources>

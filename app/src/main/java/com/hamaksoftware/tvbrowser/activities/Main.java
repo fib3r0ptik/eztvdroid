@@ -33,7 +33,6 @@ import com.hamaksoftware.tvbrowser.fragments.PrefFragment;
 import com.hamaksoftware.tvbrowser.fragments.SearchFragment;
 import com.hamaksoftware.tvbrowser.fragments.ShowDetailsFragment;
 import com.hamaksoftware.tvbrowser.fragments.ShowsFragment;
-import com.hamaksoftware.tvbrowser.models.Show;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 import com.hamaksoftware.tvbrowser.utils.ClientProfile;
 import com.hamaksoftware.tvbrowser.utils.DBHandler;
@@ -126,8 +125,6 @@ public class Main extends Activity {
 
         pref = new AppPref(getApplicationContext());
 
-        Utility.getInstance(getApplicationContext()).registerInBackground();
-
         fragmentManager = getFragmentManager();
 
         mTitle = mDrawerTitle = getResources().getString(R.string.app_name);
@@ -215,19 +212,7 @@ public class Main extends Activity {
                 }
 
                 if (currentFragmentTag == R.string.fragment_tag_myshows) {
-
-                    int count = new Select().from(Show.class).count();
-                    int subCount = new Select().from(Show.class).where("isSubscribed=?", true).count();
-                    if (count > 0) {
-                        if (subCount > 0) {
-                            launchFragment(R.string.fragment_tag_myshows, null, false);
-                        } else {
-                            showToast(getString(R.string.message_no_subscription), Toast.LENGTH_LONG);
-                        }
-
-                    } else {
-                        launchFragment(R.string.fragment_tag_shows, null, false);
-                    }
+                    launchFragment(R.string.fragment_tag_myshows, null, false);
                 }
 
                 if (currentFragmentTag == R.string.fragment_tag_rss) {
@@ -413,7 +398,7 @@ public class Main extends Activity {
                         ShowsFragment shows = (ShowsFragment) fragmentManager.findFragmentByTag(getString(R.string.fragment_tag_shows));
                         if (shows != null) {
                             shows.adapter.getFilter().filter(s);
-                            //shows.adapter.notifyDataSetChanged();
+                            //subscriptions.adapter.notifyDataSetChanged();
                             return true;
                         }
                         return false;

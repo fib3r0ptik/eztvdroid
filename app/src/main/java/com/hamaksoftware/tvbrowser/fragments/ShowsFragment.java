@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
@@ -18,14 +17,17 @@ import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.ShowAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.GetShows;
-import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
-import com.hamaksoftware.tvbrowser.models.Show;
+import com.hamaksoftware.tvbrowser.asynctasks.Subscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Show;
 
 public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
@@ -34,7 +36,6 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
     public ShowAdapter adapter;
     protected Main base;
 
-    private ProgressDialog dialog;
 
     public boolean force;
 
@@ -46,19 +47,18 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
             final CharSequence[] items = {getString(R.string.dialog_subscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(show.title);
+            builder.setTitle(show.getTitle());
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     if (items[item].equals(getString(R.string.dialog_view))) {
                         base = (Main) getActivity();
                         Bundle args = new Bundle();
-                        args.putInt("show_id", show.showId);
+                        args.putInt("show_id", show.getShowId());
                         base.launchFragment(R.string.fragment_tag_show_detail, args, false);
                     }
 
                     if (items[item].equals(getString(R.string.dialog_subscribe))) {
-                        Subscription s = new Subscription(getActivity(), show);
-                        s.isSubscribe = true;
+                        Subscribe s = new Subscribe(getActivity(),show.getShowId());
                         s.asyncTaskListener = ShowsFragment.this;
                         s.execute();
                     }
@@ -80,16 +80,9 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         lv = (PullToRefreshGridView) rootView.findViewById(R.id.myshow_grid);
         lv.getRefreshableView().setOnItemClickListener(itemClick);
 
-        if (dialog == null) {
-            dialog = new ProgressDialog(getActivity());
-        }
 
-        dialog.setIndeterminate(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setMessage(getString(R.string.loader_working));
-
-        View empty = inflater.inflate(R.layout.latest_empty, container, false);
-        lv.getRefreshableView().setEmptyView(empty);
+        //View empty = inflater.inflate(R.layout.latest_empty, container, false);
+        //lv.getRefreshableView().setEmptyView(empty);
 
         if (adapter == null) {
             adapter = new ShowAdapter(getActivity(), new ArrayList<Show>(0));
@@ -137,26 +130,18 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)) {
                 lv.onRefreshComplete();
-                List<Show> d = (List<Show>) data;
-                if (d.size() <= 0) {
-                    String title = getResources().getString(R.string.loader_title_request_result);
-                    String msg = getResources().getString(R.string.result_listing_error);
-                    String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
-                    Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
-                } else {
-                    adapter.setShows((ArrayList<Show>) d);
-                    adapter.notifyDataSetChanged();
-                }
+                adapter.setShows((ArrayList<Show>) data);
+                adapter.notifyDataSetChanged();
             }
 
-            if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                Show show = (Show) data;
-                base.showToast(show != null ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
+            if (ASYNC_ID.equalsIgnoreCase(Subscribe.ASYNC_ID)) {
+                Boolean success = (Boolean) data;
+                base.showToast(success ? getString(R.string.message_subscription_successful) : getString(R.string.message_subscription_failure)
                         , Toast.LENGTH_LONG);
             }
 
         }
-        dialog.dismiss();
+
     }
 
     @Override
@@ -176,38 +161,44 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
     }
 
     public void onActivityDrawerClosed() {
-        int count = new Select().from(Show.class).count();
-        if (force || count <= 0 || adapter.getCount() <= 0) {
-            GetShows async = new GetShows(getActivity(), force);
-            async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
-            async.execute();
-        }
+        GetShows async = new GetShows(getActivity());
+        async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
+        async.execute();
     }
 
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
-        dialog.show();
+        base.showToast(getString(R.string.loader_working),Toast.LENGTH_SHORT);
     }
 
     @Override
     public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
-        dialog.setProgress(progress);
+
     }
 
     @Override
     public void onTaskProgressMax(int max, String ASYNC_ID) {
-        dialog.setMax(max);
+
     }
 
     @Override
     public void onTaskUpdateMessage(String message, String ASYNC_ID) {
-        dialog.setMessage(message);
+
     }
 
     @Override
-    public void onTaskError(Exception e, String ASYNC_ID) {
-        dialog.setMessage("Error: " + e.getMessage());
+    public void onTaskError(final Exception e, String ASYNC_ID) {
+        if(ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)){
+            base.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    APIRequestException _e = (APIRequestException)e;
+                    Utility.showDialog(getActivity(), null, _e.getStatus().getDescription(), "Okay", null, false, null);
+                    lv.onRefreshComplete();
+                }
+            });
+        }
     }
 
 }

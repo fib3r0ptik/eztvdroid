@@ -6,15 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
-import com.hamaksoftware.tvbrowser.models.Episode;
+import com.hamaksoftware.tvbrowser.utils.Utility;
 
+
+import org.ocpsoft.prettytime.PrettyTime;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import info.besiera.api.models.Episode;
 
 public class EpisodeAdapter extends BaseAdapter {
     public Context context;
@@ -23,9 +28,6 @@ public class EpisodeAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView title;
         TextView extended_info;
-        CheckBox chk;
-        ImageView watched;
-        ImageView fav;
         LinearLayout rowHolder;
 
     }
@@ -61,12 +63,7 @@ public class EpisodeAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.rowHolder = (LinearLayout) convertView.findViewById(R.id.row_holder);
             holder.title = (TextView) convertView.findViewById(R.id.home_title);
-            holder.chk = (CheckBox) convertView.findViewById(R.id.home_chk_item);
             holder.extended_info = (TextView) convertView.findViewById(R.id.home_ext_info);
-            holder.title = (TextView) convertView.findViewById(R.id.home_title);
-            holder.fav = (ImageView) convertView.findViewById(R.id.imgfav);
-            holder.watched = (ImageView) convertView.findViewById(R.id.imgcheck);
-            //holder.show = (ImageView) convertView.findViewById(R.id.imgshow);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -78,55 +75,24 @@ public class EpisodeAdapter extends BaseAdapter {
         if (position % 2 == 0) {
             holder.rowHolder.setBackgroundColor(Color.WHITE);
         } else {
-            holder.rowHolder.setBackgroundResource(R.color.alt_blue);
+            holder.rowHolder.setBackgroundColor(Color.rgb(227,242,249));
         }
 
-        if (entry.showId > 0 && entry.showId != 187) {
-            //holder.show.setVisibility(View.VISIBLE);
-            holder.fav.setVisibility(entry.isFavorite ? View.VISIBLE : View.GONE);
-            holder.watched.setVisibility(entry.isWatched ? View.VISIBLE : View.GONE);
-            if (entry.isWatched) {
-                holder.title.setTextColor(Color.parseColor("#ff999999"));
-                holder.extended_info.setTextColor(Color.parseColor("#ff999999"));
-            } else {
-                holder.title.setTextColor(Color.parseColor("#ff000000"));
-                holder.extended_info.setTextColor(Color.parseColor("#ff000000"));
-            }
+        /*row.title = item.getString("title");
+        row.filesize = Utility.getFancySize(item.getLong("size"));
+        DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        Date dte = formatter.parse(item.getString("pubdate"));
+        row.elapsed = Utility.getInstance(ctx).getPrettytime().format(dte);
+        row.showId = Integer.parseInt(item.getString("show_id"));*/
 
-        } else {
-            //holder.show.setVisibility(View.GONE);
-            holder.fav.setVisibility(View.GONE);
-            holder.watched.setVisibility(View.GONE);
-            holder.title.setTextColor(Color.parseColor("#ff000000"));
-            holder.extended_info.setTextColor(Color.parseColor("#ff000000"));
-        }
+        PrettyTime p = new PrettyTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(entry.getPubdate());
+        String extInfo =  Utility.getFancySize(entry.getSize()) + " - " + p.format(cal.getTime());
 
+        holder.title.setText(entry.getTitle());
+        holder.extended_info.setText(extInfo);
 
-
-        /*
-        if(ids != null){
-            for(int i = 0; i < ids.length;i++){
-                int id = Integer.valueOf(ids[i]);
-                if(id == entry.showId){
-                    holder.title.setTextColor(Color.rgb(255, 136, 13));
-                    holder.title.setTypeface(null, Typeface.BOLD);
-                    break;
-                }else{
-                    holder.title.setTypeface(null, Typeface.NORMAL);
-                    holder.title.setTextColor(Color.BLACK);
-                }
-            }
-        }
-        */
-
-        /*
-        holder.chk.setOnCheckedChangeListener(chkChangeList);
-        holder.chk.setTag(position);
-        holder.chk.setChecked(entry.isSelected);
-        */
-
-        holder.title.setText(entry.title);
-        holder.extended_info.setText(entry.filesize + " - " + entry.elapsed);
 
         return convertView;
     }

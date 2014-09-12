@@ -9,15 +9,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
-import com.hamaksoftware.tvbrowser.models.Show;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.pollexor.Thumbor;
 
-import java.util.ArrayList;
 import java.util.List;
+import info.besiera.api.models.Subscription;
 
 public class MyShowAdapter extends BaseAdapter {
     public Context ctx;
-    public List<Show> shows;
+    public List<Subscription> subscriptions;
 
 
     private class ViewHolder {
@@ -30,16 +30,16 @@ public class MyShowAdapter extends BaseAdapter {
         this.ctx = context;
     }
 
-    public void setShows(ArrayList<Show> shows) {
-        this.shows = shows;
+    public void setSubscriptions(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 
     public int getCount() {
-        return shows.size();
+        return subscriptions.size();
     }
 
     public Object getItem(int position) {
-        return shows.get(position);
+        return subscriptions.get(position);
     }
 
     public long getItemId(int position) {
@@ -64,14 +64,13 @@ public class MyShowAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-
-        final Show entry = shows.get(position);
-        String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.showId;
-        //String url = "http://hamaksoftware.com/myeztv/tvimg/" + entry.showId + ".jpg";
-        holder.title.setText(entry.title);
-        holder.txt.setVisibility(entry.hasNewEpisode ? View.VISIBLE : View.GONE);
+        final Subscription subscription = subscriptions.get(position);
+        Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
+        String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + subscription.getShow().getShowId() + ".jpg")
+                .resize(250,250).smart().toUrl();
+        holder.title.setText(subscription.getShow().getTitle());
         ImageLoader.getInstance().displayImage(url, holder.img);
-
+        holder.txt.setVisibility(subscription.getShow().getLink() != null || subscription.getShow().getHdlink() != null ? View.VISIBLE:View.GONE);
         return convertView;
     }
 }

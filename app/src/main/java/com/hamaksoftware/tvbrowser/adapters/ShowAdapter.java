@@ -11,11 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hamaksoftware.tvbrowser.R;
-import com.hamaksoftware.tvbrowser.models.Show;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.pollexor.Thumbor;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import info.besiera.api.models.Show;
 
 public class ShowAdapter extends BaseAdapter implements Filterable {
     public Context context;
@@ -41,7 +43,7 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
                 if (constraint.length() > 0) {
                     for (int i = 0; i < copy.size(); i++) {
                         Show show = copy.get(i);
-                        if (show.title.toLowerCase().startsWith(constraint.toString())) {
+                        if (show.getTitle().toLowerCase().startsWith(constraint.toString())) {
                             filteredShows.add(show);
                         }
                     }
@@ -108,8 +110,12 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
 
 
         final Show entry = shows.get(position);
-        holder.title.setText(entry.title);
-        String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.showId;
+        holder.title.setText(entry.getTitle());
+        //String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.getShowId();
+        Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
+                String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + entry.getShowId() + ".jpg")
+                .resize(250,250).smart().toUrl();
+
         ImageLoader.getInstance().displayImage(url, holder.img);
 
         return convertView;

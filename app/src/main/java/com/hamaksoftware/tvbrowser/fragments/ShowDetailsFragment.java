@@ -16,40 +16,40 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
-import com.hamaksoftware.tvbrowser.asynctasks.Search;
+import com.hamaksoftware.tvbrowser.asynctasks.GetShowDetails;
+import com.hamaksoftware.tvbrowser.asynctasks.GetShowSubscription;
+import com.hamaksoftware.tvbrowser.asynctasks.SearchById;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
-import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
-import com.hamaksoftware.tvbrowser.models.Episode;
-import com.hamaksoftware.tvbrowser.models.Show;
+import com.hamaksoftware.tvbrowser.asynctasks.Subscribe;
+import com.hamaksoftware.tvbrowser.asynctasks.UnSubscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.pollexor.Thumbor;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
+
+import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Episode;
+import info.besiera.api.models.Show;
 
 public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener {
-
-    public Show show;
     public boolean force;
+    public Button status;
     protected PullToRefreshListView lv;
-    protected View footer;
-    protected Main base;
-
-
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             int headerCount = 0;
 
-            if(lv != null){
+            if (lv != null) {
                 headerCount = lv.getRefreshableView().getHeaderViewsCount();
             }
 
@@ -57,12 +57,12 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(row.title);
+            builder.setTitle(row.getTitle());
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     if (items[item].equals(getString(R.string.dialog_open))) {
 
-                        final ArrayList<String> links = (ArrayList<String>) row.links;
+                        final List<String> links = row.getLinks();
                         AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
                         final String[] slinks = new String[links.size()];
                         int ctr = 0;
@@ -80,7 +80,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
-                                    Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                                    Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -101,7 +101,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
                         if (base.pref.getClientName().length() < 2) {
                             base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
                         } else {
-                            Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                            Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
                             SendTorrent send = new SendTorrent(getActivity(), row);
                             send.asyncTaskListener = ShowDetailsFragment.this;
                             send.execute();
@@ -114,43 +114,13 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
             alert.show();
         }
     };
-    private TextView downloadCount;
-    private TextView subscriberCount;
-    private TextView playCount;
-    private TextView watcherCount;
-    private TextView rating;
-    private TextView showDescription;
-    private Button status;
+    protected View footer;
+    protected Main base;
+    private int showId;
     private EpisodeAdapter adapter;
     private ProgressDialog dialog;
+    private ImageView poster;
 
-    public static String convertToFancyString(int val) {
-        final double KILO = 1000D;
-        final double MEGA = KILO * KILO;
-        DecimalFormat df = new DecimalFormat("#.##");
-        if (val >= KILO && val < MEGA) {
-            return df.format(val / KILO) + "K";
-        } else if (val >= MEGA) {
-            return df.format(val / MEGA) + "M";
-        } else {
-            return val + "";
-        }
-
-    }
-
-    public void setShowDetails(int showId) {
-        show = new Select().from(Show.class).where("showId=?", showId)
-                .executeSingle();
-        base.setTitle(show.title);
-        status.setText(show.isSubscribed ? "UNSUBSCRIBE" : "SUBSCRIBE");
-        if (show.isSubscribed) {
-            status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
-            status.setTextColor(Color.WHITE);
-        } else {
-            status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
-            status.setTextColor(Color.WHITE);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -171,70 +141,42 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
         lv.getRefreshableView().setAdapter(adapter);
 
+        lv.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                lv.setRefreshing();
+                onActivityDrawerClosed();
+            }
+        });
+
+
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
 
         Bundle payload = getArguments();
-        show = new Select().from(Show.class).where("showId=?", payload.getInt("show_id"))
-                .executeSingle();
+        showId = payload.getInt("show_id");
 
-        ImageView img = (ImageView) headerView.findViewById(R.id.poster);
-        ImageLoader.getInstance().displayImage("http://hamaksoftware.com/myeztv/tvimg/" + show.showId + ".jpg", img);
+        poster = (ImageView) headerView.findViewById(R.id.poster);
 
 
-        if (show == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        status = (Button) rootView.findViewById(R.id.show_detail_status);
 
-            builder.setTitle("Update Needed").setMessage("TV Shows need to update. Click OK to proceed.")
-                    .setCancelable(false)
-                    .setPositiveButton("Update", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Bundle param = new Bundle();
-                            param.putBoolean("force", true);
-                            base.launchFragment(R.string.fragment_tag_shows, param, true);
-                        }
-                    });
-
-            AlertDialog alert = builder.create();
-            alert.show();
-        } else {
-
-            base.setTitle(show.title);
-            /*
-            downloadCount = (TextView) rootView.findViewById(R.id.show_detail_downcount);
-            subscriberCount = (TextView) rootView.findViewById(R.id.show_detail_subcount);
-            playCount = (TextView) rootView.findViewById(R.id.show_play_count);
-            watcherCount = (TextView) rootView.findViewById(R.id.show_play_watchers);
-            rating = (TextView) rootView.findViewById(R.id.show_rating);
-            showDescription = (TextView) rootView.findViewById(R.id.show_description);
-            */
-
-            status = (Button) rootView.findViewById(R.id.show_detail_status);
-
-            status.setText(show.isSubscribed ? "UNSUBSCRIBE" : "SUBSCRIBE");
-            if (show.isSubscribed) {
-                status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
-                status.setTextColor(Color.WHITE);
-            } else {
-                status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
-                status.setTextColor(Color.WHITE);
-            }
-
-            status.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Button btn = (Button) view;
-                    Subscription subscription = new Subscription(getActivity(), show);
-                    subscription.asyncTaskListener = ShowDetailsFragment.this;
-                    subscription.isSubscribe = !show.isSubscribed;
-                    subscription.execute();
+        status.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Button btn = (Button) view;
+                if (status.getText().toString().equalsIgnoreCase(getString(R.string.dialog_subscribe))) {
+                    Subscribe subscribe = new Subscribe(getActivity(), showId);
+                    subscribe.asyncTaskListener = ShowDetailsFragment.this;
+                    subscribe.execute();
+                } else {
+                    UnSubscribe unSubscribe = new UnSubscribe(getActivity(), showId);
+                    unSubscribe.asyncTaskListener = ShowDetailsFragment.this;
+                    unSubscribe.execute();
                 }
-            });
-
-            base.invalidateOptionsMenu();
-        }
-
-
+            }
+        });
+        base.invalidateOptionsMenu();
         return rootView;
     }
 
@@ -263,108 +205,95 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     }
 
     public void onActivityDrawerClosed() {
-        if (show == null) return;
-        /*
-        if (show.showId != 187) {
-            GetShowDetails details = new GetShowDetails(getActivity(), show);
-            details.asyncTaskListener = this;
-            details.execute();
-        }
-        */
 
-        /*
-        GetSubscriberCount info = new GetSubscriberCount(getActivity(),show);
-        info.asyncTaskListener = this;
-        info.execute();
-        */
+        GetShowDetails details = new GetShowDetails(showId);
+        details.asyncTaskListener = this;
+        details.execute();
 
-        Search search = new Search(getActivity(), show.showId + "", true);
-        search.asyncTaskListener = this;
-        search.execute();
+        SearchById searchById = new SearchById(showId);
+        searchById.asyncTaskListener = this;
+        searchById.execute();
     }
 
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
-        if (ASYNC_ID.equalsIgnoreCase(Search.ASYNC_ID)) {
+        if (lv.isRefreshing()) lv.onRefreshComplete();
+        if (ASYNC_ID.equalsIgnoreCase(GetShowDetails.ASYNC_ID)) {
+            Show show = (Show) data;
+            base.setTitle(show.getTitle());
+            Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
+            String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + show.getShowId() + ".jpg")
+                    .resize(500, 500)
+                    .smart()
+                    .toUrl();
+
+            System.out.println(url);
+            ImageLoader.getInstance().displayImage(url, poster);
+            GetShowSubscription getShowSubscription = new GetShowSubscription(getActivity(), show.getShowId());
+            getShowSubscription.asyncTaskListener = this;
+            getShowSubscription.execute();
+
+        }
+
+        if (ASYNC_ID.equalsIgnoreCase(GetShowSubscription.ASYNC_ID)) {
+            Show show = (Show) data;
+            if (show == null) {
+                status.setText(getString(R.string.dialog_subscribe));
+                status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
+                status.setTextColor(Color.WHITE);
+            } else {
+                status.setText(getString(R.string.dialog_unsubscribe));
+                status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
+                status.setTextColor(Color.WHITE);
+            }
+
+        }
+
+        if (ASYNC_ID.equalsIgnoreCase(SearchById.ASYNC_ID)) {
             if (data != null) {
                 ArrayList<Episode> items = (ArrayList<Episode>) data;
                 adapter.listings = items;
                 adapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(getActivity(), "No Episodes for " + show.title + " found.", Toast.LENGTH_LONG).show();
             }
-
             dialog.dismiss();
         }
 
-        /*
-        if (ASYNC_ID.equalsIgnoreCase(GetShowDetails.ASYNC_ID)) {
-            if (data != null) {
-                String response = (String) data;
-                try {
-                    JSONObject root = new JSONObject(response);
-                    showDescription.setText(root.getString("overview"));
-
-                    JSONObject ratings = root.getJSONObject("ratings");
-                    rating.setText(ratings.getInt("percentage") + "%");
-
-                    JSONObject stats = root.getJSONObject("stats");
-                    int plays = stats.getInt("plays");
-                    int watchers = stats.getInt("watchers");
-                    playCount.setText(convertToFancyString(plays) + "\nplays");
-                    watcherCount.setText(convertToFancyString(watchers) + "\nwatchers");
-
-                    Random r = new Random();
-                    int i1 = r.nextInt(20 - 1) + 1;
-                    downloadCount.setText(convertToFancyString(plays + i1) + "\ndownloads");
-
-                    int i2 = r.nextInt(20 - 1) + 1;
-                    subscriberCount.setText(convertToFancyString(watchers + i2) + "\nsubscribers");
-
-
-                } catch (Exception e) {
-                    Log.e("async-info", e.getMessage());
-                }
-            }
-
-        }
-        */
 
         if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
             boolean success = (Boolean) data;
             base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
         }
 
-        if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
+        if (ASYNC_ID.equalsIgnoreCase(Subscribe.ASYNC_ID)) {
             if (data != null) {
-                Show s = (Show) data;
-                if (s != null) {
-                    /*
-                    if (show.isSubscribed) {
-                        show.isSubscribed = false;
-                        status.setBackgroundColor(getResources().getColor(R.color.torrent_progress));
-                        status.setTextColor(Color.WHITE);
-                        status.setText("SUBSCRIBE");
-                    } else {
-                        status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
-                        status.setTextColor(Color.WHITE);
-                        show.isSubscribed = true;
-                        status.setText("UNSUBSCRIBE");
-                    }
-                    base.sh.updateShow(show);
-                    */
-                    setShowDetails(s.showId);
+                Boolean success = (Boolean) data;
+                if (success) {
+                    status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
+                    status.setTextColor(Color.WHITE);
+                    status.setText(getString(R.string.dialog_unsubscribe));
                 }
             }
         }
+
+        if (ASYNC_ID.equalsIgnoreCase(UnSubscribe.ASYNC_ID)) {
+            if (data != null) {
+                Boolean success = (Boolean) data;
+                if (success != null) {
+                    status.setBackgroundColor(getResources().getColor(R.color.torrent_completed));
+                    status.setTextColor(Color.WHITE);
+                    status.setText(getString(R.string.dialog_subscribe));
+                }
+            }
+        }
+
 
     }
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
-        if (ASYNC_ID.equalsIgnoreCase(Search.ASYNC_ID)) {
-            dialog.setMessage("Searching episodes for " + show.title);
+        if (ASYNC_ID.equalsIgnoreCase(SearchById.ASYNC_ID)) {
+            dialog.setMessage("Searching episodes...");
             dialog.show();
         }
     }
@@ -389,7 +318,15 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
     @Override
     public void onTaskError(Exception e, String ASYNC_ID) {
-        // TODO Auto-generated method stub
+        if (ASYNC_ID.equalsIgnoreCase(SearchById.ASYNC_ID)) {
+            final APIRequestException apiRequestException = (APIRequestException) e;
+            base.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    base.showMessage("Search Failed", apiRequestException.getStatus().getDescription() + ", Try again later.", "Okay");
+                }
+            });
+        }
 
     }
 

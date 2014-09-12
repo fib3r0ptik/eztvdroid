@@ -19,13 +19,6 @@
             android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical"
             android:visibility="gone">
-
-            <CheckBox
-                android:id="@+id/home_chk_item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -62,35 +55,6 @@
                     android:layout_marginRight="5dp"
                     android:layout_weight=".7"
                     android:text="396mb 4d 8hrs 3min" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight=".3"
-                    android:gravity="right|center_horizontal"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/imgcheck"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/ic_action_accept" />
-
-                    <ImageView
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/imgfav"
-                        android:layout_height="match_parent" />
-                    <!--ImageView
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/imgshow"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/ic_action_dock" /-->
-
-                </LinearLayout>
-
 
             </LinearLayout>
 

@@ -16,6 +16,10 @@ public class Splash extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Utility.getInstance(getApplicationContext()).registerInBackground();
+        Utility.getInstance(getApplicationContext()).getProfile();
+
         setContentView(R.layout.splash);
 
         TextView t = (TextView) findViewById(R.id.spalsh_version);
@@ -27,7 +31,6 @@ public class Splash extends Activity {
             t.setVisibility(View.GONE);
         }
 
-        Utility.getInstance(getApplicationContext()).getProfile();
 
         new Handler().postDelayed(new Runnable() {
             @Override

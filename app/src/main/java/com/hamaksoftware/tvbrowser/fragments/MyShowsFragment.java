@@ -2,61 +2,119 @@ package com.hamaksoftware.tvbrowser.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.MyShowAdapter;
-import com.hamaksoftware.tvbrowser.asynctasks.CheckForNewEpisode;
 import com.hamaksoftware.tvbrowser.asynctasks.GetMyShows;
-import com.hamaksoftware.tvbrowser.asynctasks.Subscription;
-import com.hamaksoftware.tvbrowser.models.Show;
+import com.hamaksoftware.tvbrowser.asynctasks.UnSubscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Subscription;
 
 public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected PullToRefreshGridView lv;
     public MyShowAdapter adapter;
+    protected PullToRefreshGridView lv;
     protected Main base;
 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final Show show = adapter.shows.get(position);
-            final CharSequence[] items = {getString(R.string.dialog_unsubscribe), getString(R.string.dialog_view)};
+            final Subscription subscription = adapter.subscriptions.get(position);
+
+            final CharSequence[] items = {getString(R.string.dialog_open),getString(R.string.dialog_copy),
+                    getString(R.string.dialog_unsubscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(show.title);
+            builder.setTitle(subscription.getShow().getTitle());
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
+
+                    if (items[item].equals(getString(R.string.dialog_open))) {
+                        AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
+                        final String[] _items = new String[2];
+                        _items[0] = getString(R.string.dialog_getlink);
+                        _items[1] = getString(R.string.dialog_gethdlink);
+                        final String[] slinks = new String[2];
+                        slinks[0] = subscription.getShow().getLink();
+                        slinks[1] = subscription.getShow().getHdlink();
+                        linkbuilder.setItems(_items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int pos) {
+                                if(slinks[pos] == null){
+                                    base.showToast(getString(R.string.message_empty_link), Toast.LENGTH_LONG);
+                                }else{
+                                    try {
+                                        Utility.getInstance(getActivity()).markDownload(subscription.getShow().getTitle(), subscription.getShow().getShowId());
+                                        Intent i = new Intent(Intent.ACTION_VIEW);
+                                        i.setData(Uri.parse(slinks[pos]));
+                                        startActivity(i);
+                                    } catch (ActivityNotFoundException e) {
+                                        Utility.showDialog(getActivity(), getString(R.string.dialog_title_info),
+                                                getString(R.string.unknown_handler), getString(R.string.dialog_button_ok),
+                                                getString(R.string.dialog_button_close), true, null);
+                                    }
+                                }
+                            }
+                        });
+
+                        AlertDialog linkalert = linkbuilder.create();
+                        linkalert.show();
+                    }
+
+                    if (items[item].equals(getString(R.string.dialog_copy))) {
+                        AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
+                        final String[] _items = new String[2];
+                        _items[0] = getString(R.string.dialog_getlink);
+                        _items[1] = getString(R.string.dialog_gethdlink);
+                        final String[] slinks = new String[2];
+                        slinks[0] = subscription.getShow().getLink();
+                        slinks[1] = subscription.getShow().getHdlink();
+                        linkbuilder.setItems(_items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int pos) {
+                                if(slinks[pos] == null){
+                                    base.showToast(getString(R.string.message_empty_link), Toast.LENGTH_LONG);
+                                }else{
+                                    Utility.getInstance(getActivity()).copyTextToClipBoard(slinks[pos]);
+                                    base.showToast(getString(R.string.message_copy_text_successful), Toast.LENGTH_LONG);
+                                }
+                            }
+                        });
+
+                        AlertDialog linkalert = linkbuilder.create();
+                        linkalert.show();
+                    }
+
                     if (items[item].equals(getString(R.string.dialog_view))) {
                         base = (Main) getActivity();
                         Bundle args = new Bundle();
-                        args.putInt("show_id", show.showId);
+                        args.putInt("show_id", subscription.getShow().getShowId());
                         base.launchFragment(R.string.fragment_tag_show_detail, args, false);
                     }
 
                     if (items[item].equals(getString(R.string.dialog_unsubscribe))) {
-                        Subscription s = new Subscription(getActivity(), show);
+                        UnSubscribe s = new UnSubscribe(getActivity(), subscription.getShow().getShowId());
                         s.asyncTaskListener = MyShowsFragment.this;
-                        s.isSubscribe = false;
                         s.execute();
                     }
 
@@ -89,7 +147,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
         if (adapter == null) {
             adapter = new MyShowAdapter(getActivity());
-            adapter.setShows(new ArrayList<Show>(0));
+            adapter.setSubscriptions(new ArrayList<Subscription>(0));
         }
 
         lv.getRefreshableView().setAdapter(adapter);
@@ -118,57 +176,24 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
                 lv.onRefreshComplete();
-                List<Show> d = (List<Show>) data;
+                List<Subscription> d = (List<Subscription>) data;
                 if (d.size() <= 0) {
                     String title = getResources().getString(R.string.loader_title_request_result);
-                    String msg = getResources().getString(R.string.result_listing_error);
                     String btnPosTitle = getResources().getString(R.string.dialog_button_ok);
-                    Utility.showDialog(getActivity(), title, msg, btnPosTitle, null, false, null);
+                    Utility.showDialog(getActivity(), title, "You are not following any Shows yet. Go to Shows and subscribe one.", btnPosTitle, null, false, null);
                 } else {
-                    adapter.setShows((ArrayList<Show>) d);
+                    adapter.setSubscriptions((ArrayList<Subscription>) d);
                     adapter.notifyDataSetChanged();
-
-                    if (adapter.shows.size() > 0) {
-                        CheckForNewEpisode chk = new CheckForNewEpisode(getActivity());
-                        chk.asyncTaskListener = this;
-                        chk.execute();
-                    }
-
                 }
             }
 
-            if (ASYNC_ID.equalsIgnoreCase(CheckForNewEpisode.ASYNC_ID)) {
-                String resp = (String) data;
-                try {
-                    JSONArray arr = new JSONArray(resp);
-                    for (int i = 0; i < arr.length(); i++) {
-                        JSONObject item = arr.getJSONObject(i);
-                        for (Show showItem : adapter.shows) {
-                            //System.out.println(showItem.showId + ":" + item.getInt("id"));
-                            if (showItem.showId == item.getInt("id")) {
-                                showItem.hasNewEpisode = true;
-                                break;
-                            }
-
-                        }
-                    }
-
-                    adapter.notifyDataSetChanged();
-                } catch (Exception e) {
-                    //System.out.println(e.getMessage());
-                }
-
-            }
-
-            if (ASYNC_ID.equalsIgnoreCase(Subscription.ASYNC_ID)) {
-                Show show = (Show) data;
-                base.showToast((show instanceof Show) ? getString(R.string.message_unsubscribe_successful) : getString(R.string.message_unsubscribe_failure)
+            if (ASYNC_ID.equalsIgnoreCase(UnSubscribe.ASYNC_ID)) {
+                Boolean success = (Boolean) data;
+                base.showToast(success ? getString(R.string.message_unsubscribe_successful) : getString(R.string.message_unsubscribe_failure)
                         , Toast.LENGTH_LONG);
-                if ((show instanceof Show)) {
-                    GetMyShows async = new GetMyShows(getActivity());
-                    async.asyncTaskListener = this;
-                    async.execute();
-                }
+                GetMyShows async = new GetMyShows(getActivity());
+                async.asyncTaskListener = this;
+                async.execute();
             }
 
 
@@ -218,7 +243,16 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
     }
 
     @Override
-    public void onTaskError(Exception e, String ASYNC_ID) {
+    public void onTaskError(final Exception e, String ASYNC_ID) {
+        if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
+            base.runOnUiThread(new Runnable() {
+                public void run() {
+                    APIRequestException ex = (APIRequestException) e;
+                    Utility.showDialog(getActivity(), null, ex.getStatus().getDescription(), "Okay", null, false, null);
+                    lv.onRefreshComplete();
+                }
+            });
+        }
 
     }
 

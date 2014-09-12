@@ -3,18 +3,20 @@ package com.hamaksoftware.tvbrowser.asynctasks;
 import android.os.AsyncTask;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
+
+import java.util.List;
+
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
-import info.besiera.api.models.Show;
+import info.besiera.api.models.Episode;
 
-
-public class GetShowDetails extends AsyncTask<Void, Void, Show> {
-    public static final String ASYNC_ID = "GETSHOWDETAILS";
-    public IAsyncTaskListener asyncTaskListener;
-
+public class SearchById extends AsyncTask<Void, Void, List<Episode>> {
+    public static final String ASYNC_ID = "SEARCHBYID";
     private int showId;
 
-    public GetShowDetails(int showId) {
+    public IAsyncTaskListener asyncTaskListener;
+
+    public SearchById(int showId) {
         this.showId = showId;
     }
 
@@ -24,20 +26,19 @@ public class GetShowDetails extends AsyncTask<Void, Void, Show> {
     }
 
     @Override
-    protected Show doInBackground(Void... voids) {
-        try {
+    protected List<Episode> doInBackground(Void... voids) {
+        try{
             APIRequest apiRequest = new APIRequest();
-            Show show =  apiRequest.getShow(showId);
-            return show;
-        } catch (APIRequestException e) {
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+            return apiRequest.searchById(showId);
+        }catch (APIRequestException e){
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
-
         return null;
     }
 
     @Override
-    protected void onPostExecute(Show data) {
+    protected void onPostExecute(List<Episode> data) {
         asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
+
 }

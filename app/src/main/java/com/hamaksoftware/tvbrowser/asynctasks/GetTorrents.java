@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
-import com.hamaksoftware.tvbrowser.models.Episode;
 import com.hamaksoftware.tvbrowser.torrentcontroller.ClientType;
 import com.hamaksoftware.tvbrowser.torrentcontroller.TorrentItem;
 import com.hamaksoftware.tvbrowser.torrentcontroller.TransmissionHandler;
@@ -13,6 +12,8 @@ import com.hamaksoftware.tvbrowser.torrentcontroller.ViewFilter;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
 import java.util.ArrayList;
+
+import info.besiera.api.models.Episode;
 
 public class GetTorrents extends AsyncTask<Void, Void, ArrayList<TorrentItem>> {
     public static final String ASYNC_ID = "GETTORRENTS";

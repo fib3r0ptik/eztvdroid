@@ -20,11 +20,12 @@ import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.RSSAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.GetOtherSource;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
-import com.hamaksoftware.tvbrowser.models.Episode;
 import com.hamaksoftware.tvbrowser.models.RSSItem;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import java.util.ArrayList;
+
+import info.besiera.api.models.Episode;
 
 public class OtherSourceFragment extends Fragment implements IAsyncTaskListener {
 
@@ -87,12 +88,14 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
                         if (base.pref.getClientName().length() < 2) {
                             base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
                         } else {
-                            Episode ep = new Episode();
-                            ep.links.add(row.altLInk == null || row.altLInk.equals("") ? row.itemlink : row.altLInk);
+
+                            //Episode ep = new Episode();
+                            //ep.links.add(row.altLInk == null || row.altLInk.equals("") ? row.itemlink : row.altLInk);
                             //ep.links.add(row.altLInk);
-                            SendTorrent send = new SendTorrent(getActivity(), ep);
-                            send.asyncTaskListener = OtherSourceFragment.this;
-                            send.execute();
+                            //SendTorrent send = new SendTorrent(getActivity(), ep);
+                            //send.asyncTaskListener = OtherSourceFragment.this;
+                            //send.execute();
+
                         }
                     }
 
