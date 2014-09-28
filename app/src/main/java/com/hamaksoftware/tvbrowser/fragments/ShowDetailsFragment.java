@@ -36,6 +36,7 @@ import com.squareup.pollexor.Thumbor;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Episode;
 import info.besiera.api.models.Show;
@@ -44,6 +45,7 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     public boolean force;
     public Button status;
     protected PullToRefreshListView lv;
+
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -152,6 +154,11 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
 
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
+        dialog.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
 
         Bundle payload = getArguments();
         showId = payload.getInt("show_id");

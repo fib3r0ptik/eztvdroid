@@ -8,42 +8,39 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
-import com.hamaksoftware.tvbrowser.torrentcontroller.ClientType;
-import com.hamaksoftware.tvbrowser.torrentcontroller.TransmissionHandler;
-import com.hamaksoftware.tvbrowser.torrentcontroller.UtorrentHandler;
+import com.hamaksoftware.tvbrowser.asynctasks.MarkDownload;
+import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
+import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
-import com.hamaksoftware.tvbrowser.utils.Utility;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class GcmIntentService extends IntentService {
+import info.besiera.api.APIRequest;
+import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Episode;
+import info.besiera.api.models.Subscription;
+
+public class GcmIntentService extends IntentService implements IAsyncTaskListener {
     public static final String TAG = "gcm";
     public static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     AppPref pref;
-
-    public enum QualityType {HD_ONLY, LOW_QUALITY_ONLY, BOTH_QUALITY}
-
-    ;
+    private NotificationManager mNotificationManager;
 
     public GcmIntentService() {
         super("GcmIntentService");
     }
+
+    ;
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -75,25 +72,38 @@ public class GcmIntentService extends IntentService {
                 String message = extras.getString("message");
                 Log.i("msg", message);
                 if (pref.getUseSubscription()) {
+                    GCMServerMessage template = new Gson().fromJson(message, GCMServerMessage.class);
+                    List<String> showIds = template.getData();
+                    APIRequest apiRequest = new APIRequest();
+                    ArrayList<Subscription> filtered = new ArrayList<Subscription>(0);
+                    List<Subscription> _newShow = new ArrayList<Subscription>(0);
                     try {
-                        JSONObject jObject = new JSONObject(message);
-                        JSONArray data = jObject.getJSONArray("data");
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < data.length(); i++) {
-                            sb.append(data.getInt(i)).append(",");
+                        List<Subscription> myShows = apiRequest.getMyShows(pref.getDeviceId());
+                        for (Subscription s : myShows) {
+                            if (showIds.contains(s.getShow().getShowId() + "")) {
+                                filtered.add(s);
+                            }
                         }
 
-                        String ids = sb.toString().substring(0, sb.toString().length() - 1);
-                        Log.i("ids", ids);
-                        ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(3);
-                        param.add(new BasicNameValuePair("show_ids", ids));
-                        param.add(new BasicNameValuePair("dev_id", pref.getDeviceId()));
-                        param.add(new BasicNameValuePair("method", "showInfo"));
-                        String response = Utility.getInstance(getApplicationContext()).doPostRequest(param);
-                        if (!response.equals("[]")) sendNotification(response);
-                    } catch (JSONException e) {
-                        //e.printStackTrace();
+                        if(filtered.size() > 0){
+                            List<Subscription> newShows = apiRequest.getUnseenSubscription(pref.getDeviceId());
+                            for(Subscription _s: newShows){
+                                for(Subscription f: filtered){
+                                    if(_s.getShow().getShowId() == f.getShow().getShowId()){
+                                        _newShow.add(_s);
+                                    }
+                                }
+                            }
+                        }
+
+                    } catch (APIRequestException e) {
+                        Log.e("api", e.getStatus().toString());
                     }
+                    if (_newShow.size() > 0) {
+                        sendNotification(_newShow);
+                    }
+
+
                 }
 
             }
@@ -105,137 +115,121 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String msg) {
-        //Log.i("msg",msg);
-        boolean isValidJSON = false;
+    private void sendNotification(List<Subscription> subscriptions) {
         PendingIntent contentIntent = null;
         Intent home = new Intent(this, Main.class);
-        //String[] links = null; 
-        ArrayList<String> links = new ArrayList<String>(0);
         StringBuilder sb = new StringBuilder();
-        try {
-            JSONArray responseArr = new JSONArray(msg);
-            StringBuilder ids = new StringBuilder();
-            for (int i = 0; i < responseArr.length(); i++) {
-                JSONObject item = responseArr.getJSONObject(i);
-                ids.append(item.getString("id")).append(",");
-
-                String link = item.getString("latest_link");
-                String hdlink = item.getString("latest_hdlink");
-
-                switch (QualityType.values()[pref.getAutoSendQuality()]) {
-                    case HD_ONLY:
-                        if (!hdlink.equals("null")) links.add(hdlink);
-                        break;
-                    case LOW_QUALITY_ONLY:
-                        links.add(link);
-                        break;
-                    default:
-                        links.add(link);
-                        if (!hdlink.equals("null")) links.add(hdlink);
-                        break;
-                }
-
-                if (i < 5) {
-                    sb.append(item.getString("title")).append(" - ")
-                            .append(item.getString("season"))
-                            .append(item.getString("episode")).append("\n");
-                }
-
-            }
-
-            //Toast.makeText(getApplicationContext(), links.toString(), Toast.LENGTH_LONG).show();
-
-            //Log.i("payload", msg);
-
-            isValidJSON = true;
-
-            if (pref.getAutoSend() && pref.getClientIPAddress().length() > 3) {
-                String[] slinks = new String[links.size()];
-                for (int j = 0; j < links.size(); j++) {
-                    slinks[j] = links.get(j);
-                }
-
-                new AsyncTask<String, Void, Boolean>() {
-
-                    @Override
-                    protected Boolean doInBackground(String... links) {
-                        boolean success = false;
-                        ClientType type = ClientType.valueOf(pref.getClientType());
-                        for (int i = 0; i < links.length; i++) {
-                            switch (type) {
-                                case UTORRENT:
-                                    UtorrentHandler uh = new UtorrentHandler(getApplicationContext());
-                                    //uh.setOptions(p.host,p.username,p.password,p.port,p.useAuth);
-                                    uh.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(), pref.getClientPort(), pref.getAuth());
-                                    try {
-                                        uh.addTorrent(links[i]);
-                                        success = uh.lastStatusResult;
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        success = false;
-                                    }
-                                    break;
-                                case TRANSMISSION:
-                                    TransmissionHandler th = new TransmissionHandler(getApplicationContext());
-                                    th.setOptions(pref.getClientIPAddress(), pref.getClientUsername(), pref.getClientPassword(), pref.getClientPort(), pref.getAuth());
-                                    try {
-                                        th.addTorrent(links[i]);
-                                        success = th.lastStatusResult;
-                                    } catch (Exception e) {
-                                        success = false;
-                                    }
-                                    break;
-                            }
-
-                        }
-
-                        return success;
+        ArrayList<String> links = new ArrayList<String>(0);
+        int i = 0;
+        for (Subscription subscription : subscriptions) {
+            String link = null;
+            switch (QualityType.values()[pref.getAutoSendQuality()]) {
+                case HD_ONLY:
+                    if (subscription.getShow().getHdlink() != null) {
+                        link = subscription.getShow().getHdlink();
                     }
+                    break;
+                case HD_FIRST:
+                    if (subscription.getShow().getHdlink() != null) {
+                        link = subscription.getShow().getHdlink();
+                    } else if (subscription.getShow().getLink() != null) {
+                        link = subscription.getShow().getLink();
+                    }
+                    break;
+                case LOW_QUALITY_ONLY:
+                    if (subscription.getShow().getLink() != null) {
+                        link = subscription.getShow().getLink();
+                    }
+                    break;
+            }
 
-                }.execute(slinks);
+            if (pref.getAutoSend() && pref.getClientIPAddress().length() > 3 && link != null) {
+                Episode ep = new Episode();
+                ArrayList<String> _links = new ArrayList<String>(0);
+                _links.add(link.substring(0,2).equalsIgnoreCase("//")?"http:" + link:link);
+                ep.setLinks(_links);
+                SendTorrent sendTorrent = new SendTorrent(getApplicationContext(), ep);
+                sendTorrent.asyncTaskListener = this;
+                sendTorrent.execute();
+
+                MarkDownload markDownload = new MarkDownload(getApplicationContext(), subscription.getShow().getSeason(),
+                        subscription.getShow().getEpisode(), subscription.getShow().getShowId());
+                markDownload.execute();
 
             }
 
 
-        } catch (JSONException e) {
-            //Log.i("err", e.getMessage());
-            isValidJSON = false;
+            if (i < 5) {
+                sb.append(subscription.getShow().getTitle()).append(" - Season: ")
+                        .append(subscription.getShow().getSeason()).append(" Episode: ")
+                        .append(subscription.getShow().getEpisode()).append("\n");
+            }
+            i++;
         }
 
         contentIntent = PendingIntent.getActivity(this, 0, home, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        if (isValidJSON) {
-            Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            mNotificationManager = (NotificationManager)
-                    this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this);
-            mBuilder.setSmallIcon(R.drawable.notification);
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            if (sound != null) mBuilder.setSound(sound);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.notification);
 
-            String more = links.size() - 5 <= 0 ? "" : (links.size() - 5) + "";
+        if (sound != null) mBuilder.setSound(sound);
 
-            mBuilder.setAutoCancel(true)
-                    .setContentTitle("New episodes found.")
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(sb.toString()))
-                    .setContentInfo(more)
-                    .setSmallIcon(R.drawable.notification)
-                    .setContentText(sb.toString())
-                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification));
+        String more = links.size() - 5 <= 0 ? "" : (links.size() - 5) + "";
+
+        mBuilder.setAutoCancel(true)
+                .setContentTitle("New episodes found.")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(sb.toString()))
+                .setContentInfo(more)
+                .setSmallIcon(R.drawable.notification)
+                .setContentText(sb.toString())
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification));
 
 
-            try {
-                mBuilder.setContentIntent(contentIntent);
-                mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            } catch (Exception e) {
-                //e.printStackTrace();
-            }
-
+        try {
+            mBuilder.setContentIntent(contentIntent);
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        } catch (Exception e) {
+            Log.e("notification:", e.getMessage());
         }
+
     }
+
+    @Override
+    public void onTaskCompleted(Object data, String ASYNC_ID) {
+    }
+
+    @Override
+    public void onTaskWorking(String ASYNC_ID) {
+
+    }
+
+    @Override
+    public void onTaskProgressUpdate(int progress, String ASYNC_ID) {
+
+    }
+
+    @Override
+    public void onTaskProgressMax(int max, String ASYNC_ID) {
+
+    }
+
+    @Override
+    public void onTaskUpdateMessage(String message, String ASYNC_ID) {
+
+    }
+
+    @Override
+    public void onTaskError(Exception e, String ASYNC_ID) {
+
+    }
+
+    public enum QualityType {HD_ONLY, HD_FIRST, LOW_QUALITY_ONLY}
 
 }

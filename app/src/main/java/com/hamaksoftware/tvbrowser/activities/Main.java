@@ -137,7 +137,7 @@ public class Main extends Activity {
             mDrawerList.addHeaderView(v);
         }
 
-        hintHolder = findViewById(R.id.hints);
+        //hintHolder = findViewById(R.id.hints);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         prepareListData();
         listDrawerAdapter = new DrawerGroupAdapter(this, listDataHeader, listDataChild);

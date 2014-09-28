@@ -13,15 +13,14 @@ import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Subscription;
 
-public class GetMyShows extends AsyncTask<Void, Void, List<Subscription>>{
+public class GetUnSeenShows extends AsyncTask<Void, Void, List<Subscription>>{
     public AppPref pref;
-    public static final String ASYNC_ID = "GETMYSHOWS";
-    private int page;
+    public static final String ASYNC_ID = "GETUNSEENSHOWS";
     private Context ctx;
 
     public IAsyncTaskListener asyncTaskListener;
 
-    public GetMyShows(Context ctx) {
+    public GetUnSeenShows(Context ctx) {
         this.ctx = ctx;
         pref = new AppPref(ctx);
     }
@@ -35,9 +34,9 @@ public class GetMyShows extends AsyncTask<Void, Void, List<Subscription>>{
     protected List<Subscription> doInBackground(Void... voids) {
         APIRequest apiRequest = new APIRequest();
         try {
-            return apiRequest.getMyShows(pref.getDeviceId());
+            return apiRequest.getUnseenSubscription(pref.getDeviceId());
         } catch (APIRequestException e) {
-            Log.e("api:getmyshows",e.getStatus().toString());
+            Log.e("api:getmyunseen",e.getStatus().toString());
             asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 

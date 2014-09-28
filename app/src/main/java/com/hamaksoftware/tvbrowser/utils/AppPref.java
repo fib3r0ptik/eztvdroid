@@ -14,12 +14,11 @@ public class AppPref {
     private Editor editor;
     private static String uniqueID = null;
     private static final String PREF_UNIQUE_ID = "PREF_UNIQUE_ID";
-    private Context c;
+    private Context ctx;
 
-    public AppPref(Context context) {
-        //this._sharedPrefs = context.getSharedPreferences(APP_SHARED_PREFS, Activity.MODE_PRIVATE);
-        c = context;
-        _sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public AppPref(Context ctx) {
+        this.ctx = ctx;
+        _sharedPrefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         editor = _sharedPrefs.edit();
     }
 
@@ -136,7 +135,7 @@ public class AppPref {
     }
 
     public synchronized String getDeviceId() {
-        String id = Secure.getString(c.getContentResolver(), Secure.ANDROID_ID);
+        String id = Secure.getString(ctx.getContentResolver(), Secure.ANDROID_ID);
         if (id != null) {
             setDeviceId(id);
             return id;

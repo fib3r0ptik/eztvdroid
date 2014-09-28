@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="entries_list_autosend_type">
-        <item>HD only</item>
-        <item>Low Quality only</item>
-        <item>Both HD and Low Quality</item>
+        <item>HD Only</item>
+        <item>Priority HD, then LQ</item>
+        <item>Low Quality Only</item>
     </string-array>
     <string-array name="entries_list_autosend_type_values">
         <item>0</item>

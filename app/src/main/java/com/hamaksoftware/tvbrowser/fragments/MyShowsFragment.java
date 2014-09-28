@@ -2,11 +2,13 @@ package com.hamaksoftware.tvbrowser.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,8 @@ import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.MyShowAdapter;
 import com.hamaksoftware.tvbrowser.asynctasks.GetMyShows;
+import com.hamaksoftware.tvbrowser.asynctasks.GetUnSeenShows;
+import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
 import com.hamaksoftware.tvbrowser.asynctasks.UnSubscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
@@ -26,7 +30,9 @@ import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
+import info.besiera.api.models.Episode;
 import info.besiera.api.models.Subscription;
 
 public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
@@ -41,7 +47,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Subscription subscription = adapter.subscriptions.get(position);
 
-            final CharSequence[] items = {getString(R.string.dialog_open),getString(R.string.dialog_copy),
+            final CharSequence[] items = {"Links", getString(R.string.dialog_copy),getString(R.string.dialog_send),
                     getString(R.string.dialog_unsubscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -49,7 +55,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
             builder.setItems(items, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
 
-                    if (items[item].equals(getString(R.string.dialog_open))) {
+                    if (items[item].equals(getString(R.string.dialog_send))) {
                         AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
                         final String[] _items = new String[2];
                         _items[0] = getString(R.string.dialog_getlink);
@@ -60,9 +66,45 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
                         linkbuilder.setItems(_items, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
-                                if(slinks[pos] == null){
+                                if (slinks[pos] == null || slinks[pos].isEmpty()) {
                                     base.showToast(getString(R.string.message_empty_link), Toast.LENGTH_LONG);
-                                }else{
+                                } else {
+                                    try {
+                                        Utility.getInstance(getActivity()).markDownload(subscription.getShow().getTitle(), subscription.getShow().getShowId());
+                                        Episode ep = new Episode();
+                                        ArrayList<String> links = new ArrayList<String>(0);
+                                        links.add(slinks[pos]);
+                                        ep.setLinks(links);
+                                        SendTorrent send = new SendTorrent(getActivity(), ep);
+                                        send.asyncTaskListener = MyShowsFragment.this;
+                                        send.execute();
+                                    } catch (ActivityNotFoundException e) {
+                                        Utility.showDialog(getActivity(), getString(R.string.dialog_title_info),
+                                                getString(R.string.unknown_handler), getString(R.string.dialog_button_ok),
+                                                getString(R.string.dialog_button_close), true, null);
+                                    }
+                                }
+                            }
+                        });
+
+                        AlertDialog linkalert = linkbuilder.create();
+                        linkalert.show();
+                    }
+
+                    if (items[item].equals("Links")) {
+                        AlertDialog.Builder linkbuilder = new AlertDialog.Builder(getActivity());
+                        final String[] _items = new String[2];
+                        _items[0] = getString(R.string.dialog_getlink);
+                        _items[1] = getString(R.string.dialog_gethdlink);
+                        final String[] slinks = new String[2];
+                        slinks[0] = subscription.getShow().getLink();
+                        slinks[1] = subscription.getShow().getHdlink();
+                        linkbuilder.setItems(_items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int pos) {
+                                if (slinks[pos] == null || slinks[pos].isEmpty()) {
+                                    base.showToast(getString(R.string.message_empty_link), Toast.LENGTH_LONG);
+                                } else {
                                     try {
                                         Utility.getInstance(getActivity()).markDownload(subscription.getShow().getTitle(), subscription.getShow().getShowId());
                                         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -92,9 +134,9 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
                         linkbuilder.setItems(_items, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
-                                if(slinks[pos] == null){
+                                if (slinks[pos] == null) {
                                     base.showToast(getString(R.string.message_empty_link), Toast.LENGTH_LONG);
-                                }else{
+                                } else {
                                     Utility.getInstance(getActivity()).copyTextToClipBoard(slinks[pos]);
                                     base.showToast(getString(R.string.message_copy_text_successful), Toast.LENGTH_LONG);
                                 }
@@ -125,7 +167,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
             alert.show();
         }
     };
-
+    private ProgressDialog progress;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -133,6 +175,13 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
         final View rootView = inflater.inflate(R.layout.my_shows, container, false);
         base = (Main) getActivity();
         base.toggleHintLayout(false);
+
+        progress = new ProgressDialog(getActivity());
+        progress.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
 
         lv = (PullToRefreshGridView) rootView.findViewById(R.id.myshow_grid);
         lv.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<GridView>() {
@@ -173,6 +222,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
+        if (progress != null) progress.dismiss();
         if (data != null) {
             if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
                 lv.onRefreshComplete();
@@ -184,6 +234,13 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
                 } else {
                     adapter.setSubscriptions((ArrayList<Subscription>) d);
                     adapter.notifyDataSetChanged();
+                    try {
+                        GetUnSeenShows unSeenShows = new GetUnSeenShows(getActivity());
+                        unSeenShows.asyncTaskListener = this;
+                        unSeenShows.execute();
+                    }catch (Exception e){
+                        Log.e("async:unseen",e.getMessage());
+                    }
                 }
             }
 
@@ -196,6 +253,20 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
                 async.execute();
             }
 
+            if (ASYNC_ID.equalsIgnoreCase(GetUnSeenShows.ASYNC_ID)) {
+                if (data != null) {
+                    List<Subscription> unseen = (List<Subscription>) data;
+                    adapter.unseen = unseen;
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
+                Boolean success = (Boolean) data;
+                if(success){
+                    base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
+                }
+            }
 
         }
 
@@ -225,7 +296,17 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
+        if(progress != null){
+            if(ASYNC_ID.equalsIgnoreCase(GetUnSeenShows.ASYNC_ID)){
+                progress.setMessage("Checking for new Episodes...");
+            }
 
+            if(ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)){
+                progress.setMessage(getString(R.string.loader_working));
+            }
+
+            progress.show();
+        }
     }
 
     @Override
@@ -243,16 +324,17 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
     }
 
     @Override
-    public void onTaskError(final Exception e, String ASYNC_ID) {
-        if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
-            base.runOnUiThread(new Runnable() {
-                public void run() {
+    public void onTaskError(final Exception e, final String ASYNC_ID) {
+        base.runOnUiThread(new Runnable() {
+            public void run() {
+                if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
                     APIRequestException ex = (APIRequestException) e;
                     Utility.showDialog(getActivity(), null, ex.getStatus().getDescription(), "Okay", null, false, null);
                     lv.onRefreshComplete();
+                    if (progress != null) progress.dismiss();
                 }
-            });
-        }
+            }
+        });
 
     }
 

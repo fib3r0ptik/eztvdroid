@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.ShowAdapter;
@@ -22,22 +21,22 @@ import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
+
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Show;
 
 public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
-
+    private ProgressDialog progress;
     protected PullToRefreshGridView lv;
     public ShowAdapter adapter;
     protected Main base;
 
 
-    public boolean force;
+    private boolean force;
 
 
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
@@ -80,7 +79,12 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         lv = (PullToRefreshGridView) rootView.findViewById(R.id.myshow_grid);
         lv.getRefreshableView().setOnItemClickListener(itemClick);
 
-
+        progress = new ProgressDialog(getActivity());
+        progress.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
         //View empty = inflater.inflate(R.layout.latest_empty, container, false);
         //lv.getRefreshableView().setEmptyView(empty);
 
@@ -121,8 +125,9 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        //fragmentListener.onFragmentViewCreated();
-        onActivityDrawerClosed();
+        if(force || adapter.shows.size() <= 0) {
+            onActivityDrawerClosed();
+        }
     }
 
     @Override
@@ -142,6 +147,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
         }
 
+        if(progress != null) progress.dismiss();
     }
 
     @Override
@@ -164,12 +170,15 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
         GetShows async = new GetShows(getActivity());
         async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
         async.execute();
+        force = false;
     }
 
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
-        base.showToast(getString(R.string.loader_working),Toast.LENGTH_SHORT);
+        //base.showToast(getString(R.string.loader_working),Toast.LENGTH_SHORT);
+        progress.setMessage(getString(R.string.loader_working));
+        progress.show();
     }
 
     @Override
@@ -199,6 +208,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
                 }
             });
         }
+        if(progress != null) progress.dismiss();
     }
 
 }

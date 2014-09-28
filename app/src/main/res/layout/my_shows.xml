@@ -14,9 +14,9 @@
         android:layout_marginTop="5dp"
         android:numColumns="3"
         android:id="@+id/myshow_grid"
-        android:background="@color/background_holo_light"
         ptr:ptrRefreshLabel="@string/loader_working"
         ptr:ptrAnimationStyle="flip"
+        android:scrollbars="none"
 
         />
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Episode;
 
@@ -75,7 +77,11 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int pos) {
                                 try {
-                                    //Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                                    try {
+                                        Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
+                                    }catch (NumberFormatException e){
+                                        Log.e("markdownload",e.getMessage());
+                                    }
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
                                     startActivity(i);
@@ -96,7 +102,11 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                         if (base.pref.getClientName().length() < 2) {
                             base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
                         } else {
-                            //Utility.getInstance(getActivity()).markDownload(row.title, row.showId);
+                            try {
+                                Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
+                            }catch (NumberFormatException e){
+                                Log.e("markdownload",e.getMessage());
+                            }
                             SendTorrent send = new SendTorrent(getActivity(), row);
                             send.asyncTaskListener = SearchFragment.this;
                             send.execute();
@@ -143,6 +153,11 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
         if (dialog == null) dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
         dialog.setMessage(getString(R.string.loader_searching));
+        dialog.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
 
         lv = (PullToRefreshListView) rootView.findViewById(R.id.latest_list_feed);
         lv.getRefreshableView().setOnItemClickListener(itemClick);

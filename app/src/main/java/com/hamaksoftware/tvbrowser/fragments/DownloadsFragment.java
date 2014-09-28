@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,13 +34,39 @@ import java.util.ArrayList;
 public class DownloadsFragment extends Fragment implements IAsyncTaskListener {
 
 
-    protected ListView lv;
-    public DownloadAdapter adapter;
-    protected Main base;
-    AppPref pref;
     final Handler handler = new Handler();
-
-
+    public DownloadAdapter adapter;
+    protected ListView lv;
+    protected Main base;
+    private AppPref pref;
+    private ViewFilter viewFilter = ViewFilter.ALL;
+    View.OnClickListener chkboxOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            resetCheckboxes();
+            CheckBox chk = (CheckBox) view;
+            chk.setChecked(true);
+            if (chk.getText().toString().equalsIgnoreCase(getString(R.string.chk_download_running))) {
+                viewFilter = ViewFilter.RUNNING;
+            } else if (chk.getText().toString().equalsIgnoreCase(getString(R.string.chk_download_completed))) {
+                viewFilter = ViewFilter.COMPLETED;
+            } else {
+                viewFilter = ViewFilter.ALL;
+            }
+        }
+    };
+    private CheckBox downloadRunning;
+    private CheckBox downloadCompleted;
+    private CheckBox downloadAll;
+    private Runnable autoRun = new Runnable() {
+        public void run() {
+            GetTorrents async = new GetTorrents(getActivity(), viewFilter);
+            async.asyncTaskListener = DownloadsFragment.this;
+            async.execute();
+            //int ref = pref.getRefreshInterval();
+            handler.postDelayed(this, 1 * 1000);
+        }
+    };
     AdapterView.OnItemClickListener itemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -95,17 +122,13 @@ public class DownloadsFragment extends Fragment implements IAsyncTaskListener {
         }
     };
 
-
-    private Runnable autoRun = new Runnable() {
-        public void run() {
-            GetTorrents async = new GetTorrents(getActivity(), ViewFilter.ALL);
-            async.asyncTaskListener = DownloadsFragment.this;
-            async.execute();
-            //int ref = pref.getRefreshInterval();
-            handler.postDelayed(this, 1 * 1000);
+    private void resetCheckboxes() {
+        if (downloadAll != null && downloadCompleted != null && downloadRunning != null) {
+            downloadAll.setChecked(false);
+            downloadRunning.setChecked(false);
+            downloadCompleted.setChecked(false);
         }
-    };
-
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,6 +139,16 @@ public class DownloadsFragment extends Fragment implements IAsyncTaskListener {
         if (pref == null) {
             pref = new AppPref(getActivity());
         }
+
+
+        downloadRunning = (CheckBox) rootView.findViewById(R.id.download_running);
+        downloadCompleted = (CheckBox) rootView.findViewById(R.id.download_completed);
+        downloadAll = (CheckBox) rootView.findViewById(R.id.download_all);
+
+        downloadRunning.setOnClickListener(chkboxOnClick);
+        downloadCompleted.setOnClickListener(chkboxOnClick);
+        downloadAll.setOnClickListener(chkboxOnClick);
+
 
         final ActionBar actionBar = base.getActionBar();
         actionBar.setDisplayShowTitleEnabled(true);

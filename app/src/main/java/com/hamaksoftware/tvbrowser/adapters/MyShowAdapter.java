@@ -18,6 +18,7 @@ import info.besiera.api.models.Subscription;
 public class MyShowAdapter extends BaseAdapter {
     public Context ctx;
     public List<Subscription> subscriptions;
+    public List<Subscription> unseen;
 
 
     private class ViewHolder {
@@ -26,6 +27,15 @@ public class MyShowAdapter extends BaseAdapter {
         TextView title;
     }
 
+    private boolean isUnseen(int showId){
+        if(unseen == null) return false;
+        for(Subscription s: unseen){
+            if(s.getShow().getShowId() == showId){
+                return true;
+            }
+        }
+        return false;
+    }
     public MyShowAdapter(Context context) {
         this.ctx = context;
     }
@@ -70,7 +80,7 @@ public class MyShowAdapter extends BaseAdapter {
                 .resize(250,250).smart().toUrl();
         holder.title.setText(subscription.getShow().getTitle());
         ImageLoader.getInstance().displayImage(url, holder.img);
-        holder.txt.setVisibility(subscription.getShow().getLink() != null || subscription.getShow().getHdlink() != null ? View.VISIBLE:View.GONE);
+        holder.txt.setVisibility(isUnseen(subscription.getShow().getShowId())?View.VISIBLE:View.GONE);
         return convertView;
     }
 }

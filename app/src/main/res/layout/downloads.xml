@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ListView
+        android:layout_above="@+id/bottom_bar"
         android:id="@+id/ldownloads_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -17,5 +18,35 @@
         android:background="@color/background_holo_light">
 
     </ListView>
-
-</LinearLayout>
+    <LinearLayout
+        android:gravity="center_horizontal|center_vertical"
+        android:background="@drawable/shape_queued"
+        android:padding="5dp"
+        android:orientation="horizontal"
+        android:id="@+id/bottom_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <CheckBox
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_marginRight="10dp"
+            android:id="@+id/download_running"
+            android:text="@string/chk_download_running"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <CheckBox
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_marginRight="10dp"
+            android:id="@+id/download_completed"
+            android:text="@string/chk_download_completed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <CheckBox
+            android:checked="true"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_marginRight="10dp"
+            android:id="@+id/download_all"
+            android:text="@string/chk_download_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+</RelativeLayout>

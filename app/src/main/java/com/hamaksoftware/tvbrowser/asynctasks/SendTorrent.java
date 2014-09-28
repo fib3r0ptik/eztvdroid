@@ -25,6 +25,7 @@ public class SendTorrent extends AsyncTask<Void, Void, Boolean> {
         pref = new AppPref(ctx);
     }
 
+
     @Override
     protected void onPreExecute() {
         asyncTaskListener.onTaskWorking(ASYNC_ID);

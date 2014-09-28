@@ -24,9 +24,13 @@ public class PrefFragment extends PreferenceFragment implements IAsyncTaskListen
                         pref.getClientPort() > 0 && !pref.getClientUsername().equals("") && !pref.getClientPassword().equals("");
 
                 if (canVerify) {
-                    VerifyClient verify = new VerifyClient(getActivity());
-                    verify.asyncTaskListener = PrefFragment.this;
-                    verify.execute();
+                    try {
+                        VerifyClient verify = new VerifyClient(getActivity());
+                        verify.asyncTaskListener = PrefFragment.this;
+                        verify.execute();
+                    }catch (Exception e){
+                        base.showToast("Cannot verify at this time.",Toast.LENGTH_SHORT);
+                    }
                 }
             }
         }

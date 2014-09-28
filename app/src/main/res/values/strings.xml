@@ -170,4 +170,7 @@
     <string name="message_subscription_failure">Failed to subscribe.</string>
     <string name="message_unsubscribe_successful">Successfully Unsubscribed.</string>
     <string name="message_unsubscribe_failure">Failed to Unsubscribe.</string>
+    <string name="chk_download_running">Running</string>
+    <string name="chk_download_completed">Completed</string>
+    <string name="chk_download_all">View All</string>
 </resources>

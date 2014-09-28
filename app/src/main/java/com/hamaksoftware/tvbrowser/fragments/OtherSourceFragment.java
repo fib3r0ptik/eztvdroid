@@ -25,6 +25,7 @@ import com.hamaksoftware.tvbrowser.utils.Utility;
 
 import java.util.ArrayList;
 
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.models.Episode;
 
 public class OtherSourceFragment extends Fragment implements IAsyncTaskListener {
@@ -89,12 +90,14 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
                             base.showToast("Set up a profile for a torrent client in the settings first.", Toast.LENGTH_LONG);
                         } else {
 
-                            //Episode ep = new Episode();
-                            //ep.links.add(row.altLInk == null || row.altLInk.equals("") ? row.itemlink : row.altLInk);
-                            //ep.links.add(row.altLInk);
-                            //SendTorrent send = new SendTorrent(getActivity(), ep);
-                            //send.asyncTaskListener = OtherSourceFragment.this;
-                            //send.execute();
+                            Episode ep = new Episode();
+                            ArrayList<String> links = new ArrayList<String>(0);
+                            links.add(row.altLInk == null || row.altLInk.equals("") ? row.itemlink : row.altLInk);
+                            links.add(row.altLInk);
+                            ep.setLinks(links);
+                            SendTorrent send = new SendTorrent(getActivity(), ep);
+                            send.asyncTaskListener = OtherSourceFragment.this;
+                            send.execute();
 
                         }
                     }
@@ -119,6 +122,11 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
 
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
+        dialog.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
 
         if (adapter == null) {
             adapter = new RSSAdapter(getActivity());

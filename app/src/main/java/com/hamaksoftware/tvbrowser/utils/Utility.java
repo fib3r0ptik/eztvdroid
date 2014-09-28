@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.hamaksoftware.tvbrowser.R;
+import com.hamaksoftware.tvbrowser.asynctasks.MarkDownload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -242,7 +243,7 @@ public class Utility {
     }
 
     public void markDownload(String title, int showId) {
-        //new MarkDownload(ctx, title, showId).execute();
+        new MarkDownload(ctx, title, showId).execute();
     }
 
     public String doPostRequest(ArrayList<NameValuePair> params) {
@@ -257,7 +258,6 @@ public class Utility {
 
             post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-            //new String(MessageDigest.getInstance("MD5").digest((getAppVersion()+SENDER_ID).getBytes("UTF-8")));
 
             HttpResponse response = httpclient.execute(post);
             InputStream is = response.getEntity().getContent();
@@ -376,7 +376,7 @@ public class Utility {
                         pref.setClientName(profile.getName());
                         pref.setClientIPAddress(profile.getHost());
                         pref.setClientPort(profile.getPort() + "");
-                        pref.setAuth(profile.getUseAuth() == "1");
+                        pref.setAuth(profile.getUseAuth().equalsIgnoreCase("1"));
                         pref.setClientUsername(profile.getUserName());
                         pref.setClientPassword(profile.getPassword());
                     }

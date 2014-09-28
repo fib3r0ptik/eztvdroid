@@ -2,6 +2,7 @@ package com.hamaksoftware.tvbrowser.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+
 import android.widget.Toast;
 
 import com.hamaksoftware.tvbrowser.R;
@@ -24,16 +26,16 @@ import com.hamaksoftware.tvbrowser.asynctasks.Subscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Episode;
 
 public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
-    //private ProgressDialog dialog;
+    private ProgressDialog progress;
     public boolean force;
     protected PullToRefreshListView lv;
     protected EpisodeAdapter adapter;
@@ -170,12 +172,12 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
         lv.getRefreshableView().setFooterDividersEnabled(true);
         lv.getRefreshableView().addFooterView(footer);
 
-
-        //dialog = new ProgressDialog(getActivity());
-        //dialog.setIndeterminate(true);
-
-        //View empty = inflater.inflate(R.layout.latest_empty,container,false);
-        //lv.setEmptyView(empty);
+        progress = new ProgressDialog(getActivity());
+        progress.setIndeterminateDrawable(new CircularProgressDrawable
+                .Builder(getActivity())
+                .colors(getResources().getIntArray(R.array.gplus_colors))
+                .sweepSpeed(1f)
+                .style(CircularProgressDrawable.Style.NORMAL).build());
 
         if (adapter == null) {
             adapter = new EpisodeAdapter(getActivity(), new ArrayList<Episode>(0));
@@ -190,6 +192,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
                 lv.setRefreshing();
                 force = true;
                 onActivityDrawerClosed();
+                base.currentPage = 0;
             }
         });
 
@@ -224,14 +227,6 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        /*
-        int count = new Select().from(Show.class).count();
-        if(count <= 0) {
-            GetShows getShows = new GetShows(getActivity(), true);
-            getShows.asyncTaskListener = this;
-            getShows.execute();
-        }
-        */
         if (force || adapter.listings.size() <= 0) {
             adapter.listings.clear();
             onActivityDrawerClosed();
@@ -240,10 +235,12 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
+        if(data == null) return;
         if (this.isAdded()) {
             if (ASYNC_ID.equalsIgnoreCase(GetLatestShow.ASYNC_ID)) {
                 lv.onRefreshComplete();
                 List<Episode> d = (List<Episode>) data;
+                if(base.currentPage == 0) adapter.listings.clear();
                 adapter.listings.addAll(d);
                 adapter.notifyDataSetChanged();
                 footer.setVisibility(View.VISIBLE);
@@ -263,8 +260,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
             }
 
 
-            //if (dialog.isShowing()) dialog.dismiss();
-            //force = false;
+            if(progress != null) progress.dismiss();
         }
     }
 
@@ -275,13 +271,14 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
         base.invalidateOptionsMenu();
         //base.setTitle(getString(R.string.app_name));
         base.toggleHintLayout(true);
+        base.currentPage = 0;
     }
 
 
     public void onActivityDrawerClosed() {
         if (lv.isRefreshing()) base.currentPage = 0;
         GetLatestShow async = new GetLatestShow(getActivity(), base.currentPage++);
-        async.asyncTaskListener = this; //set this class as observer to listen to asynctask events
+        async.asyncTaskListener = this;
         async.execute();
     }
 
@@ -289,7 +286,8 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
     @Override
     public void onTaskWorking(String ASYNC_ID) {
         if (!lv.isRefreshing()) {
-            base.showToast(getString(R.string.loader_working), Toast.LENGTH_SHORT);
+            progress.setMessage(getString(R.string.loader_working));
+            progress.show();
         }
 
     }
@@ -316,9 +314,14 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
     public void onTaskError(final Exception e, String ASYNC_ID) {
         base.runOnUiThread(new Runnable() {
             public void run() {
-                APIRequestException ex = (APIRequestException) e;
-                Utility.showDialog(getActivity(), null, ex.getStatus().toString(), "Okay", null, false, null);
+                try {
+                    APIRequestException ex = (APIRequestException) e;
+                    Utility.showDialog(getActivity(), null, ex.getStatus().getDescription(), "Okay", null, false, null);
+                }catch (Exception ee){
+                    base.showToast("Error while performing the request",Toast.LENGTH_SHORT);
+                }
                 lv.onRefreshComplete();
+                if(progress != null) progress.dismiss();
             }
         });
 

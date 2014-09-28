@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <!--LinearLayout
             android:id="@+id/hints"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                 android:textSize="15dp" />
 
 
-        </LinearLayout>
+        </LinearLayout-->
     </FrameLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat

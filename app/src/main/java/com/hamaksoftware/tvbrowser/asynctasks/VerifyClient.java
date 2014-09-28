@@ -13,14 +13,12 @@ import info.besiera.api.models.Episode;
 
 public class VerifyClient extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "VERIFYCLIENT";
-    private Episode item;
     private Context ctx;
     private AppPref pref;
     public IAsyncTaskListener asyncTaskListener;
 
 
     public VerifyClient(Context ctx) {
-        this.item = item;
         this.ctx = ctx;
         pref = new AppPref(ctx);
     }
