@@ -4,25 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
-import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
-import com.hamaksoftware.tvbrowser.utils.AppPref;
-import com.hamaksoftware.tvbrowser.utils.Utility;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
@@ -33,7 +20,9 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
     private Context ctx;
     public IAsyncTaskListener asyncTaskListener;
 
-    public GetShows(Context ctx) {this.ctx = ctx;}
+    public GetShows(Context ctx) {
+        this.ctx = ctx;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -47,8 +36,8 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
             int cacheSize = 15 * 1024 * 1024; // 10 MiB
             try {
                 apiRequest.setClientCacheInfo(cacheSize, ctx.getCacheDir().getAbsolutePath());
-            }catch (IOException e){
-                Log.e("api","Unable to set Cache Information for API Request.");
+            } catch (IOException e) {
+                Log.e("api", "Unable to set Cache Information for API Request.");
             }
 
             ArrayList<Show> shows = new ArrayList<Show>(apiRequest.getShows());
@@ -59,8 +48,8 @@ public class GetShows extends AsyncTask<Void, Void, ArrayList<Show>> {
                 }
             });
             return shows;
-        }catch (APIRequestException e){
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+        } catch (APIRequestException e) {
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
         return null;
     }

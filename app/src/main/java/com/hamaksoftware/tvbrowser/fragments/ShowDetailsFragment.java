@@ -212,7 +212,6 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
     }
 
     public void onActivityDrawerClosed() {
-
         GetShowDetails details = new GetShowDetails(showId);
         details.asyncTaskListener = this;
         details.execute();
@@ -228,19 +227,22 @@ public class ShowDetailsFragment extends Fragment implements IAsyncTaskListener 
         if (lv.isRefreshing()) lv.onRefreshComplete();
         if (ASYNC_ID.equalsIgnoreCase(GetShowDetails.ASYNC_ID)) {
             Show show = (Show) data;
-            base.setTitle(show.getTitle());
-            Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
-            String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + show.getShowId() + ".jpg")
-                    .resize(500, 500)
-                    .smart()
-                    .toUrl();
+            if (show instanceof Show) {
+                base.setTitle(show.getTitle());
+                Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
+                String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + show.getShowId() + ".jpg")
+                        .resize(500, 500)
+                        .smart()
+                        .toUrl();
 
-            System.out.println(url);
-            ImageLoader.getInstance().displayImage(url, poster);
-            GetShowSubscription getShowSubscription = new GetShowSubscription(getActivity(), show.getShowId());
-            getShowSubscription.asyncTaskListener = this;
-            getShowSubscription.execute();
-
+                System.out.println(url);
+                ImageLoader.getInstance().displayImage(url, poster);
+                GetShowSubscription getShowSubscription = new GetShowSubscription(getActivity(), show.getShowId());
+                getShowSubscription.asyncTaskListener = this;
+                getShowSubscription.execute();
+            } else {
+                base.showToast("Failed to get Show Detailed Information.", Toast.LENGTH_SHORT);
+            }
         }
 
         if (ASYNC_ID.equalsIgnoreCase(GetShowSubscription.ASYNC_ID)) {

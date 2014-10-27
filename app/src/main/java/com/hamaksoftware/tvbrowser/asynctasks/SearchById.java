@@ -27,10 +27,10 @@ public class SearchById extends AsyncTask<Void, Void, List<Episode>> {
 
     @Override
     protected List<Episode> doInBackground(Void... voids) {
-        try{
+        try {
             APIRequest apiRequest = new APIRequest();
             return apiRequest.searchById(showId);
-        }catch (APIRequestException e){
+        } catch (APIRequestException e) {
             asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
         return null;

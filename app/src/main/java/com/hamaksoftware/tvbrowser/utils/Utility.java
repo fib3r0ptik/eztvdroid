@@ -23,7 +23,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -56,7 +55,6 @@ import javax.xml.xpath.XPathFactory;
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Profile;
-import info.besiera.api.models.ResponseTemplate;
 
 public class Utility {
     public static final String EXTRA_MESSAGE = "message";
@@ -166,6 +164,8 @@ public class Utility {
     }
 
     public static String getURL(String feed) {
+
+        if (feed == null) return null;
 
         if (ctx.getString(R.string.subcat_sources_eztvrss).equalsIgnoreCase(feed)) {
             return "http://www.ezrss.it/feed/";
@@ -431,9 +431,9 @@ public class Utility {
                     apiRequest.unRegisterDevice(pref.getDeviceId());
                     pref.setDeviceRegId("");
                 } catch (IOException ex) {
-                    Log.e("gcm",ex.getMessage());
+                    Log.e("gcm", ex.getMessage());
                 } catch (APIRequestException e) {
-                    Log.e("api",e.getStatus().toString());
+                    Log.e("api", e.getStatus().toString());
                 }
                 return null;
             }

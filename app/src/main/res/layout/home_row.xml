@@ -18,8 +18,7 @@
             android:layout_weight="0"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical"
-            android:visibility="gone">
-        </LinearLayout>
+            android:visibility="gone"></LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"

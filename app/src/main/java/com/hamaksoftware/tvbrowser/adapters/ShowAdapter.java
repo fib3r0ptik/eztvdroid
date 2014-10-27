@@ -113,8 +113,8 @@ public class ShowAdapter extends BaseAdapter implements Filterable {
         holder.title.setText(entry.getTitle());
         //String url = "http://hamaksoftware.com/myeztv/api-beta.php?method=t&id=" + entry.getShowId();
         Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
-                String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + entry.getShowId() + ".jpg")
-                .resize(250,250).smart().toUrl();
+        String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + entry.getShowId() + ".jpg")
+                .resize(250, 250).smart().toUrl();
 
         ImageLoader.getInstance().displayImage(url, holder.img);
 

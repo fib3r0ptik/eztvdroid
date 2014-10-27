@@ -47,7 +47,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Subscription subscription = adapter.subscriptions.get(position);
 
-            final CharSequence[] items = {"Links", getString(R.string.dialog_copy),getString(R.string.dialog_send),
+            final CharSequence[] items = {"Links", getString(R.string.dialog_copy), getString(R.string.dialog_send),
                     getString(R.string.dialog_unsubscribe), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -238,8 +238,8 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
                         GetUnSeenShows unSeenShows = new GetUnSeenShows(getActivity());
                         unSeenShows.asyncTaskListener = this;
                         unSeenShows.execute();
-                    }catch (Exception e){
-                        Log.e("async:unseen",e.getMessage());
+                    } catch (Exception e) {
+                        Log.e("async:unseen", e.getMessage());
                     }
                 }
             }
@@ -263,7 +263,7 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
             if (ASYNC_ID.equalsIgnoreCase(SendTorrent.ASYNC_ID)) {
                 Boolean success = (Boolean) data;
-                if(success){
+                if (success) {
                     base.showToast(success ? "Torrent sent successfully." : "Warning: Failed to send torrent.", Toast.LENGTH_LONG);
                 }
             }
@@ -296,12 +296,12 @@ public class MyShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskWorking(String ASYNC_ID) {
-        if(progress != null){
-            if(ASYNC_ID.equalsIgnoreCase(GetUnSeenShows.ASYNC_ID)){
+        if (progress != null) {
+            if (ASYNC_ID.equalsIgnoreCase(GetUnSeenShows.ASYNC_ID)) {
                 progress.setMessage("Checking for new Episodes...");
             }
 
-            if(ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)){
+            if (ASYNC_ID.equalsIgnoreCase(GetMyShows.ASYNC_ID)) {
                 progress.setMessage(getString(R.string.loader_working));
             }
 

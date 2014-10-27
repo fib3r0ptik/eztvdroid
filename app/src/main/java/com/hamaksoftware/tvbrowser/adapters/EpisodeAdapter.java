@@ -12,11 +12,9 @@ import android.widget.TextView;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 
-
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import info.besiera.api.models.Episode;
@@ -75,7 +73,7 @@ public class EpisodeAdapter extends BaseAdapter {
         if (position % 2 == 0) {
             holder.rowHolder.setBackgroundColor(Color.WHITE);
         } else {
-            holder.rowHolder.setBackgroundColor(Color.rgb(227,242,249));
+            holder.rowHolder.setBackgroundColor(Color.rgb(227, 242, 249));
         }
 
         /*row.title = item.getString("title");
@@ -88,7 +86,7 @@ public class EpisodeAdapter extends BaseAdapter {
         PrettyTime p = new PrettyTime();
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(entry.getPubdate());
-        String extInfo =  Utility.getFancySize(entry.getSize()) + " - " + p.format(cal.getTime());
+        String extInfo = Utility.getFancySize(entry.getSize()) + " - " + p.format(cal.getTime());
 
         holder.title.setText(entry.getTitle());
         holder.extended_info.setText(extInfo);

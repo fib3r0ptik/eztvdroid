@@ -17,7 +17,7 @@ public class GetShowSubscription extends AsyncTask<Void, Void, Show> {
     private int showId;
     private AppPref pref;
 
-    public GetShowSubscription(Context ctx,int showId) {
+    public GetShowSubscription(Context ctx, int showId) {
         pref = new AppPref(ctx);
         this.showId = showId;
     }
@@ -33,7 +33,7 @@ public class GetShowSubscription extends AsyncTask<Void, Void, Show> {
         try {
             return apiRequest.isSubsribed(pref.getDeviceId(), showId);
         } catch (APIRequestException e) {
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 
         return null;

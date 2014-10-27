@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.adapters.DrawerGroupAdapter;
 import com.hamaksoftware.tvbrowser.fragments.DownloadsFragment;
@@ -153,7 +152,7 @@ public class Main extends Activity {
             public void onGroupCollapse(int i) {
                 LinearLayout parent = (LinearLayout) mDrawerList.getChildAt(i + 1);
                 ImageView expand = (ImageView) parent.findViewById(R.id.drawer_collapse);
-                if(expand != null) expand.setImageResource(R.drawable.ic_action_expand);
+                if (expand != null) expand.setImageResource(R.drawable.ic_action_expand);
             }
         });
 
@@ -162,7 +161,7 @@ public class Main extends Activity {
             public void onGroupExpand(int i) {
                 LinearLayout parent = (LinearLayout) mDrawerList.getChildAt(i + 1);
                 ImageView collapse = (ImageView) parent.findViewById(R.id.drawer_collapse);
-                if(collapse != null) collapse.setImageResource(R.drawable.ic_action_collapse);
+                if (collapse != null) collapse.setImageResource(R.drawable.ic_action_collapse);
             }
         });
 
@@ -281,7 +280,7 @@ public class Main extends Activity {
                     showFragment = new ShowsFragment();
                     showFragment.setArguments(params);
                 } else {
-                    showFragment.getArguments().putBoolean("force",true);
+                    showFragment.getArguments().putBoolean("force", true);
                 }
                 transaction.replace(R.id.content_frame, showFragment, getString(R.string.fragment_tag_shows));
                 setTitle("TV Shows");
@@ -303,7 +302,7 @@ public class Main extends Activity {
                     detail = new ShowDetailsFragment();
                     detail.setArguments(params);
                 } else {
-                    detail.getArguments().putInt("show_id",params.getInt("show_id"));
+                    detail.getArguments().putInt("show_id", params.getInt("show_id"));
                 }
 
                 transaction.replace(R.id.content_frame, detail, getString(R.string.fragment_tag_show_detail));

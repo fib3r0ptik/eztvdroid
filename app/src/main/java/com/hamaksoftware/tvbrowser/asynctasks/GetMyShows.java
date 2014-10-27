@@ -13,7 +13,7 @@ import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Subscription;
 
-public class GetMyShows extends AsyncTask<Void, Void, List<Subscription>>{
+public class GetMyShows extends AsyncTask<Void, Void, List<Subscription>> {
     public AppPref pref;
     public static final String ASYNC_ID = "GETMYSHOWS";
     private int page;
@@ -37,7 +37,7 @@ public class GetMyShows extends AsyncTask<Void, Void, List<Subscription>>{
         try {
             return apiRequest.getMyShows(pref.getDeviceId());
         } catch (APIRequestException e) {
-            Log.e("api:getmyshows",e.getStatus().toString());
+            Log.e("api:getmyshows", e.getStatus().toString());
             asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 

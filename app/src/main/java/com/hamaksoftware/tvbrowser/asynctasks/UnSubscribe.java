@@ -9,7 +9,6 @@ import com.hamaksoftware.tvbrowser.utils.AppPref;
 
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
-import info.besiera.api.models.ResponseTemplate;
 
 public class UnSubscribe extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "UNSUBSCRIBE";
@@ -35,7 +34,7 @@ public class UnSubscribe extends AsyncTask<Void, Void, Boolean> {
         try {
             return apiRequest.unSubscribe(pref.getDeviceId(), showId);
         } catch (APIRequestException e) {
-            Log.e("err",e.getStatus().toString());
+            Log.e("err", e.getStatus().toString());
         }
 
         return null;

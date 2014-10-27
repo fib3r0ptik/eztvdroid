@@ -3,6 +3,7 @@ package com.hamaksoftware.tvbrowser.asynctasks;
 import android.os.AsyncTask;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
+
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Show;
@@ -27,10 +28,10 @@ public class GetShowDetails extends AsyncTask<Void, Void, Show> {
     protected Show doInBackground(Void... voids) {
         try {
             APIRequest apiRequest = new APIRequest();
-            Show show =  apiRequest.getShow(showId);
+            Show show = apiRequest.getShow(showId);
             return show;
         } catch (APIRequestException e) {
-            asyncTaskListener.onTaskError(e,ASYNC_ID);
+            asyncTaskListener.onTaskError(e, ASYNC_ID);
         }
 
         return null;

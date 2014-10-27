@@ -5,11 +5,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
-import com.hamaksoftware.tvbrowser.utils.AppPref;
 
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
-import info.besiera.api.models.ResponseTemplate;
 
 public class RegisterDevice extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "REGISTERDEVICE";
@@ -35,7 +33,7 @@ public class RegisterDevice extends AsyncTask<Void, Void, Boolean> {
         try {
             return apiRequest.registerDevice(deviceId, registrationId);
         } catch (APIRequestException e) {
-            Log.e("err",e.getStatus().toString());
+            Log.e("err", e.getStatus().toString());
         }
 
         return null;

@@ -1,7 +1,8 @@
 package com.hamaksoftware.tvbrowser.gcm;
 
 public class GCMResponseTemplate {
-    public GCMResponseTemplate(){}
+    public GCMResponseTemplate() {
+    }
 
     private GCMServerMessage message;
 

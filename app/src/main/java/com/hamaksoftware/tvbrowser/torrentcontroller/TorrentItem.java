@@ -156,7 +156,7 @@ public class TorrentItem {
 	 * public int compare(TorrentItem t) { return _percent - t._percent; }
 	 */
     /*
-	public int compareTo(TorrentItem t) {
+    public int compareTo(TorrentItem t) {
 		if(t.getOrder() == t._order) return 0;
 		return t.getOrder() - _order;
 		//return (t.getOrder() < _order?-1:1);

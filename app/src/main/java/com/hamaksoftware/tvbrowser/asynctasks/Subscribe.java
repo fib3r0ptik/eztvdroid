@@ -7,11 +7,8 @@ import android.util.Log;
 import com.hamaksoftware.tvbrowser.fragments.IAsyncTaskListener;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
-import java.util.List;
-
 import info.besiera.api.APIRequest;
 import info.besiera.api.APIRequestException;
-import info.besiera.api.models.Episode;
 import info.besiera.api.models.ResponseTemplate;
 
 public class Subscribe extends AsyncTask<Void, Void, Boolean> {
@@ -39,7 +36,7 @@ public class Subscribe extends AsyncTask<Void, Void, Boolean> {
             ResponseTemplate response = apiRequest.subscribe(pref.getDeviceId(), showId);
             return (response != null && response.isSuccess());
         } catch (APIRequestException e) {
-            Log.e("err",e.getStatus().toString());
+            Log.e("err", e.getStatus().toString());
         }
 
         return null;

@@ -142,7 +142,7 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
         return rootView;
     }
 
-    public void refreshView(){
+    public void refreshView() {
 
     }
 
@@ -235,7 +235,9 @@ public class OtherSourceFragment extends Fragment implements IAsyncTaskListener 
     @Override
     public void onTaskError(Exception e, String ASYNC_ID) {
         // TODO Auto-generated method stub
-
+        if (dialog != null) {
+            if (dialog.isShowing()) dialog.dismiss();
+        }
     }
 
 }

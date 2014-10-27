@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.hamaksoftware.tvbrowser.R;
 import com.hamaksoftware.tvbrowser.activities.Main;
 import com.hamaksoftware.tvbrowser.adapters.EpisodeAdapter;
-import com.hamaksoftware.tvbrowser.asynctasks.SearchById;
 import com.hamaksoftware.tvbrowser.asynctasks.SearchByKeyword;
 import com.hamaksoftware.tvbrowser.asynctasks.SendTorrent;
 import com.hamaksoftware.tvbrowser.utils.Utility;
@@ -46,11 +45,11 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             int headerCount = 0;
 
-            if(lv != null){
+            if (lv != null) {
                 headerCount = lv.getRefreshableView().getHeaderViewsCount();
             }
 
-            final Episode row = adapter.listings.get(position-headerCount);
+            final Episode row = adapter.listings.get(position - headerCount);
             final CharSequence[] items = {getString(R.string.dialog_open), getString(R.string.dialog_send), getString(R.string.dialog_view)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -79,8 +78,8 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                                 try {
                                     try {
                                         Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
-                                    }catch (NumberFormatException e){
-                                        Log.e("markdownload",e.getMessage());
+                                    } catch (NumberFormatException e) {
+                                        Log.e("markdownload", e.getMessage());
                                     }
                                     Intent i = new Intent(Intent.ACTION_VIEW);
                                     i.setData(Uri.parse(links.get(pos)));
@@ -104,8 +103,8 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
                         } else {
                             try {
                                 Utility.getInstance(getActivity()).markDownload(row.getTitle(), Integer.parseInt(row.getShow_id()));
-                            }catch (NumberFormatException e){
-                                Log.e("markdownload",e.getMessage());
+                            } catch (NumberFormatException e) {
+                                Log.e("markdownload", e.getMessage());
                             }
                             SendTorrent send = new SendTorrent(getActivity(), row);
                             send.asyncTaskListener = SearchFragment.this;
@@ -249,16 +248,29 @@ public class SearchFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskError(final Exception e, String ASYNC_ID) {
-        final APIRequestException apiRequestException = (APIRequestException)e;
-        if(ASYNC_ID.equalsIgnoreCase(SearchByKeyword.ASYNC_ID)){
-            base.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    base.showToast("Error: " + apiRequestException.getStatus().toString(), Toast.LENGTH_SHORT);
-                    dialog.dismiss();
-                }
-            });
+        if (e instanceof APIRequestException) {
+            final APIRequestException apiRequestException = (APIRequestException) e;
+            if (ASYNC_ID.equalsIgnoreCase(SearchByKeyword.ASYNC_ID)) {
+                base.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        base.showToast("Error: " + apiRequestException.getStatus().toString(), Toast.LENGTH_SHORT);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        } else {
+            if (ASYNC_ID.equalsIgnoreCase(SearchByKeyword.ASYNC_ID)) {
+                base.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        base.showToast("Error: " + e.getMessage(), Toast.LENGTH_SHORT);
+                        dialog.dismiss();
+                    }
+                });
+            }
         }
+
     }
 
 }

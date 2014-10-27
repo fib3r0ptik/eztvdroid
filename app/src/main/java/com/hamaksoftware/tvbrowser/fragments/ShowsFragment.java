@@ -23,7 +23,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 
 import java.util.ArrayList;
 
-
 import fr.castorflex.android.circularprogressbar.CircularProgressDrawable;
 import info.besiera.api.APIRequestException;
 import info.besiera.api.models.Show;
@@ -57,7 +56,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
                     }
 
                     if (items[item].equals(getString(R.string.dialog_subscribe))) {
-                        Subscribe s = new Subscribe(getActivity(),show.getShowId());
+                        Subscribe s = new Subscribe(getActivity(), show.getShowId());
                         s.asyncTaskListener = ShowsFragment.this;
                         s.execute();
                     }
@@ -125,7 +124,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if(force || adapter.shows.size() <= 0) {
+        if (force || adapter.shows.size() <= 0) {
             onActivityDrawerClosed();
         }
     }
@@ -147,7 +146,7 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
         }
 
-        if(progress != null) progress.dismiss();
+        if (progress != null) progress.dismiss();
     }
 
     @Override
@@ -198,17 +197,17 @@ public class ShowsFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskError(final Exception e, String ASYNC_ID) {
-        if(ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)){
+        if (ASYNC_ID.equalsIgnoreCase(GetShows.ASYNC_ID)) {
             base.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    APIRequestException _e = (APIRequestException)e;
+                    APIRequestException _e = (APIRequestException) e;
                     Utility.showDialog(getActivity(), null, _e.getStatus().getDescription(), "Okay", null, false, null);
                     lv.onRefreshComplete();
                 }
             });
         }
-        if(progress != null) progress.dismiss();
+        if (progress != null) progress.dismiss();
     }
 
 }

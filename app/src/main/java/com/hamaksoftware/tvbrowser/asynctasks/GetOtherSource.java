@@ -26,7 +26,7 @@ public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>> {
 
     @Override
     protected void onPreExecute() {
-        asyncTaskListener.onTaskWorking(ASYNC_ID);
+        if (asyncTaskListener != null) asyncTaskListener.onTaskWorking(ASYNC_ID);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class GetOtherSource extends AsyncTask<Void, Void, ArrayList<RSSItem>> {
 
     @Override
     protected void onPostExecute(ArrayList<RSSItem> data) {
-        asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
+        if (asyncTaskListener != null) asyncTaskListener.onTaskCompleted(data, ASYNC_ID);
     }
 
 }

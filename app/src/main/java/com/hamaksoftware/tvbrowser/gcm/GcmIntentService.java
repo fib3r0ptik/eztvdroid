@@ -85,11 +85,11 @@ public class GcmIntentService extends IntentService implements IAsyncTaskListene
                             }
                         }
 
-                        if(filtered.size() > 0){
+                        if (filtered.size() > 0) {
                             List<Subscription> newShows = apiRequest.getUnseenSubscription(pref.getDeviceId());
-                            for(Subscription _s: newShows){
-                                for(Subscription f: filtered){
-                                    if(_s.getShow().getShowId() == f.getShow().getShowId()){
+                            for (Subscription _s : newShows) {
+                                for (Subscription f : filtered) {
+                                    if (_s.getShow().getShowId() == f.getShow().getShowId()) {
                                         _newShow.add(_s);
                                     }
                                 }
@@ -146,7 +146,7 @@ public class GcmIntentService extends IntentService implements IAsyncTaskListene
             if (pref.getAutoSend() && pref.getClientIPAddress().length() > 3 && link != null) {
                 Episode ep = new Episode();
                 ArrayList<String> _links = new ArrayList<String>(0);
-                _links.add(link.substring(0,2).equalsIgnoreCase("//")?"http:" + link:link);
+                _links.add(link.substring(0, 2).equalsIgnoreCase("//") ? "http:" + link : link);
                 ep.setLinks(_links);
                 SendTorrent sendTorrent = new SendTorrent(getApplicationContext(), ep);
                 sendTorrent.asyncTaskListener = this;

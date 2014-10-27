@@ -6,8 +6,7 @@
     android:orientation="vertical"
     android:textAlignment="center">
 
-    <com.handmark.pulltorefresh.library.PullToRefreshListView
-        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+    <com.handmark.pulltorefresh.library.PullToRefreshListView xmlns:ptr="http://schemas.android.com/apk/res-auto"
         android:id="@+id/latest_list_feed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,8 +20,7 @@
         android:focusable="true"
         android:footerDividersEnabled="false"
         ptr:ptrRefreshLabel="@string/loader_working"
-        ptr:ptrAnimationStyle="flip"
-        />
+        ptr:ptrAnimationStyle="flip" />
 
 
 </RelativeLayout>

@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-
 import android.widget.Toast;
 
 import com.hamaksoftware.tvbrowser.R;
@@ -26,6 +25,7 @@ import com.hamaksoftware.tvbrowser.asynctasks.Subscribe;
 import com.hamaksoftware.tvbrowser.utils.Utility;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,12 +235,12 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
 
     @Override
     public void onTaskCompleted(Object data, String ASYNC_ID) {
-        if(data == null) return;
+        if (data == null) return;
         if (this.isAdded()) {
             if (ASYNC_ID.equalsIgnoreCase(GetLatestShow.ASYNC_ID)) {
                 lv.onRefreshComplete();
                 List<Episode> d = (List<Episode>) data;
-                if(base.currentPage == 0) adapter.listings.clear();
+                if (base.currentPage == 0) adapter.listings.clear();
                 adapter.listings.addAll(d);
                 adapter.notifyDataSetChanged();
                 footer.setVisibility(View.VISIBLE);
@@ -260,7 +260,7 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
             }
 
 
-            if(progress != null) progress.dismiss();
+            if (progress != null) progress.dismiss();
         }
     }
 
@@ -317,11 +317,11 @@ public class LatestFragment extends Fragment implements IAsyncTaskListener {
                 try {
                     APIRequestException ex = (APIRequestException) e;
                     Utility.showDialog(getActivity(), null, ex.getStatus().getDescription(), "Okay", null, false, null);
-                }catch (Exception ee){
-                    base.showToast("Error while performing the request",Toast.LENGTH_SHORT);
+                } catch (Exception ee) {
+                    base.showToast("Error while performing the request", Toast.LENGTH_SHORT);
                 }
                 lv.onRefreshComplete();
-                if(progress != null) progress.dismiss();
+                if (progress != null) progress.dismiss();
             }
         });
 

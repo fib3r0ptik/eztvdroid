@@ -13,6 +13,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.pollexor.Thumbor;
 
 import java.util.List;
+
 import info.besiera.api.models.Subscription;
 
 public class MyShowAdapter extends BaseAdapter {
@@ -27,15 +28,16 @@ public class MyShowAdapter extends BaseAdapter {
         TextView title;
     }
 
-    private boolean isUnseen(int showId){
-        if(unseen == null) return false;
-        for(Subscription s: unseen){
-            if(s.getShow().getShowId() == showId){
+    private boolean isUnseen(int showId) {
+        if (unseen == null) return false;
+        for (Subscription s : unseen) {
+            if (s.getShow().getShowId() == showId) {
                 return true;
             }
         }
         return false;
     }
+
     public MyShowAdapter(Context context) {
         this.ctx = context;
     }
@@ -77,10 +79,10 @@ public class MyShowAdapter extends BaseAdapter {
         final Subscription subscription = subscriptions.get(position);
         Thumbor thumbor = Thumbor.create("http://besiera.info:8888/");
         String url = thumbor.buildImage("http://besiera.info/apibackend/tvimg/" + subscription.getShow().getShowId() + ".jpg")
-                .resize(250,250).smart().toUrl();
+                .resize(250, 250).smart().toUrl();
         holder.title.setText(subscription.getShow().getTitle());
         ImageLoader.getInstance().displayImage(url, holder.img);
-        holder.txt.setVisibility(isUnseen(subscription.getShow().getShowId())?View.VISIBLE:View.GONE);
+        holder.txt.setVisibility(isUnseen(subscription.getShow().getShowId()) ? View.VISIBLE : View.GONE);
         return convertView;
     }
 }

@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +40,7 @@ public class MarkDownload extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        if(title == null){
+        if (title == null) {
             try {
                 APIRequest apiRequest = new APIRequest();
                 apiRequest.markDownload(pref.getDeviceId(), showId, season, episode);
@@ -50,7 +49,7 @@ public class MarkDownload extends AsyncTask<Void, Void, Void> {
             } catch (Exception exx) {
                 Log.e("markdownload", exx.getMessage());
             }
-        }else {
+        } else {
             Pattern p = Pattern.compile("(.*?)S?(\\d{1,2})E?(\\d{2})(.*)", Pattern.DOTALL);
             Matcher matcher = p.matcher(title);
             String s = "";

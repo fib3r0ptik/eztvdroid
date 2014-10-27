@@ -9,8 +9,6 @@ import com.hamaksoftware.tvbrowser.torrentcontroller.TransmissionHandler;
 import com.hamaksoftware.tvbrowser.torrentcontroller.UtorrentHandler;
 import com.hamaksoftware.tvbrowser.utils.AppPref;
 
-import info.besiera.api.models.Episode;
-
 public class VerifyClient extends AsyncTask<Void, Void, Boolean> {
     public static final String ASYNC_ID = "VERIFYCLIENT";
     private Context ctx;
